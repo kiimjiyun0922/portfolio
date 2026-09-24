@@ -76,11 +76,8 @@ export default function Experience() {
       <p className="text-accent text-xs font-mono tracking-widest uppercase mb-2">Experience</p>
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-8 sm:mb-12">Work Experience</h2>
 
-      <div className="max-w-3xl mx-auto relative">
-        {/* Timeline line */}
-        <div className="absolute left-[7px] top-2 bottom-2 w-px bg-gray-800" />
-
-        <div className="space-y-10">
+      <div className="experience-ledger max-w-3xl mx-auto relative">
+        <div className="experience-list space-y-10">
           {resume.work.filter((w) => w.company).map((job, i) => (
             <motion.div
               key={i}
@@ -89,47 +86,46 @@ export default function Experience() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.05 }}
-              className="relative pl-6 sm:pl-8 transition-all duration-500"
+              className="experience-entry relative transition-all duration-500"
             >
-              {/* Dot */}
-              <div className={`absolute left-[0px] top-[7px] w-[13px] h-[13px] rounded-full border-2 ${
-                i === 0
-                  ? 'bg-accent border-accent'
-                  : 'bg-gray-950 border-accent/60'
-              }`} />
+              <span className="experience-entry__index">{String(i + 1).padStart(2, '0')}</span>
 
-              {/* Period */}
-              <p className="text-xs font-mono text-gray-500 mb-1">{job.period}</p>
+              <div className="experience-entry__identity">
+                {/* Period */}
+                <p className="text-xs font-mono text-gray-500 mb-1">{job.period}</p>
 
-              {/* Company & Title */}
-              <h3 className="text-base sm:text-lg md:text-xl font-bold text-white">{job.company}</h3>
-              <p className="text-sm text-accent font-medium mb-1">{job.title}</p>
+                {/* Company & Title */}
+                <h3 className="text-base sm:text-lg md:text-xl font-bold text-white">{job.company}</h3>
+                <p className="text-sm text-accent font-medium mb-1">{job.title}</p>
 
-              {/* Leave note */}
-              {job.leaveNote && (
-                <span className="inline-block text-[11px] font-mono text-gray-500 bg-gray-800 px-2 py-0.5 rounded mt-1 mb-2">
-                  {job.leaveNote}
-                </span>
-              )}
+                {/* Leave note */}
+                {job.leaveNote && (
+                  <span className="inline-block text-[11px] font-mono text-gray-500 bg-gray-800 px-2 py-0.5 rounded mt-1 mb-2">
+                    {job.leaveNote}
+                  </span>
+                )}
+              </div>
 
-              {/* Projects — always visible, no toggle */}
-              {job.projects?.length > 0 && (
-                <div className="mt-4 space-y-0 divide-y divide-gray-800/40">
-                  {job.projects.map((p, j) => (
-                    <ProjectDetail key={j} project={p} />
-                  ))}
-                </div>
-              )}
-
-              {/* Other projects — markdown */}
-              {job.otherProjects && (
-                <div className="mt-4">
-                  <p className="text-[11px] font-mono text-gray-600 uppercase tracking-wider mb-2">Other Tasks</p>
-                  <div className="text-xs text-gray-500 leading-relaxed pl-1">
-                    <MarkdownRenderer content={job.otherProjects} />
+              <div className="experience-entry__body">
+                {/* Projects — always visible, no toggle */}
+                {job.projects?.length > 0 && (
+                  <div className="experience-entry__projects space-y-0 divide-y divide-gray-800/40">
+                    {job.projects.map((p, j) => (
+                      <ProjectDetail key={j} project={p} />
+                    ))}
                   </div>
-                </div>
-              )}
+                )}
+
+                {/* Other projects — markdown */}
+                {job.otherProjects && (
+                  <div className="experience-entry__other mt-4">
+                    <p className="text-[11px] font-mono text-gray-600 uppercase tracking-wider mb-2">Other Tasks</p>
+                    <div className="text-xs text-gray-500 leading-relaxed pl-1">
+                      <MarkdownRenderer content={job.otherProjects} />
+                    </div>
+                  </div>
+                )}
+              </div>
             </motion.div>
           ))}
         </div>
