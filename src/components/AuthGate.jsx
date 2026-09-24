@@ -85,6 +85,8 @@ export default function AuthGate({ onSuccess }) {
         }
       })
     }
+  // The URL token is intentionally consumed only once on initial mount.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleSubmit = async (e) => {

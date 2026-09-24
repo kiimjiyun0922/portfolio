@@ -1,4 +1,3 @@
-/* global Buffer, process */
 import { createHash, createSign } from 'node:crypto'
 
 let cachedAccess = { token: null, exp: 0 }

@@ -16,7 +16,7 @@ export function loadProjects() {
         return parsed
       }
     }
-  } catch (e) {
+  } catch {
     // ignore
   }
   return defaultProjects

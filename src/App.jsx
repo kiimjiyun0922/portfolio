@@ -59,11 +59,11 @@ import { watchOwnerAuth, signInVisitor, signOutOwner, OWNER_EMAIL } from './util
 
 function TokenExpiryBanner({ expiresAt }) {
   const [visible, setVisible] = useState(true)
+  const [now] = useState(Date.now)
 
   if (!expiresAt || !visible) return null
 
   const expiryDate = new Date(expiresAt)
-  const now = Date.now()
   const diffMs = expiresAt - now
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
   const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))

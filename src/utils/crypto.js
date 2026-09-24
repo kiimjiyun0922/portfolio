@@ -167,7 +167,7 @@ export function revokeAccessToken(id) {
   // only identifying metadata (label, hint, dates) is kept for the audit trail.
   const tokens = getAccessTokens().map((t) => {
     if (t.id !== id) return t
-    const { token, tokenHash, ...meta } = t
+    const { token, tokenHash: _tokenHash, ...meta } = t
     return {
       ...meta,
       tokenHint: t.tokenHint || (token ? `${token.slice(0, 4)}…${token.slice(-4)}` : ''),

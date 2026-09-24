@@ -30,7 +30,6 @@ import {
   loadResumeConfig,
   saveResumeConfig,
   resetResumeConfig,
-  defaultResumeConfig,
   loadContactConfig,
   saveContactConfig,
   resetContactConfig,
@@ -496,6 +495,7 @@ function ResumeSection() {
       <SectionHeader title="이력서" description="학력, 경력, 활동 내역을 관리합니다" />
       <ActionBar>
         <SaveButton onClick={handleSave} />
+        <ResetButton onClick={handleReset} />
         <div className="flex-1" />
         <ImportExportBar
           onImport={handleImport}
@@ -584,6 +584,7 @@ function HeroSection() {
       <SectionHeader title="히어로" description="메인 화면 상단 영역을 설정합니다" />
       <ActionBar>
         <SaveButton onClick={handleSave} />
+        <ResetButton onClick={handleReset} />
       </ActionBar>
       <div className="space-y-4 max-w-4xl">
         <Field label="태그라인" value={config.tagline} onChange={(v) => update('tagline', v)} />
@@ -613,6 +614,7 @@ function AuthGateSection() {
       <SectionHeader title="접속 화면" description="방문자 인증 화면의 텍스트를 설정합니다" />
       <ActionBar>
         <SaveButton onClick={handleSave} />
+        <ResetButton onClick={handleReset} />
       </ActionBar>
       <div className="space-y-4 max-w-4xl">
         <Field label="태그라인" value={config.tagline} onChange={(v) => update('tagline', v)} />
@@ -733,6 +735,7 @@ function ContactSection() {
       <SectionHeader title="연락처" description="하단 연락처 영역의 내용을 설정합니다" />
       <ActionBar>
         <SaveButton onClick={handleSave} />
+        <ResetButton onClick={handleReset} />
       </ActionBar>
       <div className="space-y-4 max-w-4xl">
         <Field label="제목" value={config.heading} onChange={(v) => update('heading', v)} />
@@ -1382,6 +1385,7 @@ function ProjectsSection() {
       <SectionHeader title="프로젝트" description="Featured Projects 섹션에 표시될 프로젝트를 관리합니다" />
       <ActionBar>
         <SaveButton onClick={handleSave} />
+        <ResetButton onClick={handleReset} />
         <div className="flex-1" />
         <ImportExportBar
           onImport={handleImport}
@@ -1559,6 +1563,7 @@ function AboutSection() {
       <SectionHeader title="소개" description="About 섹션의 내용을 설정합니다" />
       <ActionBar>
         <SaveButton onClick={handleSave} />
+        <ResetButton onClick={handleReset} />
       </ActionBar>
       <div className="space-y-4 max-w-4xl">
         <Field label="섹션 헤딩" value={config.heading || ''} onChange={(v) => update('heading', v)} rows={2} />
@@ -1641,6 +1646,7 @@ function AchievementsSection() {
       <SectionHeader title="핵심 성과" description="Achievements 섹션에 표시될 성과 카드를 관리합니다" />
       <ActionBar>
         <SaveButton onClick={handleSave} />
+        <ResetButton onClick={handleReset} />
         <button onClick={addItem} className="px-4 py-2 border border-accent text-accent hover:bg-accent/10 text-sm rounded-lg transition-colors cursor-pointer">+ 성과 추가</button>
       </ActionBar>
       <div className="space-y-3">
@@ -1704,6 +1710,7 @@ function JourneySection() {
       </div>
       <ActionBar>
         <SaveButton onClick={handleSave} />
+        <ResetButton onClick={handleReset} />
         <button onClick={addItem} className="px-4 py-2 border border-accent text-accent hover:bg-accent/10 text-sm rounded-lg transition-colors cursor-pointer">+ 항목 추가</button>
       </ActionBar>
       <div className="space-y-3">
@@ -1760,6 +1767,7 @@ function JourneySection() {
 
 function HomeSection({ onNavigate, onExportPDF, onViewPortfolio }) {
   const [hoverDay, setHoverDay] = useState(null) // hovered day index on the trend chart
+  const [now] = useState(Date.now)
   const tokens = getAccessTokens()
   const accessLogs = getAccessLog()
   const gateLogs = getGateLog()
@@ -1769,7 +1777,6 @@ function HomeSection({ onNavigate, onExportPDF, onViewPortfolio }) {
   const DAY = 24 * 60 * 60 * 1000
   const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0)
   const t0 = todayStart.getTime()
-  const now = Date.now()
 
   const activeTokens = tokens.filter((t) => !t.revoked && !t.forceExpired && t.expiresAt > now)
   const projectCount = (projectData.groups || []).reduce((s, g) => s + (g.projects?.length || 0), 0)
@@ -2008,10 +2015,10 @@ function LogsSection() {
   const [openRow, setOpenRow] = useState(null)
   const [ver, setVer] = useState(0) // bump to re-read logs after deletion
   const [toast, setToast] = useState('')
+  const [now] = useState(Date.now)
   const flash = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2000) }
 
   const LIVE_WINDOW = 6 * 60 * 1000
-  const now = Date.now()
 
   const removeRow = (r) => {
     if (!confirm('이 기록을 삭제하시겠습니까?')) return
@@ -2198,7 +2205,15 @@ function HistorySection() {
     }
   }
 
-  useEffect(() => { load(activeDoc) }, [activeDoc])
+  useEffect(() => {
+    let cancelled = false
+    cloudListSnapshots(activeDoc).then((items) => {
+      if (!cancelled) setSnapshots(items)
+    }).catch(() => {
+      if (!cancelled) { setLoadError(true); setSnapshots([]) }
+    })
+    return () => { cancelled = true }
+  }, [activeDoc])
 
   const handleRestore = async (snap) => {
     const docLabel = HISTORY_DOCS.find((d) => d.id === activeDoc)?.label || activeDoc
@@ -2229,7 +2244,7 @@ function HistorySection() {
         {HISTORY_DOCS.map((d) => (
           <button
             key={d.id}
-            onClick={() => setActiveDoc(d.id)}
+            onClick={() => { setSnapshots(null); setLoadError(false); setActiveDoc(d.id) }}
             className={`px-3 py-1.5 text-xs rounded-lg cursor-pointer transition-colors ${
               activeDoc === d.id ? 'bg-accent/15 text-accent font-medium' : 'bg-gray-800/60 text-gray-400 hover:text-white hover:bg-gray-800'
             }`}

@@ -85,7 +85,6 @@ function DesktopJourney({ journey }) {
 
         if (isRowTransition) {
           // Row change — U-turn curve that swings outside the grid edge
-          const midY = (prev.y + curr.y) / 2
           // Push control points outward: if both are on the right side, swing further right
           const boxW = box.width
           const isRightSide = prev.x > boxW / 2
@@ -104,7 +103,7 @@ function DesktopJourney({ journey }) {
     window.addEventListener('resize', update)
     const timer = setTimeout(update, 500) // after animations
     return () => { window.removeEventListener('resize', update); clearTimeout(timer) }
-  }, [journey])
+  }, [journey, setPath])
 
   // Flatten items in display order
   let globalIdx = 0

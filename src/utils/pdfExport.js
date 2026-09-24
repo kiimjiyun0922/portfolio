@@ -73,7 +73,7 @@ export async function exportPortfolioPDF({ resume, projects, achievements, hero,
   // Featured Projects — each project card as separate section
   if (projects?.groups?.length > 0) {
     sections.push(sec(h2('Featured Projects')))
-    projects.groups.forEach((g, gi) => {
+    projects.groups.forEach((g) => {
       let groupHeader = `<div style="font-size:10.5px;font-weight:700;color:#222;margin-bottom:2px;">${esc(g.title)}</div>`
       if (g.subtitle) groupHeader += `<div style="font-size:8px;color:#999;margin-bottom:4px;">${esc(g.subtitle)}</div>`
       sections.push(sec(groupHeader))
