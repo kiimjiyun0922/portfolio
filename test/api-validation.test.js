@@ -68,3 +68,17 @@ test('rate limiter uses the shared Upstash counter when configured', async () =>
     else process.env.UPSTASH_REDIS_REST_TOKEN = oldToken
   }
 })
+
+test('rate limiter recognizes Vercel Marketplace prefixed credentials', async () => {
+  const urlKey = 'UPSTASH_REDIS_REST_KV_REST_API_URL'
+  const tokenKey = 'UPSTASH_REDIS_REST_KV_REST_API_TOKEN'
+  process.env[urlKey] = 'https://marketplace.example'
+  process.env[tokenKey] = 'marketplace-secret'
+  const limited = createRateLimiter(1, 1000, { fetch: async (url, init) => {
+    assert.equal(url, 'https://marketplace.example/multi-exec')
+    assert.equal(init.headers.Authorization, 'Bearer marketplace-secret')
+    return { ok: true, json: async () => [{ result: 1 }, { result: 1 }] }
+  } })
+  try { assert.equal(await limited({ headers: {} }, 100), false) }
+  finally { delete process.env[urlKey]; delete process.env[tokenKey] }
+})

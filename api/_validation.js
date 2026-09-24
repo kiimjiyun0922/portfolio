@@ -35,7 +35,11 @@ export function createRateLimiter(max, windowMs = 60_000, options = {}) {
   return async (req, now = Date.now()) => {
     const key = String(req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown').split(',')[0].trim()
     const url = process.env.UPSTASH_REDIS_REST_URL
+      || process.env.UPSTASH_REDIS_REST_KV_REST_API_URL
+      || process.env.KV_REST_API_URL
     const token = process.env.UPSTASH_REDIS_REST_TOKEN
+      || process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN
+      || process.env.KV_REST_API_TOKEN
     if (url && token && request) {
       try {
         const digest = createHash('sha256').update(key).digest('hex').slice(0, 24)
