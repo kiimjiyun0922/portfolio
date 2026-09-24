@@ -269,19 +269,31 @@ body {
   [data-theme="mist"] .t-gate {
     display: flex;
     align-items: stretch;
-    justify-content: center;
+    justify-content: flex-start;
     min-height: 100dvh;
-    padding: 72px 24px 42px;
+    padding: 78px 24px 40px;
   }
   [data-theme="mist"] .t-gate::before { top: 32px; right: 24px; left: 24px; }
-  [data-theme="mist"] .t-gate .gate-eyebrow { margin-bottom: 14px; }
-  [data-theme="mist"] .t-gate .gate-title {
-    max-width: 12ch;
-    font-size: clamp(36px, 11vw, 48px);
+  [data-theme="mist"] .t-gate .gate-eyebrow {
+    align-self: stretch;
+    margin-bottom: 16px;
+    text-align: left;
   }
-  [data-theme="mist"] .t-gate .gate-title__line { white-space: normal; }
-  [data-theme="mist"] .t-gate .gate-deck { margin-top: 18px; font-size: 14px; }
-  [data-theme="mist"] .t-gate .gate-panel { margin-top: 46px; }
+  [data-theme="mist"] .t-gate .gate-title {
+    width: 100%;
+    max-width: none;
+    font-size: clamp(29px, 9.2vw, 38px);
+    line-height: 1.04;
+  }
+  [data-theme="mist"] .t-gate .gate-title__line { white-space: nowrap; }
+  [data-theme="mist"] .t-gate .gate-deck {
+    width: 100%;
+    max-width: none;
+    margin-top: 20px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  [data-theme="mist"] .t-gate .gate-panel { margin-top: 34px; }
   [data-theme="mist"] .t-gate .gate-card { padding: 22px 0; }
   [data-theme="mist"] .t-gate .gate-contact { grid-template-columns: 1fr; }
   [data-theme="mist"] .t-gate .gate-contact > p:first-child { white-space: normal; }
