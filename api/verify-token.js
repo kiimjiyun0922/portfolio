@@ -6,7 +6,7 @@ const limited = createRateLimiter(20)
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store')
   if (req.method !== 'POST') { res.setHeader('Allow', 'POST'); return res.status(405).json({ error: 'method-not-allowed' }) }
-  if (limited(req)) return res.status(429).json({ error: 'too-many-requests' })
+  if (await limited(req)) return res.status(429).json({ error: 'too-many-requests' })
   try {
     const account = getServiceAccount()
     if (!account) return res.status(501).json({ error: 'not-configured' })

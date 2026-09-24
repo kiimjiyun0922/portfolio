@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 export function normalizeToken(value) {
@@ -27,10 +29,31 @@ export function cleanSession(input, verified, now = Date.now()) {
   }
 }
 
-export function createRateLimiter(max, windowMs = 60_000) {
+export function createRateLimiter(max, windowMs = 60_000, options = {}) {
   const attempts = new Map()
-  return (req, now = Date.now()) => {
+  const request = options.fetch || globalThis.fetch
+  return async (req, now = Date.now()) => {
     const key = String(req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown').split(',')[0].trim()
+    const url = process.env.UPSTASH_REDIS_REST_URL
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN
+    if (url && token && request) {
+      try {
+        const digest = createHash('sha256').update(key).digest('hex').slice(0, 24)
+        const redisKey = `portfolio:rate:${max}:${Math.floor(now / windowMs)}:${digest}`
+        const response = await request(`${url.replace(/\/$/, '')}/multi-exec`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify([['INCR', redisKey], ['PEXPIRE', redisKey, windowMs + 1000]]),
+        })
+        if (!response.ok) throw new Error(`upstash-http-${response.status}`)
+        const data = await response.json()
+        const count = Number(data?.[0]?.result)
+        if (!Number.isFinite(count)) throw new Error('upstash-invalid-response')
+        return count > max
+      } catch (error) {
+        console.warn('[rate-limit] durable store unavailable, using local fallback', error)
+      }
+    }
     const hit = attempts.get(key)
     if (!hit || now - hit.at >= windowMs) {
       attempts.set(key, { at: now, count: 1 })

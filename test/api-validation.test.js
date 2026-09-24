@@ -34,13 +34,37 @@ test('cleanSession trusts server token metadata and bounds visitor input', () =>
   assert.equal(session.actions[0].target.length, 60)
 })
 
-test('rate limiter isolates IPs and resets after its window', () => {
+test('rate limiter isolates IPs and resets after its window', async () => {
   const limited = createRateLimiter(2, 1000)
   const a = { headers: { 'x-forwarded-for': '1.2.3.4, 10.0.0.1' } }
   const b = { headers: { 'x-real-ip': '5.6.7.8' } }
-  assert.equal(limited(a, 100), false)
-  assert.equal(limited(a, 200), false)
-  assert.equal(limited(a, 300), true)
-  assert.equal(limited(b, 300), false)
-  assert.equal(limited(a, 1200), false)
+  assert.equal(await limited(a, 100), false)
+  assert.equal(await limited(a, 200), false)
+  assert.equal(await limited(a, 300), true)
+  assert.equal(await limited(b, 300), false)
+  assert.equal(await limited(a, 1200), false)
+})
+
+test('rate limiter uses the shared Upstash counter when configured', async () => {
+  const oldUrl = process.env.UPSTASH_REDIS_REST_URL
+  const oldToken = process.env.UPSTASH_REDIS_REST_TOKEN
+  process.env.UPSTASH_REDIS_REST_URL = 'https://redis.example'
+  process.env.UPSTASH_REDIS_REST_TOKEN = 'secret'
+  let request
+  const limited = createRateLimiter(2, 1000, { fetch: async (url, init) => {
+    request = { url, init }
+    return { ok: true, json: async () => [{ result: 3 }, { result: 1 }] }
+  } })
+  try {
+    assert.equal(await limited({ headers: { 'x-real-ip': '1.2.3.4' } }, 1500), true)
+    assert.equal(request.url, 'https://redis.example/multi-exec')
+    assert.equal(request.init.headers.Authorization, 'Bearer secret')
+    assert.equal(JSON.parse(request.init.body)[0][0], 'INCR')
+    assert.equal(request.init.body.includes('1.2.3.4'), false)
+  } finally {
+    if (oldUrl === undefined) delete process.env.UPSTASH_REDIS_REST_URL
+    else process.env.UPSTASH_REDIS_REST_URL = oldUrl
+    if (oldToken === undefined) delete process.env.UPSTASH_REDIS_REST_TOKEN
+    else process.env.UPSTASH_REDIS_REST_TOKEN = oldToken
+  }
 })

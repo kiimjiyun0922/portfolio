@@ -51,6 +51,8 @@ import {
 import { THEMES, getTheme } from '../themes'
 import { SITE, SITE_HOST } from '../site.config'
 import { validateProjectsImport, validateResumeImport } from '../utils/importValidation'
+import { ImportExportBar } from './admin/JsonTransfer'
+import { downloadJson, importJson } from './admin/JsonTransferUtils'
 
 /* ─── Navigation ─── */
 
@@ -238,59 +240,6 @@ function FloatingJumpNav({ items = [] }) {
           </svg>
         </button>
       </div>
-    </div>
-  )
-}
-
-/* ─── Import / Export / Sample ─── */
-
-function downloadJson(data, filename) {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename
-  a.click()
-  URL.revokeObjectURL(url)
-}
-
-function importJson(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      try {
-        resolve(JSON.parse(e.target.result))
-      } catch {
-        reject(new Error('JSON 파싱 실패'))
-      }
-    }
-    reader.onerror = () => reject(new Error('파일 읽기 실패'))
-    reader.readAsText(file)
-  })
-}
-
-function ImportExportBar({ onImport, onExport, onSample, importLabel = 'JSON 가져오기', sampleLabel = '샘플 다운로드' }) {
-  const fileRef = useRef(null)
-  return (
-    <div className="flex flex-wrap gap-2">
-      <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={async (e) => {
-        const file = e.target.files?.[0]
-        if (file) {
-          try { await onImport(file) } catch (err) { alert(err.message) }
-        }
-        e.target.value = ''
-      }} />
-      <button onClick={() => fileRef.current?.click()} className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700/60 text-gray-300 hover:text-white text-xs rounded-lg transition-colors cursor-pointer flex items-center gap-1.5">
-        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>
-        {importLabel}
-      </button>
-      <button onClick={onExport} className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700/60 text-gray-300 hover:text-white text-xs rounded-lg transition-colors cursor-pointer flex items-center gap-1.5">
-        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>
-        JSON 내보내기
-      </button>
-      <button onClick={onSample} className="px-3 py-1.5 border border-gray-700/60 hover:border-gray-600 text-gray-500 hover:text-gray-300 text-xs rounded-lg transition-colors cursor-pointer">
-        {sampleLabel}
-      </button>
     </div>
   )
 }
