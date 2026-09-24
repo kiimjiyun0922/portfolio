@@ -77,7 +77,7 @@ export default function Experience() {
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-8 sm:mb-12">Work Experience</h2>
 
       <div className="experience-ledger max-w-3xl mx-auto relative">
-        <div className="experience-list space-y-10">
+        <div className="experience-list">
           {resume.work.filter((w) => w.company).map((job, i) => (
             <motion.div
               key={i}
