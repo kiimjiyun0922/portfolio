@@ -1,13 +1,7 @@
 import { findActiveToken, getServiceAccount, mintCustomToken } from './_firebase-service.js'
+import { createRateLimiter, normalizeToken } from './_validation.js'
 
-const attempts = new Map()
-function limited(req) {
-  const key = String(req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown').split(',')[0].trim()
-  const now = Date.now(), hit = attempts.get(key)
-  if (!hit || now - hit.at >= 60_000) { attempts.set(key, { at: now, count: 1 }); return false }
-  hit.count += 1
-  return hit.count > 20
-}
+const limited = createRateLimiter(20)
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store')
@@ -16,8 +10,8 @@ export default async function handler(req, res) {
   try {
     const account = getServiceAccount()
     if (!account) return res.status(501).json({ error: 'not-configured' })
-    const token = String(req.body?.token || '').trim()
-    if (!token || token.length > 256) return res.status(400).json({ error: 'invalid-request' })
+    const token = normalizeToken(req.body?.token)
+    if (!token) return res.status(400).json({ error: 'invalid-request' })
     const match = await findActiveToken(account, token)
     if (!match) return res.status(401).json({ error: 'invalid-token' })
     const accessExpiresAt = Math.min(match.expiresAt, Date.now() + 6 * 60_000)

@@ -50,6 +50,7 @@ import {
 } from '../utils/crypto'
 import { THEMES, getTheme } from '../themes'
 import { SITE, SITE_HOST } from '../site.config'
+import { validateProjectsImport, validateResumeImport } from '../utils/importValidation'
 
 /* ─── Navigation ─── */
 
@@ -483,8 +484,7 @@ function ResumeSection() {
   }
 
   const handleImport = async (file) => {
-    const data = await importJson(file)
-    if (typeof data !== 'object' || Array.isArray(data)) throw new Error('올바른 이력서 JSON 형식이 아닙니다')
+    const data = validateResumeImport(await importJson(file))
     setConfig({ ...config, ...data })
     flash('가져오기 완료 — 저장 버튼을 눌러주세요')
   }
@@ -1374,7 +1374,7 @@ function ProjectsSection() {
   const handleReset = () => { if (confirm('초기화하시겠습니까?')) { resetProjects(); setData(loadProjects()); flash('초기화 완료') } }
 
   const handleImport = async (file) => {
-    const imported = await importJson(file)
+    const imported = validateProjectsImport(await importJson(file))
     setData(imported)
     flash('가져오기 완료 — 저장 버튼을 눌러주세요')
   }
