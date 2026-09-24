@@ -47,6 +47,11 @@ service cloud.firestore {
       match /history/{snap} {
         allow read, write: if isOwner();
       }
+
+      // Visitor sessions are written only by the trusted server service account.
+      match /sessions/{session} {
+        allow read, write: if isOwner();
+      }
     }
 
     // Block everything else

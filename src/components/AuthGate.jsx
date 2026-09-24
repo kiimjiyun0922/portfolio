@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { verifyAccessToken, recordAccess, recordGateVisit, recordSecurityAlert, loadAuthGateConfig, ADMIN_PATH } from '../utils/crypto'
 import { signInVisitor } from '../utils/firebase'
 import { syncFromCloud } from '../utils/db'
@@ -51,11 +50,11 @@ export default function AuthGate({ onSuccess }) {
     if (server.ok) {
       try {
         await signInVisitor(server.data.customToken)
-      } catch (e) {
+      } catch {
         return { error: '인증 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.' }
       }
       await syncFromCloud() // content reads are now permitted — pull it
-      const sid = recordAccess(server.data.id, server.data.label)
+      const sid = recordAccess(server.data.id, server.data.label, t)
       return { result: { id: server.data.id, expiresAt: server.data.expiresAt, sid, plainToken: t, theme: server.data.theme || '' } }
     }
     if (server.invalid) {
@@ -67,7 +66,7 @@ export default function AuthGate({ onSuccess }) {
     if (ALLOW_CLIENT_FALLBACK) {
       const result = await verifyAccessToken(t)
       if (result) {
-        const sid = recordAccess(result.id, result.label)
+        const sid = recordAccess(result.id, result.label, t)
         return { result: { id: result.id, expiresAt: result.expiresAt, sid, plainToken: t, theme: result.theme || '' } }
       }
       recordSecurityAlert('token_fail', `${t.slice(0, 4)}…(${t.length}자)`)

@@ -15,6 +15,9 @@ function MermaidBlock({ code }) {
       if (!mermaidInitialized) {
         mermaid.initialize({
           startOnLoad: false,
+          securityLevel: 'strict',
+          suppressErrorRendering: true,
+          maxTextSize: 50000,
           theme: 'dark',
           themeVariables: {
             primaryColor: '#3b82f6',

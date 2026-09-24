@@ -1,4 +1,4 @@
-import { cloudSet, cloudDelete, cloudSaveSnapshot } from './db'
+import { cloudSet, cloudDelete, cloudSaveSnapshot, cloudDeleteAccessSession, cloudClearAccessSessions } from './db'
 import { SITE } from '../site.config'
 import { sampleAbout, sampleAchievements, sampleJourney, sampleResume } from '../data/sampleContent'
 
@@ -232,15 +232,31 @@ export function getAccessLog() {
 
 function saveAccessLog(log) {
   localStorage.setItem(ACCESS_LOG_KEY, JSON.stringify(log))
-  cloudSet('access_log', { items: log })
 }
 
-export function recordAccess(tokenId, tokenLabel) {
+let activeAnalyticsToken = null
+
+async function syncAccessSession(session) {
+  if (!activeAnalyticsToken || !session) return
+  try {
+    await fetch('/api/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: activeAnalyticsToken, session }),
+      keepalive: true,
+    })
+  } catch {
+    // Analytics must never interrupt the portfolio experience.
+  }
+}
+
+export function recordAccess(tokenId, tokenLabel, plaintextToken = '') {
   // Owner's own browser is excluded from access stats
   if (isOwnerBrowser()) return null
   const sessionId = crypto.randomUUID()
   const log = getAccessLog()
-  log.push({
+  activeAnalyticsToken = plaintextToken || null
+  const session = {
     tokenId,
     tokenLabel,
     sessionId,
@@ -248,8 +264,10 @@ export function recordAccess(tokenId, tokenLabel) {
     lastSeenAt: Date.now(),
     userAgent: navigator.userAgent,
     language: navigator.language,
-  })
+  }
+  log.push(session)
   saveAccessLog(log)
+  void syncAccessSession(session)
   return sessionId
 }
 
@@ -261,6 +279,7 @@ let flushTimer = null
 
 export function setActiveSession(sid) {
   activeSessionId = sid || null
+  if (!sid) activeAnalyticsToken = null
 }
 
 export function trackAction(kind, target) {
@@ -286,6 +305,7 @@ export function recordHeartbeat(sessionId) {
   pendingActions = []
   log[idx] = { ...log[idx], lastSeenAt: Date.now(), actions }
   saveAccessLog(log)
+  void syncAccessSession(log[idx])
 }
 
 export function getAccessLogForToken(tokenId) {
@@ -294,11 +314,14 @@ export function getAccessLogForToken(tokenId) {
 
 export function clearAccessLog() {
   localStorage.setItem(ACCESS_LOG_KEY, JSON.stringify([]))
-  cloudSet('access_log', { items: [] })
+  void cloudClearAccessSessions()
 }
 
 export function removeAccessLogEntry(accessedAt) {
-  saveAccessLog(getAccessLog().filter((e) => e.accessedAt !== accessedAt))
+  const log = getAccessLog()
+  const target = log.find((e) => e.accessedAt === accessedAt)
+  saveAccessLog(log.filter((e) => e.accessedAt !== accessedAt))
+  if (target?.sessionId) void cloudDeleteAccessSession(target.sessionId)
 }
 
 // --- Owner Browser Marker (exclude the site owner from visit stats) ---

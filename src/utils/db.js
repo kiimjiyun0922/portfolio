@@ -2,6 +2,39 @@ import { db, hasConfig } from './firebase'
 import { doc, getDoc, setDoc, deleteDoc, collection, getDocs } from 'firebase/firestore'
 
 const COLLECTION = 'site'
+const ACCESS_LOG_KEY = 'portfolio_access_log'
+
+async function syncAccessSessions() {
+  if (!db) return { docId: 'access_log', found: false }
+  try {
+    const snaps = await getDocs(collection(db, COLLECTION, 'access_log', 'sessions'))
+    const sessions = snaps.docs.map((item) => item.data()).sort((a, b) => (b.accessedAt || 0) - (a.accessedAt || 0))
+    localStorage.setItem(ACCESS_LOG_KEY, JSON.stringify(sessions))
+    return { docId: 'access_log', found: sessions.length > 0 }
+  } catch (e) {
+    console.warn('[Firestore] access sessions read failed:', e)
+    return { docId: 'access_log', found: false }
+  }
+}
+
+export async function cloudDeleteAccessSession(sessionId) {
+  if (!db || !sessionId) return
+  try {
+    await deleteDoc(doc(db, COLLECTION, 'access_log', 'sessions', sessionId))
+  } catch (e) {
+    console.warn('[Firestore] access session delete failed:', e)
+  }
+}
+
+export async function cloudClearAccessSessions() {
+  if (!db) return
+  try {
+    const snaps = await getDocs(collection(db, COLLECTION, 'access_log', 'sessions'))
+    await Promise.all(snaps.docs.map((item) => deleteDoc(item.ref)))
+  } catch (e) {
+    console.warn('[Firestore] access sessions clear failed:', e)
+  }
+}
 
 // --- Low-level Firestore helpers ---
 
@@ -95,13 +128,12 @@ const SYNC_MAP = {
   projects: 'portfolio_projects',
   case_studies: 'portfolio_case_studies',
   tokens: 'portfolio_access_tokens',
-  access_log: 'portfolio_access_log',
   gate_log: 'portfolio_gate_log',
   alert_log: 'portfolio_alert_log',
 }
 
 // Array-type docs store data wrapped as { items: [...] }
-const ARRAY_DOCS = new Set(['case_studies', 'tokens', 'access_log', 'gate_log', 'alert_log'])
+const ARRAY_DOCS = new Set(['case_studies', 'tokens', 'gate_log', 'alert_log'])
 
 /**
  * Pull all data from Firestore → localStorage cache.
@@ -110,8 +142,9 @@ const ARRAY_DOCS = new Set(['case_studies', 'tokens', 'access_log', 'gate_log', 
 export async function syncFromCloud() {
   if (!hasConfig) return
 
-  const results = await Promise.all(
-    Object.entries(SYNC_MAP).map(async ([docId, localKey]) => {
+  const results = await Promise.all([
+    syncAccessSessions(),
+    ...Object.entries(SYNC_MAP).map(async ([docId, localKey]) => {
       const data = await cloudGet(docId)
       if (data) {
         const value = ARRAY_DOCS.has(docId) ? data.items : data
@@ -119,7 +152,7 @@ export async function syncFromCloud() {
       }
       return { docId, found: !!data }
     }),
-  )
+  ])
 
   return results
 }
