@@ -671,9 +671,13 @@ body {
 }
 [data-theme="mist"] #about > div { width: min(100%, var(--editorial-rail)); margin-inline: auto; max-width: var(--editorial-rail); }
 [data-theme="mist"] #about h2 {
-  max-width: 14ch;
+  max-width: none;
   font-size: clamp(2rem, 4vw, 4rem);
   line-height: .9;
+}
+[data-theme="mist"] #about .about-heading__line {
+  display: block;
+  white-space: nowrap;
 }
 [data-theme="mist"] #about img { filter: saturate(.7) contrast(.92); }
 
@@ -1001,6 +1005,7 @@ body {
 [data-theme="mist"] .journey-index__status { justify-self: end; color: #75684d; font-weight: 700; }
 
 @media (max-width: 767px) {
+  [data-theme="mist"] #about .about-heading__line { white-space: normal; }
   [data-theme="mist"] .resume-sheet { width: 100%; }
   [data-theme="mist"] .resume-block__heading {
     padding-bottom: 13px;

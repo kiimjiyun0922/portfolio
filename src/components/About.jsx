@@ -14,6 +14,7 @@ const SKILL_COLORS = {
 
 export default function About() {
   const [config] = useState(loadAboutConfig)
+  const headingLines = (config.heading || 'Designing the balance\nbetween users and business').split('\n')
 
   if (!config.bio && (!config.skills || config.skills.length === 0)) return null
 
@@ -27,8 +28,10 @@ export default function About() {
           transition={{ duration: 0.5 }}
         >
           <p className="text-accent text-xs font-mono tracking-widest uppercase mb-2">About</p>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 sm:mb-8 leading-snug">
-            {config.heading || 'Designing the balance\nbetween users and business'}
+          <h2 className="about-heading text-xl sm:text-2xl md:text-3xl font-bold mb-6 sm:mb-8 leading-snug">
+            {headingLines.map((line, index) => (
+              <span key={`${line}-${index}`} className="about-heading__line">{line}</span>
+            ))}
           </h2>
         </motion.div>
 
