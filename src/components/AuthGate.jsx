@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { verifyAccessToken, recordAccess, recordGateVisit, recordSecurityAlert, loadAuthGateConfig, ADMIN_PATH } from '../utils/crypto'
 import { signInVisitor } from '../utils/firebase'
 import { syncFromCloud } from '../utils/db'
