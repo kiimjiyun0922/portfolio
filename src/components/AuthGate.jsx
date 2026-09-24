@@ -118,8 +118,8 @@ export default function AuthGate({ onSuccess }) {
   return (
     <div className="t-gate relative min-h-screen bg-gray-950 flex flex-col items-center justify-center px-6 text-center overflow-hidden">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-accent/10 via-transparent to-transparent pointer-events-none" />
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="gate-backdrop absolute inset-0 bg-gradient-to-b from-accent/10 via-transparent to-transparent pointer-events-none" />
+      <div className="gate-backdrop absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/3 rounded-full blur-3xl" />
       </div>
@@ -129,7 +129,7 @@ export default function AuthGate({ onSuccess }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="relative text-accent text-sm md:text-base font-medium tracking-wider uppercase mb-6"
+        className="gate-eyebrow relative text-accent text-sm md:text-base font-medium tracking-wider uppercase mb-6"
       >
         {config.tagline}
       </motion.p>
@@ -139,7 +139,7 @@ export default function AuthGate({ onSuccess }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.15 }}
-        className="relative text-2xl md:text-4xl lg:text-5xl font-bold leading-tight max-w-4xl"
+        className="gate-title relative text-2xl md:text-4xl lg:text-5xl font-bold leading-tight max-w-4xl"
       >
         {headlineParts.length > 1 ? (
           <>
@@ -156,7 +156,7 @@ export default function AuthGate({ onSuccess }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.3 }}
-        className="relative mt-4 text-gray-400 text-sm md:text-base max-w-2xl"
+        className="gate-deck relative mt-4 text-gray-400 text-sm md:text-base max-w-2xl"
       >
         {config.subtitle}
       </motion.p>
@@ -166,10 +166,10 @@ export default function AuthGate({ onSuccess }) {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.5 }}
-        className="relative w-full max-w-md mt-12"
+        className="gate-panel relative w-full max-w-md mt-12"
       >
-        <div className="t-card bg-gray-900/60 backdrop-blur-xl rounded-2xl p-8 border border-gray-800/60 shadow-2xl">
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="gate-card t-card bg-gray-900/60 backdrop-blur-xl rounded-2xl p-8 border border-gray-800/60 shadow-2xl">
+          <form onSubmit={handleSubmit} className="gate-form space-y-4">
             <input
               type="text"
               value={token}
@@ -209,7 +209,7 @@ export default function AuthGate({ onSuccess }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="mt-6 text-center space-y-2"
+          className="gate-contact mt-6 text-center space-y-2"
         >
           <p className="text-gray-500 text-sm">
             {config.contactMessage}
