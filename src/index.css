@@ -69,6 +69,13 @@ body {
   color: var(--color-gray-100);
 }
 
+/* Admin-authored copy keeps intentional line breaks; long lines may still
+   wrap when the available viewport or column becomes narrower. */
+.admin-copy {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

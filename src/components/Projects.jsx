@@ -57,7 +57,7 @@ export default function Projects() {
             <div className="projects-archive-heading mb-6">
               {expId ? (
                 <h3
-                  className="text-lg md:text-xl font-bold text-white inline-flex items-center gap-2 cursor-pointer hover:text-accent transition-colors group"
+                  className="admin-copy text-lg md:text-xl font-bold text-white inline-flex items-center gap-2 cursor-pointer hover:text-accent transition-colors group"
                   onClick={() => scrollToExperience(expId)}
                 >
                   {group.title}
@@ -66,9 +66,9 @@ export default function Projects() {
                   </svg>
                 </h3>
               ) : (
-                <h3 className="text-lg md:text-xl font-bold text-white">{group.title}</h3>
+                <h3 className="admin-copy text-lg md:text-xl font-bold text-white">{group.title}</h3>
               )}
-              <p className="text-sm md:text-base text-gray-500 mt-1">{group.subtitle}</p>
+              <p className="admin-copy text-sm md:text-base text-gray-500 mt-1">{group.subtitle}</p>
             </div>
 
             {/* Project Cards Grid */}

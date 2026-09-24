@@ -41,8 +41,8 @@ export default function Journey() {
           >
             <span className="journey-index__number">{String(i + 1).padStart(2, '0')}</span>
             <span className="journey-index__year">{item.year}</span>
-            <span className="journey-index__company">{item.org}</span>
-            <span className="journey-index__field">{item.field}</span>
+            <span className="admin-copy journey-index__company">{item.org}</span>
+            <span className="admin-copy journey-index__field">{item.field}</span>
             <span className="journey-index__status">{item.current ? 'Now' : ''}</span>
           </motion.button>
         ))}

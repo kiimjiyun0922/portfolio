@@ -15,7 +15,7 @@ export default function Contact() {
       </div>
 
       <div className="notebook-footer__column notebook-footer__column--center">
-        <p>{config.message}</p>
+        <p className="admin-copy">{config.message}</p>
         {config.linkedinUrl && (
           <a href={config.linkedinUrl} target="_blank" rel="noopener noreferrer" className="notebook-footer__strong">
             {config.linkedinLabel || 'LinkedIn'} ↗
@@ -27,7 +27,7 @@ export default function Contact() {
         <button type="button" onClick={scrollToTop} className="notebook-footer__link">
           Back to top <span aria-hidden="true">↑</span>
         </button>
-        <p>{config.copyright}</p>
+        <p className="admin-copy">{config.copyright}</p>
       </div>
     </footer>
   )

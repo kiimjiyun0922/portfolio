@@ -129,7 +129,7 @@ export default function AuthGate({ onSuccess }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="gate-eyebrow relative text-accent text-sm md:text-base font-medium tracking-wider uppercase mb-6"
+        className="admin-copy gate-eyebrow relative text-accent text-sm md:text-base font-medium tracking-wider uppercase mb-6"
       >
         {config.tagline}
       </motion.p>
@@ -155,7 +155,7 @@ export default function AuthGate({ onSuccess }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.3 }}
-        className="gate-deck relative mt-4 text-gray-400 text-sm md:text-base max-w-2xl"
+        className="admin-copy gate-deck relative mt-4 text-gray-400 text-sm md:text-base max-w-2xl"
       >
         {config.subtitle}
       </motion.p>
@@ -210,7 +210,7 @@ export default function AuthGate({ onSuccess }) {
           transition={{ delay: 0.8 }}
           className="gate-contact mt-6 text-center space-y-2"
         >
-          <p className="text-gray-500 text-sm">
+          <p className="admin-copy text-gray-500 text-sm">
             {config.contactMessage}
           </p>
           <a
@@ -222,7 +222,7 @@ export default function AuthGate({ onSuccess }) {
             </svg>
             {config.contactEmail}
           </a>
-          <p className="text-gray-600 text-xs">{config.contactHint}</p>
+          <p className="admin-copy text-gray-600 text-xs">{config.contactHint}</p>
         </motion.div>
       </motion.div>
     </div>

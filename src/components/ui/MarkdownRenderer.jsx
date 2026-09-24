@@ -134,7 +134,7 @@ export default function MarkdownRenderer({ content }) {
   if (!content) return null
 
   return (
-    <div className="space-y-1">
+    <div className="admin-copy space-y-1">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
         {content}
       </ReactMarkdown>

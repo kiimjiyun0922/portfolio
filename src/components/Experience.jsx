@@ -24,8 +24,8 @@ function ProjectDetail({ project }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
         </svg>
         <div className="flex-1 min-w-0">
-          <p className="text-[13px] font-medium text-gray-300 group-hover:text-white transition-colors leading-snug">{project.title}</p>
-          <p className="text-[11px] text-gray-600 mt-0.5">{project.period}{project.role && ` · ${project.role}`}{project.team && ` · ${project.team}`}</p>
+          <p className="admin-copy text-[13px] font-medium text-gray-300 group-hover:text-white transition-colors leading-snug">{project.title}</p>
+          <p className="admin-copy text-[11px] text-gray-600 mt-0.5">{project.period}{project.role && ` · ${project.role}`}{project.team && ` · ${project.team}`}</p>
         </div>
       </button>
 
@@ -92,11 +92,11 @@ export default function Experience() {
 
               <div className="experience-entry__identity">
                 {/* Period */}
-                <p className="text-xs font-mono text-gray-500 mb-1">{job.period}</p>
+                <p className="admin-copy text-xs font-mono text-gray-500 mb-1">{job.period}</p>
 
                 {/* Company & Title */}
-                <h3 className="text-base sm:text-lg md:text-xl font-bold text-white">{job.company}</h3>
-                <p className="text-sm text-accent font-medium mb-1">{job.title}</p>
+                <h3 className="admin-copy text-base sm:text-lg md:text-xl font-bold text-white">{job.company}</h3>
+                <p className="admin-copy text-sm text-accent font-medium mb-1">{job.title}</p>
 
                 {/* Leave note */}
                 {job.leaveNote && (

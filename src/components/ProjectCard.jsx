@@ -107,8 +107,8 @@ export default function ProjectCard({ project }) {
         <span className={`inline-block text-[11px] font-mono font-medium tracking-wider uppercase px-2.5 py-1 rounded mb-3 ${badgeCls}`}>
           {project.badge}
         </span>
-        <h3 className="text-lg md:text-xl font-bold text-white mb-2 leading-snug">{project.title}</h3>
-        <p className="text-sm text-gray-500 leading-relaxed">{project.subtitle}</p>
+        <h3 className="admin-copy text-lg md:text-xl font-bold text-white mb-2 leading-snug">{project.title}</h3>
+        <p className="admin-copy text-sm text-gray-500 leading-relaxed">{project.subtitle}</p>
       </div>
 
       {/* Story Box */}

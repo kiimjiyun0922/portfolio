@@ -33,8 +33,8 @@ export default function Resume() {
               {resume.education.filter((e) => e.school).map((edu, i) => (
                 <div key={i} className="resume-education__row bg-gray-900 rounded-xl p-4">
                   <div className="resume-education__copy">
-                    <p className="text-white font-semibold">{edu.school}</p>
-                    {edu.degree && <p className="text-gray-400 text-sm">{edu.degree}</p>}
+                    <p className="admin-copy text-white font-semibold">{edu.school}</p>
+                    {edu.degree && <p className="admin-copy text-gray-400 text-sm">{edu.degree}</p>}
                   </div>
                   <span className="resume-education__period text-gray-500 text-sm">{edu.period}</span>
                 </div>
@@ -56,8 +56,8 @@ export default function Resume() {
                     {act.year && <span className="resume-activity__year text-gray-500 text-sm font-mono">{act.year}</span>}
                     {act.category && <span className="resume-activity__category text-accent text-sm font-medium">{act.category}</span>}
                     <div className="resume-activity__copy">
-                      <p className="text-gray-300 text-sm">{act.summary}</p>
-                      {act.detail && <p className="text-gray-500 text-xs mt-1">{act.detail}</p>}
+                      <p className="admin-copy text-gray-300 text-sm">{act.summary}</p>
+                      {act.detail && <p className="admin-copy text-gray-500 text-xs mt-1">{act.detail}</p>}
                       {act.link && (
                         <a href={act.link} target="_blank" rel="noopener noreferrer" className="text-accent text-xs hover:underline mt-1 inline-block">
                           {act.linkLabel || act.link}

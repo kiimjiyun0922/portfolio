@@ -379,7 +379,7 @@ function HeroSection() {
       <div className="space-y-4 max-w-4xl">
         <Field label="사이트 타이틀" value={config.siteTitle || ''} onChange={(v) => update('siteTitle', v)} />
         <Field label="태그라인" value={config.tagline} onChange={(v) => update('tagline', v)} />
-        <Field label="헤드라인" value={config.headline} onChange={(v) => update('headline', v)} />
+        <Field label="헤드라인" value={config.headline} onChange={(v) => update('headline', v)} rows={2} />
         <Field label="서브타이틀" value={config.subtitle} onChange={(v) => update('subtitle', v)} rows={2} />
         <Field label="CTA 텍스트" value={config.ctaText} onChange={(v) => update('ctaText', v)} />
       </div>
@@ -409,8 +409,8 @@ function AuthGateSection() {
       </ActionBar>
       <div className="space-y-4 max-w-4xl">
         <Field label="태그라인" value={config.tagline} onChange={(v) => update('tagline', v)} />
-        <Field label="헤드라인 (줄바꿈: \\n)" value={config.headline} onChange={(v) => update('headline', v)} />
-        <Field label="서브타이틀" value={config.subtitle} onChange={(v) => update('subtitle', v)} />
+        <Field label="헤드라인" value={config.headline} onChange={(v) => update('headline', v)} rows={2} />
+        <Field label="서브타이틀" value={config.subtitle} onChange={(v) => update('subtitle', v)} rows={2} />
         <Field label="버튼 텍스트" value={config.buttonText} onChange={(v) => update('buttonText', v)} />
         <Field label="연락 안내 메시지" value={config.contactMessage} onChange={(v) => update('contactMessage', v)} />
         <Field label="연락 이메일" value={config.contactEmail} onChange={(v) => update('contactEmail', v)} />

@@ -38,7 +38,7 @@ export default function Achievements() {
           >
             <div className="achievement-index shrink-0">{String(i + 1).padStart(2, '0')}</div>
             <div className="flex-1 min-w-0">
-              <h4 className="text-base font-bold text-white mb-1 leading-snug">{item.title}</h4>
+              <h4 className="admin-copy text-base font-bold text-white mb-1 leading-snug">{item.title}</h4>
               <div className="text-sm text-gray-400 leading-relaxed"><MarkdownRenderer content={item.description} /></div>
             </div>
           </div>

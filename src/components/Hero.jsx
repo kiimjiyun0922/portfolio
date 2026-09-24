@@ -96,9 +96,9 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 0.55 }}
           className="mist-hero-meta text-left"
         >
-          <p className="font-semibold">{hero.tagline}</p>
-          <h1 className="max-w-[28ch] mt-1 whitespace-pre-line">{hero.headline}</h1>
-          <p className="mt-2 text-gray-500 max-w-[34ch]">{hero.subtitle}</p>
+          <p className="admin-copy font-semibold">{hero.tagline}</p>
+          <h1 className="admin-copy max-w-[28ch] mt-1">{hero.headline}</h1>
+          <p className="admin-copy mt-2 text-gray-500 max-w-[34ch]">{hero.subtitle}</p>
         </motion.div>
 
         <motion.dl
