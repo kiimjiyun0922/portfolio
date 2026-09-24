@@ -11,9 +11,6 @@ export default function Contact() {
   return (
     <footer id="contact" className="notebook-footer">
       <div className="notebook-footer__column notebook-footer__column--start">
-        <button type="button" onClick={scrollToTop} className="notebook-footer__link">
-          Back to top <span aria-hidden="true">↑</span>
-        </button>
         {config.email && <a href={`mailto:${config.email}`} className="notebook-footer__strong">{config.email}</a>}
       </div>
 
@@ -27,6 +24,9 @@ export default function Contact() {
       </div>
 
       <div className="notebook-footer__column notebook-footer__column--end">
+        <button type="button" onClick={scrollToTop} className="notebook-footer__link">
+          Back to top <span aria-hidden="true">↑</span>
+        </button>
         <p>{config.copyright}</p>
       </div>
     </footer>
