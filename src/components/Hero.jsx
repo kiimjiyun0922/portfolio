@@ -8,7 +8,7 @@ export default function Hero() {
   const reduceMotion = useReducedMotion()
   const focusX = useMotionValue(50)
   const focusY = useMotionValue(48)
-  const fogMask = useMotionTemplate`radial-gradient(circle clamp(92px, 24vw, 270px) at ${focusX}% ${focusY}%, transparent 0%, rgba(0,0,0,.04) 18%, rgba(0,0,0,.16) 38%, rgba(0,0,0,.46) 66%, rgba(0,0,0,.8) 88%, black 100%)`
+  const fogMask = useMotionTemplate`radial-gradient(circle clamp(126px, 34vw, 270px) at ${focusX}% ${focusY}%, transparent 0%, rgba(0,0,0,.03) 22%, rgba(0,0,0,.12) 43%, rgba(0,0,0,.4) 70%, rgba(0,0,0,.76) 90%, black 100%)`
 
   const workYears = (() => {
     const work = resume.work?.filter((item) => item.company && item.period) || []
@@ -50,12 +50,12 @@ export default function Hero() {
       focusY.set(48)
       return undefined
     }
-    const horizontal = animate(focusX, [38, 62, 56, 43, 38], {
+    const horizontal = animate(focusX, [42, 58, 54, 46, 42], {
       duration: 9,
       repeat: Infinity,
       ease: 'easeInOut',
     })
-    const vertical = animate(focusY, [50, 40, 57, 45, 50], {
+    const vertical = animate(focusY, [44, 40, 48, 42, 44], {
       duration: 11,
       repeat: Infinity,
       ease: 'easeInOut',
