@@ -377,6 +377,7 @@ function HeroSection() {
         <ResetButton onClick={handleReset} />
       </ActionBar>
       <div className="space-y-4 max-w-4xl">
+        <Field label="사이트 타이틀" value={config.siteTitle || ''} onChange={(v) => update('siteTitle', v)} />
         <Field label="태그라인" value={config.tagline} onChange={(v) => update('tagline', v)} />
         <Field label="헤드라인" value={config.headline} onChange={(v) => update('headline', v)} />
         <Field label="서브타이틀" value={config.subtitle} onChange={(v) => update('subtitle', v)} rows={2} />

@@ -567,6 +567,7 @@ export function resetResumeConfig() {
 // --- Hero Config ---
 
 const defaultHeroConfig = {
+  siteTitle: '김지윤 | Product Manager',
   tagline: 'PM Portfolio',
   headline: 'Data-driven decisions,\nUser-centric design',
   subtitle: 'A product manager who drives growth through data-driven decisions and user-centric design',
@@ -585,11 +586,13 @@ export function saveHeroConfig(config) {
   localStorage.setItem(HERO_KEY, JSON.stringify(config))
   cloudSet('hero', config)
   cloudSaveSnapshot('hero', config)
+  window.dispatchEvent(new CustomEvent('portfolio-site-title-change'))
 }
 
 export function resetHeroConfig() {
   localStorage.removeItem(HERO_KEY)
   cloudDelete('hero')
+  window.dispatchEvent(new CustomEvent('portfolio-site-title-change'))
   return defaultHeroConfig
 }
 

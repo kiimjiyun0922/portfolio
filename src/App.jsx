@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { recordHeartbeat, trackAction, setActiveSession, loadThemeSettings, ADMIN_PATH } from './utils/crypto'
+import { recordHeartbeat, trackAction, setActiveSession, loadThemeSettings, loadHeroConfig, ADMIN_PATH } from './utils/crypto'
 import { applyTheme, THEMES } from './themes'
 
 const Admin = lazy(() => import('./components/Admin'))
@@ -128,6 +128,15 @@ function App() {
   // Admin theme preview: { view: 'site' | 'gate', theme } — renders the real
   // visitor screens under the chosen theme without leaving the admin session
   const [themePreview, setThemePreview] = useState(null)
+
+  useEffect(() => {
+    const updateSiteTitle = () => {
+      document.title = loadHeroConfig().siteTitle?.trim() || '김지윤 | Product Manager'
+    }
+    updateSiteTitle()
+    window.addEventListener('portfolio-site-title-change', updateSiteTitle)
+    return () => window.removeEventListener('portfolio-site-title-change', updateSiteTitle)
+  }, [cloudReady])
 
   // One theme per screen: admin console stays on the default design,
   // the gate uses the admin-set entry theme, and an authenticated visitor
