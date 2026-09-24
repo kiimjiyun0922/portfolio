@@ -1420,7 +1420,13 @@ body {
   [data-theme="mist"] #about > div { margin-left: 0; }
   [data-theme="mist"] #projects > h2 { margin-bottom: 30px; }
   [data-theme="mist"] #projects .projects-archive { gap: 36px; }
-  [data-theme="mist"] .notebook-ornaments--projects { display: none; }
+  [data-theme="mist"] .notebook-ornaments--projects {
+    top: 92px;
+    right: 6px;
+    display: block;
+    width: 14px;
+    height: 124px;
+  }
   [data-theme="mist"] #projects .projects-archive-group {
     border-top: 2px solid rgba(49, 44, 31, .52);
   }
