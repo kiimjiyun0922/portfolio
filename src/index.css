@@ -1213,8 +1213,12 @@ body {
 @media (max-width: 767px) {
   [data-theme="mist"] {
     --paper-gutter: 24px;
-    --section-inset: 56px;
-    --section-head-gap: 28px;
+    --section-inset: 48px;
+    --section-head-gap: 24px;
+  }
+  [data-theme="mist"] .admin-copy {
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
   [data-theme="mist"] .portfolio-mobile-status,
   [data-theme="mist"] .notebook-top-button { display: none !important; }
@@ -1371,8 +1375,8 @@ body {
   [data-theme="mist"] .section-wrap { padding-block: var(--section-inset); }
   [data-theme="mist"] #about { padding-top: var(--section-inset); padding-bottom: var(--section-inset); }
   [data-theme="mist"] #about > div { margin-left: 0; }
-  [data-theme="mist"] #projects > h2 { margin-bottom: 36px; }
-  [data-theme="mist"] #projects .projects-archive { gap: 44px; }
+  [data-theme="mist"] #projects > h2 { margin-bottom: 30px; }
+  [data-theme="mist"] #projects .projects-archive { gap: 36px; }
   [data-theme="mist"] #projects .t-card { min-height: 0; }
   [data-theme="mist"] #projects .projects-archive-heading,
   [data-theme="mist"] #projects .t-card > div:first-child { grid-template-columns: 1fr; gap: 7px; }
@@ -1398,6 +1402,7 @@ body {
     --resume-key-column: 1fr;
     --resume-column-gap: 0px;
   }
+  [data-theme="mist"] .resume-sheet > * + * { margin-top: 36px; }
   [data-theme="mist"] .resume-block__heading {
     position: relative;
     display: block;
@@ -1423,8 +1428,8 @@ body {
   [data-theme="mist"] .experience-entry {
     grid-template-columns: 1fr;
     column-gap: 0;
-    row-gap: 18px;
-    padding-block: 22px;
+    row-gap: 14px;
+    padding-block: 20px;
   }
   [data-theme="mist"] .experience-entry__index {
     grid-column: 1;
@@ -1438,8 +1443,34 @@ body {
     padding-right: 36px;
   }
   [data-theme="mist"] .experience-entry__body { grid-column: 1; grid-row: 2; }
-  [data-theme="mist"] .experience-entry__other { padding-left: 0; }
-  [data-theme="mist"] .experience-entry__other ul { padding-left: 1.1em; }
+  [data-theme="mist"] .experience-entry__other {
+    margin-top: 12px;
+    padding-left: 0;
+  }
+  [data-theme="mist"] .experience-entry__other > p {
+    margin: 0 0 7px;
+  }
+  [data-theme="mist"] .experience-entry__other .admin-copy {
+    white-space: normal;
+  }
+  [data-theme="mist"] .experience-entry__other .admin-copy > * {
+    margin-block: 0 !important;
+  }
+  [data-theme="mist"] .experience-entry__other ul {
+    display: grid;
+    gap: 6px;
+    padding-left: 1.1em;
+  }
+  [data-theme="mist"] .experience-entry__other li {
+    margin: 0;
+    line-height: 1.5;
+  }
+  [data-theme="mist"] .experience-entry__other li > p { margin: 0; }
+}
+
+@media (max-width: 359px) {
+  [data-theme="mist"] .notebook-footer__label { white-space: normal; }
+  [data-theme="mist"] .t-gate .gate-title { font-size: 27px; }
 }
 
 @media (hover: none), (pointer: coarse) {
