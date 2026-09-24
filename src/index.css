@@ -373,18 +373,6 @@ body {
 [data-theme="mist"] .mist-nav-link:focus-visible::after { right: 0; }
 
 [data-theme="mist"] .mist-hero-title { z-index: 1; }
-[data-theme="mist"] #home::before {
-  content: '';
-  position: absolute;
-  z-index: 0;
-  inset: 12% 8% 18%;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse at 44% 49%, rgba(188, 105, 95, .3) 0 11%, rgba(188, 105, 95, .12) 28%, transparent 51%),
-    radial-gradient(ellipse at 59% 53%, rgba(223, 169, 119, .17), transparent 39%),
-    radial-gradient(ellipse at 57% 41%, rgba(132, 142, 164, .11), transparent 35%);
-  filter: blur(30px);
-}
 [data-theme="mist"] .mist-hero-title span {
   display: block;
   font-family: var(--font-display);
@@ -1423,10 +1411,6 @@ body {
   }
   [data-theme="mist"] .mist-hero-meta { order: 1; font-size: 13px; }
   [data-theme="mist"] .mist-hero-title span { font-size: clamp(2.35rem, 12vw, 4rem); }
-  [data-theme="mist"] #home::before {
-    inset: 20% -18% 25%;
-    filter: blur(20px);
-  }
   [data-theme="mist"] .mist-fog-layer::before { opacity: .42; }
   [data-theme="mist"] .mist-fog-layer::after { opacity: .34; }
   [data-theme="mist"] .notebook-ornaments--hero .notebook-mark--cross,
