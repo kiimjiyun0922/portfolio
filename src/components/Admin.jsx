@@ -53,6 +53,8 @@ import { SITE, SITE_HOST } from '../site.config'
 import { validateProjectsImport, validateResumeImport } from '../utils/importValidation'
 import { ImportExportBar } from './admin/JsonTransfer'
 import { downloadJson, importJson } from './admin/JsonTransferUtils'
+import { ACTION_LABELS, LOG_FILTERS, SECTION_LABELS, buildLogRows, countLogRows } from './admin/logModel'
+import { filterTokens, getTokenStatus, isActiveToken } from './admin/tokenModel'
 
 /* ─── Navigation ─── */
 
@@ -725,6 +727,7 @@ function parseOS(ua) {
 
 function TokensSection({ onPreviewTheme }) {
   const [tokens, setTokens] = useState(getAccessTokens)
+  const [tokenNow] = useState(Date.now)
   const [label, setLabel] = useState('')
   const [expMode, setExpMode] = useState('days') // 'days' or 'datetime'
   const [expDays, setExpDays] = useState(7)
@@ -736,7 +739,7 @@ function TokensSection({ onPreviewTheme }) {
   const [extendDays, setExtendDays] = useState(7)
   const [createOpen, setCreateOpen] = useState(false)
   const [createdToken, setCreatedToken] = useState(null) // plaintext shown once after creation
-  const [newTheme, setNewTheme] = useState('default') // theme attached to the new token
+  const [newTheme, setNewTheme] = useState('mist') // theme attached to the new token
   const [toast, setToast] = useState('')
 
   const [hoverStat, setHoverStat] = useState(null) // hovered day index on the stats chart
@@ -749,7 +752,7 @@ function TokensSection({ onPreviewTheme }) {
     setExpMode('days')
     setExpDays(7)
     setExpDatetime('')
-    setNewTheme('default')
+    setNewTheme('mist')
   }
 
   const flash = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2000) }
@@ -822,15 +825,6 @@ function TokensSection({ onPreviewTheme }) {
     refresh()
     flash(`${d}일 연장 완료`)
   }
-
-  const getStatus = (t) => {
-    if (t.revoked) return { text: '폐기됨', cls: 'text-gray-500' }
-    if (t.forceExpired) return { text: '만료(강제)', cls: 'text-yellow-400' }
-    if (new Date(t.expiresAt) < new Date()) return { text: '만료', cls: 'text-red-400' }
-    return { text: '활성', cls: 'text-green-400' }
-  }
-
-  const isActiveToken = (t) => !t.revoked && !t.forceExpired && t.expiresAt > Date.now()
 
   return (
     <div>
@@ -970,8 +964,8 @@ function TokensSection({ onPreviewTheme }) {
       <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
         <div className="flex items-center gap-1.5">
           {[
-            { key: 'active', label: '활성', count: tokens.filter(isActiveToken).length },
-            { key: 'expired', label: '만료', count: tokens.filter((t) => !t.revoked && !isActiveToken(t)).length },
+            { key: 'active', label: '활성', count: filterTokens(tokens, 'active', tokenNow).length },
+            { key: 'expired', label: '만료', count: filterTokens(tokens, 'expired', tokenNow).length },
             { key: 'revoked', label: '폐기', count: tokens.filter((t) => t.revoked).length },
           ].map((tab) => (
             <button
@@ -1099,14 +1093,14 @@ function TokensSection({ onPreviewTheme }) {
       )}
 
       <div className="space-y-3">
-        {tokens.filter((t) => (tokenTab === 'active' ? isActiveToken(t) : tokenTab === 'expired' ? (!t.revoked && !isActiveToken(t)) : t.revoked)).length === 0 && (
+        {filterTokens(tokens, tokenTab, tokenNow).length === 0 && (
           <p className="text-gray-600 text-sm py-4 text-center">
             {tokenTab === 'active' ? '활성 토큰이 없습니다' : tokenTab === 'expired' ? '만료된 토큰이 없습니다' : '폐기 기록이 없습니다'}
           </p>
         )}
-        {tokens.filter((t) => (tokenTab === 'active' ? isActiveToken(t) : tokenTab === 'expired' ? (!t.revoked && !isActiveToken(t)) : t.revoked)).map((t) => {
-          const status = getStatus(t)
-          const isActive = isActiveToken(t)
+        {filterTokens(tokens, tokenTab, tokenNow).map((t) => {
+          const status = getTokenStatus(t, tokenNow)
+          const isActive = isActiveToken(t, tokenNow)
           const logs = getAccessLogForToken(t.id)
           const isExpanded = expandedToken === t.id
 
@@ -1945,19 +1939,6 @@ function HomeSection({ onNavigate, onExportPDF, onViewPortfolio }) {
 
 /* ─── Access Logs Section ─── */
 
-const LOG_FILTERS = [
-  { key: 'all', label: '전체' },
-  { key: 'access', label: '인증 접속' },
-  { key: 'gate', label: '게이트 방문' },
-  { key: 'alert', label: '보안 알림' },
-]
-
-const SECTION_KO = {
-  about: '소개', journey: '커리어 저니', achievements: '핵심 성과',
-  projects: '최근 프로젝트', experience: '경력사항', resume: '학력·활동', contact: '연락처',
-}
-const ACTION_KIND_KO = { section: '섹션 도달', tab: '카드 탭', journey: '저니 클릭', detail: '경력 상세 펼침', click: '클릭' }
-
 function LogsSection() {
   const [filter, setFilter] = useState('all')
   const [openRow, setOpenRow] = useState(null)
@@ -1965,8 +1946,6 @@ function LogsSection() {
   const [toast, setToast] = useState('')
   const [now] = useState(Date.now)
   const flash = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2000) }
-
-  const LIVE_WINDOW = 6 * 60 * 1000
 
   const removeRow = (r) => {
     if (!confirm('이 기록을 삭제하시겠습니까?')) return
@@ -1989,39 +1968,7 @@ function LogsSection() {
     flash(`${label} 기록 전체 삭제 완료`)
   }
 
-  // Merge the three log stores into one timeline
-  const rows = [
-    ...getAccessLog().map((l) => ({
-      kind: 'access',
-      at: l.accessedAt,
-      title: l.tokenLabel || 'unknown',
-      detail: l.lastSeenAt && now - l.lastSeenAt < LIVE_WINDOW
-        ? '지금 열람 중'
-        : l.lastSeenAt && Math.round((l.lastSeenAt - l.accessedAt) / 60000) >= 1
-          ? `체류 ${Math.round((l.lastSeenAt - l.accessedAt) / 60000)}분`
-          : '',
-      ua: l.userAgent,
-      lang: l.language,
-      live: l.lastSeenAt && now - l.lastSeenAt < LIVE_WINDOW,
-      actions: l.actions || [],
-    })),
-    ...getGateLog().map((l) => ({
-      kind: 'gate',
-      at: l.visitedAt,
-      title: '게이트 도달',
-      detail: l.referrer ? `유입: ${l.referrer.replace(/^https?:\/\//, '').slice(0, 40)}` : '직접 접속',
-      ua: l.userAgent,
-      lang: l.language,
-    })),
-    ...getAlertLog().map((l) => ({
-      kind: 'alert',
-      at: l.at,
-      title: l.type === 'admin_fail' ? '어드민 로그인 실패' : '잘못된 토큰 시도',
-      detail: l.detail || '',
-      ua: l.userAgent,
-      lang: l.language,
-    })),
-  ].sort((a, b) => b.at - a.at)
+  const rows = buildLogRows({ accessLogs: getAccessLog(), gateLogs: getGateLog(), alertLogs: getAlertLog(), now })
 
   const filtered = filter === 'all' ? rows : rows.filter((r) => r.kind === filter)
   const KIND_STYLE = {
@@ -2030,8 +1977,7 @@ function LogsSection() {
     alert: 'bg-red-500/15 text-red-400',
   }
   const KIND_LABEL = { access: '인증', gate: '방문', alert: '알림' }
-  const counts = { all: rows.length, access: 0, gate: 0, alert: 0 }
-  rows.forEach((r) => { counts[r.kind]++ })
+  const counts = countLogRows(rows)
 
   return (
     <div>
@@ -2094,12 +2040,12 @@ function LogsSection() {
                   <div className="px-4 pb-3 pt-1 border-t border-gray-800/70 space-y-1">
                     {r.actions.map((a, ai) => {
                       const offMin = Math.max(0, Math.round((a.t - r.at) / 60000))
-                      const target = a.kind === 'section' ? (SECTION_KO[a.target] || a.target) : a.target
+                      const target = a.kind === 'section' ? (SECTION_LABELS[a.target] || a.target) : a.target
                       return (
                         <div key={ai} className="flex items-center gap-2 text-[11px] text-gray-500">
                           <span className="font-mono text-gray-600 w-12 shrink-0">+{offMin}분</span>
                           <span className={`px-1.5 py-0.5 rounded text-[10px] shrink-0 ${a.kind === 'tab' ? 'bg-purple-500/10 text-purple-400' : a.kind === 'journey' ? 'bg-teal-500/10 text-teal-400' : a.kind === 'detail' ? 'bg-amber-500/10 text-amber-400' : 'bg-gray-800 text-gray-400'}`}>
-                            {ACTION_KIND_KO[a.kind] || a.kind}
+                            {ACTION_LABELS[a.kind] || a.kind}
                           </span>
                           <span className="truncate text-gray-400">{target}</span>
                         </div>
