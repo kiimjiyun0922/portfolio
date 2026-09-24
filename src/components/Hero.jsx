@@ -89,31 +89,33 @@ export default function Hero() {
         style={{ maskImage: fogMask, WebkitMaskImage: fogMask }}
       />
 
-      <motion.div
-        initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.55 }}
-        className="mist-hero-meta absolute left-5 sm:left-8 md:left-11 bottom-7 sm:bottom-9 text-left"
-      >
-        <p className="font-semibold">{hero.tagline}</p>
-        <h1 className="max-w-[28ch] mt-1 whitespace-pre-line">{hero.headline}</h1>
-        <p className="mt-2 text-gray-500 max-w-[34ch]">{hero.subtitle}</p>
-      </motion.div>
+      <div className="mist-hero-footer">
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.55 }}
+          className="mist-hero-meta text-left"
+        >
+          <p className="font-semibold">{hero.tagline}</p>
+          <h1 className="max-w-[28ch] mt-1 whitespace-pre-line">{hero.headline}</h1>
+          <p className="mt-2 text-gray-500 max-w-[34ch]">{hero.subtitle}</p>
+        </motion.div>
 
-      <motion.dl
-        initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.7 }}
-        className="mist-hero-stats"
-        aria-label="Portfolio highlights"
-      >
-        {statItems.map((stat) => (
-          <button key={`${stat.label}-${stat.num}`} type="button" onClick={() => scrollTo(stat.link || 'projects')}>
-            <dd>{stat.num}</dd>
-            <dt>{stat.label}</dt>
-          </button>
-        ))}
-      </motion.dl>
+        <motion.dl
+          initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.7 }}
+          className="mist-hero-stats"
+          aria-label="Portfolio highlights"
+        >
+          {statItems.map((stat) => (
+            <button key={`${stat.label}-${stat.num}`} type="button" onClick={() => scrollTo(stat.link || 'projects')}>
+              <dd>{stat.num}</dd>
+              <dt>{stat.label}</dt>
+            </button>
+          ))}
+        </motion.dl>
+      </div>
 
     </section>
   )
