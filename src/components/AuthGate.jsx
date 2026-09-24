@@ -143,9 +143,8 @@ export default function AuthGate({ onSuccess }) {
       >
         {headlineParts.length > 1 ? (
           <>
-            {headlineParts[0]}
-            <br />
-            <span className="text-accent">{headlineParts.slice(1).join('\n')}</span>
+            <span className="gate-title__line">{headlineParts[0]}</span>
+            <span className="gate-title__line gate-title__line--accent">{headlineParts.slice(1).join('\n')}</span>
           </>
         ) : (
           config.headline
