@@ -1397,7 +1397,7 @@ body {
     left: var(--paper-gutter);
     gap: 16px;
   }
-  [data-theme="mist"] .mist-hero-title { transform: translateY(-7dvh); }
+  [data-theme="mist"] .mist-hero-title { transform: translateY(-16dvh); }
   [data-theme="mist"] .mist-hero-stats {
     order: 2;
     width: 100%;

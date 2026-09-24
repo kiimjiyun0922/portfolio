@@ -5,6 +5,7 @@ import { loadHeroConfig, loadResumeConfig } from '../utils/crypto'
 export default function Hero() {
   const [hero] = useState(loadHeroConfig)
   const [resume] = useState(loadResumeConfig)
+  const [isMobile, setIsMobile] = useState(false)
   const reduceMotion = useReducedMotion()
   const focusX = useMotionValue(50)
   const focusY = useMotionValue(48)
@@ -45,9 +46,18 @@ export default function Hero() {
   }
 
   useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined
+    const query = window.matchMedia('(max-width: 767px)')
+    const update = () => setIsMobile(query.matches)
+    update()
+    query.addEventListener('change', update)
+    return () => query.removeEventListener('change', update)
+  }, [])
+
+  useEffect(() => {
     if (reduceMotion) {
       focusX.set(50)
-      focusY.set(48)
+      focusY.set(isMobile ? 33 : 48)
       return undefined
     }
     const horizontal = animate(focusX, [42, 58, 54, 46, 42], {
@@ -55,7 +65,7 @@ export default function Hero() {
       repeat: Infinity,
       ease: 'easeInOut',
     })
-    const vertical = animate(focusY, [44, 40, 48, 42, 44], {
+    const vertical = animate(focusY, isMobile ? [33, 29, 37, 31, 33] : [44, 40, 48, 42, 44], {
       duration: 11,
       repeat: Infinity,
       ease: 'easeInOut',
@@ -64,7 +74,7 @@ export default function Hero() {
       horizontal.stop()
       vertical.stop()
     }
-  }, [focusX, focusY, reduceMotion])
+  }, [focusX, focusY, isMobile, reduceMotion])
 
   return (
     <section id="home" className="t-hero relative min-h-[100dvh] flex flex-col items-center justify-center px-5 text-center overflow-hidden">
