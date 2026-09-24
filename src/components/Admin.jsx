@@ -61,28 +61,28 @@ import { ActionBar, AutoTextarea, Field, FloatingJumpNav, ResetButton, SaveButto
 
 const NAV_ITEMS = [
   { group: '대시보드', items: [
-    { id: 'home', label: '홈', icon: '📊' },
+    { id: 'home', label: '홈', icon: '01' },
   ]},
   { group: '콘텐츠', items: [
-    { id: 'projects', label: '프로젝트', icon: '🚀' },
-    { id: 'resume', label: '경력·학력', icon: '📄' },
-    { id: 'about', label: '소개', icon: '👋' },
-    { id: 'achievements', label: '핵심 성과', icon: '🏆' },
-    { id: 'journey', label: '커리어 저니', icon: '🗺️' },
+    { id: 'projects', label: '프로젝트', icon: '02' },
+    { id: 'resume', label: '경력·학력', icon: '03' },
+    { id: 'about', label: '소개', icon: '04' },
+    { id: 'achievements', label: '핵심 성과', icon: '05' },
+    { id: 'journey', label: '커리어 저니', icon: '06' },
   ]},
   { group: '페이지 설정', items: [
-    { id: 'hero', label: '히어로', icon: '🏠' },
-    { id: 'authgate', label: '접속 화면', icon: '🔐' },
-    { id: 'theme', label: '테마', icon: '🎨' },
-    { id: 'contact', label: '연락처', icon: '✉️' },
+    { id: 'hero', label: '히어로', icon: '07' },
+    { id: 'authgate', label: '접속 화면', icon: '08' },
+    { id: 'theme', label: '테마', icon: '09' },
+    { id: 'contact', label: '연락처', icon: '10' },
   ]},
   { group: '접속 관리', items: [
-    { id: 'tokens', label: '토큰', icon: '🎫' },
-    { id: 'logs', label: '접속 로그', icon: '📋' },
+    { id: 'tokens', label: '토큰', icon: '11' },
+    { id: 'logs', label: '접속 로그', icon: '12' },
   ]},
   { group: '설정', items: [
-    { id: 'history', label: '변경 이력', icon: '🕘' },
-    { id: 'account', label: '관리자 계정', icon: '⚙️' },
+    { id: 'history', label: '변경 이력', icon: '13' },
+    { id: 'account', label: '관리자 계정', icon: '14' },
   ]},
 ]
 
@@ -917,7 +917,7 @@ function TokensSection({ onPreviewTheme }) {
                   {createdToken}
                 </div>
                 <div className="bg-amber-500/10 border border-amber-500/25 rounded-lg px-3 py-2.5 text-[11px] text-amber-200/90 leading-relaxed mb-4">
-                  ⚠️ 토큰은 해시로 저장되므로 <b>이 화면을 닫으면 다시 확인할 수 없습니다.</b> 지금 복사해서 전달하세요.
+                  <b>주의.</b> 토큰은 해시로 저장되므로 <b>이 화면을 닫으면 다시 확인할 수 없습니다.</b> 지금 복사해서 전달하세요.
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => copyToken(createdToken)} className="flex-1 px-4 py-2.5 bg-accent hover:bg-accent-light text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer">토큰 복사</button>
@@ -994,7 +994,7 @@ function TokensSection({ onPreviewTheme }) {
                       title="이 토큰의 방문자 테마 (다음 접속부터 적용)"
                       className="px-1.5 py-1 text-xs bg-gray-800 text-gray-300 border border-gray-700 rounded-lg cursor-pointer focus:outline-none focus:border-accent"
                     >
-                      {THEMES.map((th) => <option key={th.id} value={th.id}>🎨 {th.name}</option>)}
+                      {THEMES.map((th) => <option key={th.id} value={th.id}>{th.name}</option>)}
                     </select>
                   )}
                   {t.token && (
@@ -1428,7 +1428,7 @@ function AchievementsSection() {
 
   const removeItem = (i) => setConfig({ ...config, items: items.filter((_, idx) => idx !== i) })
 
-  const addItem = () => setConfig({ ...config, items: [...items, { icon: '🎯', iconBg: '#1f2937', title: '', description: '' }] })
+  const addItem = () => setConfig({ ...config, items: [...items, { icon: '', iconBg: '#1f2937', title: '', description: '' }] })
 
   return (
     <div>
@@ -1442,12 +1442,10 @@ function AchievementsSection() {
         {items.map((item, i) => (
           <div key={i} className="bg-gray-900 rounded-xl p-4 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-lg">{item.icon}</span>
+              <span className="text-xs font-mono text-gray-500">{String(i + 1).padStart(2, '0')}</span>
               <button onClick={() => removeItem(i)} className="text-xs text-red-400 hover:text-red-300 cursor-pointer">삭제</button>
             </div>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              <Field label="아이콘 (이모지)" value={item.icon} onChange={(v) => updateItem(i, { ...item, icon: v })} />
-              <Field label="배경색" value={item.iconBg || '#1f2937'} onChange={(v) => updateItem(i, { ...item, iconBg: v })} />
+            <div className="grid grid-cols-1 gap-2">
               <Field label="제목" value={item.title} onChange={(v) => updateItem(i, { ...item, title: v })} />
             </div>
             <Field label="설명" value={item.description} onChange={(v) => updateItem(i, { ...item, description: v })} rows={2} />
@@ -1482,7 +1480,7 @@ function JourneySection() {
 
   const removeItem = (i) => setConfig({ ...config, items: items.filter((_, idx) => idx !== i) })
 
-  const addItem = () => setConfig({ ...config, items: [...items, { year: '', org: '', field: '', color: '#4f46e5', emoji: '💼', companyId: '' }] })
+  const addItem = () => setConfig({ ...config, items: [...items, { year: '', org: '', field: '', color: '#75684d', emoji: '', companyId: '' }] })
 
   const move = (i, dir) => {
     const j = i + dir
@@ -1495,7 +1493,7 @@ function JourneySection() {
     <div>
       <SectionHeader title="커리어 저니" description="Career Journey 타임라인을 관리합니다" />
       <div className="bg-accent/5 border border-accent/15 rounded-lg px-4 py-3 mb-5 text-xs text-gray-400 leading-relaxed">
-        💡 항목은 <b className="text-gray-300">최신순(맨 위 = 현재)</b>으로 정렬하세요. 데스크탑 화면에서는 오래된 항목부터 5개씩 줄바꿈되며 <b className="text-gray-300">S자 흐름이 자동으로</b> 만들어집니다 — 개수가 늘어도 별도 설정이 필요 없습니다. 모바일은 위에서 아래로 최신순 세로 타임라인으로 표시됩니다.
+        항목은 <b className="text-gray-300">최신순(맨 위 = 현재)</b>으로 정렬하세요. 데스크탑 화면에서는 오래된 항목부터 5개씩 줄바꿈되며 <b className="text-gray-300">S자 흐름이 자동으로</b> 만들어집니다 — 개수가 늘어도 별도 설정이 필요 없습니다. 모바일은 위에서 아래로 최신순 세로 타임라인으로 표시됩니다.
       </div>
       <ActionBar>
         <SaveButton onClick={handleSave} />
@@ -1508,7 +1506,7 @@ function JourneySection() {
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
                 <span className="w-3 h-3 rounded-full border-2 shrink-0" style={{ borderColor: item.color, backgroundColor: item.current ? item.color : 'transparent' }} />
-                <span className="text-sm text-white truncate">{item.emoji} {item.org || '새 항목'}</span>
+                <span className="text-sm text-white truncate">{item.org || '새 항목'}</span>
                 {item.current && <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent/20 text-accent shrink-0">NOW</span>}
               </div>
               <div className="flex items-center gap-1 shrink-0">
@@ -1517,11 +1515,10 @@ function JourneySection() {
                 <button onClick={() => removeItem(i)} className="text-xs text-red-400 hover:text-red-300 cursor-pointer ml-1">삭제</button>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
               <Field label="연도" value={item.year || ''} onChange={(v) => updateItem(i, { ...item, year: v })} />
               <Field label="회사명" value={item.org || ''} onChange={(v) => updateItem(i, { ...item, org: v })} />
               <Field label="분야" value={item.field || ''} onChange={(v) => updateItem(i, { ...item, field: v })} />
-              <Field label="이모지" value={item.emoji || ''} onChange={(v) => updateItem(i, { ...item, emoji: v })} />
             </div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               <Field label="색상 (hex)" value={item.color || ''} onChange={(v) => updateItem(i, { ...item, color: v })} />
@@ -1610,10 +1607,10 @@ function HomeSection({ onNavigate, onExportPDF, onViewPortfolio }) {
   ]
 
   const shortcuts = [
-    { icon: '🚀', label: '프로젝트 편집', desc: '카드·그룹 관리', action: () => onNavigate('projects') },
-    { icon: '🎫', label: '토큰 발급', desc: '접속 권한 관리', action: () => onNavigate('tokens') },
-    { icon: '📑', label: 'PDF 출력', desc: '전체 내용 문서화', action: onExportPDF },
-    { icon: '👁', label: '포트폴리오 보기', desc: '방문자 화면 확인', action: onViewPortfolio },
+    { icon: '01', label: '프로젝트 편집', desc: '카드·그룹 관리', action: () => onNavigate('projects') },
+    { icon: '02', label: '토큰 발급', desc: '접속 권한 관리', action: () => onNavigate('tokens') },
+    { icon: '03', label: 'PDF 출력', desc: '전체 내용 문서화', action: onExportPDF },
+    { icon: '04', label: '포트폴리오 보기', desc: '방문자 화면 확인', action: onViewPortfolio },
   ]
 
   return (
@@ -1774,10 +1771,10 @@ function HomeSection({ onNavigate, onExportPDF, onViewPortfolio }) {
       <div className="bg-gray-900 rounded-xl p-5">
         <h3 className="text-sm font-semibold text-accent mb-3">콘텐츠 현황</h3>
         <div className="flex flex-wrap gap-2">
-          <button onClick={() => onNavigate('projects')} className="px-3 py-1.5 bg-gray-800/60 hover:bg-gray-800 rounded-lg text-xs text-gray-300 cursor-pointer transition-colors">🚀 프로젝트 <b className="text-white">{projectCount}</b></button>
-          <button onClick={() => onNavigate('resume')} className="px-3 py-1.5 bg-gray-800/60 hover:bg-gray-800 rounded-lg text-xs text-gray-300 cursor-pointer transition-colors">📄 경력 <b className="text-white">{companyCount}</b>개사</button>
-          <button onClick={() => onNavigate('resume')} className="px-3 py-1.5 bg-gray-800/60 hover:bg-gray-800 rounded-lg text-xs text-gray-300 cursor-pointer transition-colors">⭐ 활동 <b className="text-white">{activityCount}</b></button>
-          <button onClick={() => onNavigate('journey')} className="px-3 py-1.5 bg-gray-800/60 hover:bg-gray-800 rounded-lg text-xs text-gray-300 cursor-pointer transition-colors">🗺️ 저니 <b className="text-white">{(loadJourneyConfig().items || []).length}</b></button>
+          <button onClick={() => onNavigate('projects')} className="px-3 py-1.5 bg-gray-800/60 hover:bg-gray-800 rounded-lg text-xs text-gray-300 cursor-pointer transition-colors">프로젝트 <b className="text-white">{projectCount}</b></button>
+          <button onClick={() => onNavigate('resume')} className="px-3 py-1.5 bg-gray-800/60 hover:bg-gray-800 rounded-lg text-xs text-gray-300 cursor-pointer transition-colors">경력 <b className="text-white">{companyCount}</b>개사</button>
+          <button onClick={() => onNavigate('resume')} className="px-3 py-1.5 bg-gray-800/60 hover:bg-gray-800 rounded-lg text-xs text-gray-300 cursor-pointer transition-colors">활동 <b className="text-white">{activityCount}</b></button>
+          <button onClick={() => onNavigate('journey')} className="px-3 py-1.5 bg-gray-800/60 hover:bg-gray-800 rounded-lg text-xs text-gray-300 cursor-pointer transition-colors">저니 <b className="text-white">{(loadJourneyConfig().items || []).length}</b></button>
         </div>
       </div>
     </div>
@@ -1914,14 +1911,14 @@ function LogsSection() {
 /* ─── History Section ─── */
 
 const HISTORY_DOCS = [
-  { id: 'projects', label: '프로젝트', icon: '🚀' },
-  { id: 'resume', label: '경력·학력', icon: '📄' },
-  { id: 'about', label: '소개', icon: '👋' },
-  { id: 'achievements', label: '핵심 성과', icon: '🏆' },
-  { id: 'journey', label: '커리어 저니', icon: '🗺️' },
-  { id: 'hero', label: '히어로', icon: '🏠' },
-  { id: 'authgate', label: '접속 화면', icon: '🔐' },
-  { id: 'contact', label: '연락처', icon: '✉️' },
+  { id: 'projects', label: '프로젝트', icon: '01' },
+  { id: 'resume', label: '경력·학력', icon: '02' },
+  { id: 'about', label: '소개', icon: '03' },
+  { id: 'achievements', label: '핵심 성과', icon: '04' },
+  { id: 'journey', label: '커리어 저니', icon: '05' },
+  { id: 'hero', label: '히어로', icon: '06' },
+  { id: 'authgate', label: '접속 화면', icon: '07' },
+  { id: 'contact', label: '연락처', icon: '08' },
 ]
 
 function HistorySection() {
@@ -2121,7 +2118,7 @@ export default function Admin({ onLogout, onViewPortfolio, onPreviewTheme }) {
           </h1>
           {cloudConfigured && ownerUser ? (
             <p className="text-[11px] text-gray-600 mt-0.5 truncate" title={ownerUser.email}>
-              🔐 <span className="text-gray-500">{ownerUser.email}</span> 로 인증됨
+              <span className="text-gray-500">{ownerUser.email}</span> 로 인증됨
             </p>
           ) : (
             <p className="text-[11px] text-gray-600 mt-0.5">{SITE_HOST} 관리 콘솔</p>
@@ -2234,7 +2231,7 @@ export default function Admin({ onLogout, onViewPortfolio, onPreviewTheme }) {
                   PDF 출력
                 </button>
                 {cloudConfigured && ownerUser && (
-                  <p className="text-[10px] text-gray-600 text-center truncate">🔐 <span className="text-gray-500">{ownerUser.email}</span> 로 인증됨</p>
+                  <p className="text-[10px] text-gray-600 text-center truncate"><span className="text-gray-500">{ownerUser.email}</span> 로 인증됨</p>
                 )}
               </div>
             </div>

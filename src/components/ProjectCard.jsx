@@ -70,12 +70,11 @@ function StoryTabs({ project }) {
             <MarkdownRenderer content={project.result} />
           </div>
 
-          {/* Insight */}
-          {project.insight && (
-            <div className="bg-gray-900/80 border border-gray-700/40 rounded-lg px-4 py-4">
-              <div className="flex gap-3 items-start">
-                <span className="text-base shrink-0">💡</span>
-                <div>
+              {/* Insight */}
+              {project.insight && (
+                <div className="bg-gray-900/80 border border-gray-700/40 rounded-lg px-4 py-4">
+                  <div className="flex gap-3 items-start">
+                    <div>
                   <p className="text-[10px] font-mono text-accent/50 uppercase tracking-wider mb-2">Insight</p>
                   <div className="text-[13px] text-gray-400 leading-[1.7]">
                     <MarkdownRenderer content={project.insight} />
@@ -100,6 +99,7 @@ export default function ProjectCard({ project }) {
 
   return (
     <div
+      data-note-cursor="CASE NOTE ↗"
       className="t-card h-full flex flex-col bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6 md:p-8 hover:border-accent/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/5"
     >
       {/* Header */}

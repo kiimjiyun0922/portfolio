@@ -1,123 +1,120 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { animate, motion, useMotionTemplate, useMotionValue, useReducedMotion } from 'framer-motion'
 import { loadHeroConfig, loadResumeConfig } from '../utils/crypto'
 
 export default function Hero() {
   const [hero] = useState(loadHeroConfig)
-  const resume = loadResumeConfig()
+  const [resume] = useState(loadResumeConfig)
+  const reduceMotion = useReducedMotion()
+  const focusX = useMotionValue(50)
+  const focusY = useMotionValue(48)
+  const fogMask = useMotionTemplate`radial-gradient(circle 270px at ${focusX}% ${focusY}%, transparent 0%, rgba(0,0,0,.03) 18%, rgba(0,0,0,.14) 38%, rgba(0,0,0,.42) 66%, rgba(0,0,0,.78) 88%, black 100%)`
+
+  const workYears = (() => {
+    const work = resume.work?.filter((item) => item.company && item.period) || []
+    let months = 0
+    work.forEach((item) => {
+      const [startText, endText] = item.period.split('~').map((part) => part.trim())
+      const start = startText?.match(/(\d{4})\.(\d{1,2})/)
+      const end = endText?.match(/(\d{4})\.(\d{1,2})/)
+      if (!start) return
+      const startYear = Number(start[1])
+      const startMonth = Number(start[2])
+      const endYear = end ? Number(end[1]) : new Date().getFullYear()
+      const endMonth = end ? Number(end[2]) : new Date().getMonth() + 1
+      months += Math.max(0, (endYear - startYear) * 12 + endMonth - startMonth)
+    })
+    return Math.floor(months / 12)
+  })()
+
+  const totalProjects = resume.work?.reduce((sum, item) => {
+    const mainProjects = item.projects?.length || 0
+    const otherProjects = item.otherProjects ? (item.otherProjects.match(/^- /gm) || []).length : 0
+    return sum + mainProjects + otherProjects
+  }, 0) || 0
+
+  const computedStats = [
+    { num: `${workYears}+`, label: 'Years experience', link: 'journey' },
+    { num: `${totalProjects}+`, label: 'Projects', link: 'projects' },
+    { num: String(resume.work?.filter((item) => item.company).length || 0), label: 'Companies', link: 'journey' },
+  ]
+  const statItems = hero.stats?.length > 0 ? hero.stats : computedStats
 
   const scrollTo = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  // Auto-compute stats from real data
-  const workYears = (() => {
-    const work = resume.work?.filter((w) => w.company && w.period) || []
-    let months = 0
-    work.forEach((w) => {
-      const parts = w.period.split('~').map((s) => s.trim())
-      const start = parts[0]?.match(/(\d{4})\.(\d{1,2})/)
-      const end = parts[1]?.match(/(\d{4})\.(\d{1,2})/)
-      if (start) {
-        const sy = +start[1], sm = +start[2]
-        const ey = end ? +end[1] : new Date().getFullYear()
-        const em = end ? +end[2] : new Date().getMonth() + 1
-        months += (ey - sy) * 12 + (em - sm)
-      }
+  useEffect(() => {
+    if (reduceMotion) {
+      focusX.set(50)
+      focusY.set(48)
+      return undefined
+    }
+    const horizontal = animate(focusX, [38, 62, 56, 43, 38], {
+      duration: 9,
+      repeat: Infinity,
+      ease: 'easeInOut',
     })
-    return Math.floor(months / 12)
-  })()
-  const totalProjects = resume.work?.reduce((sum, w) => {
-    const main = w.projects?.length || 0
-    const other = w.otherProjects ? (w.otherProjects.match(/^- /gm) || []).length : 0
-    return sum + main + other
-  }, 0) || 0
-  const totalCompanies = resume.work?.filter((w) => w.company).length || 0
-
-  const statItems = hero.stats?.length > 0 ? hero.stats : [
-    { num: `${workYears}+`, label: 'Years Experience', link: 'journey' },
-    { num: `${totalProjects}+`, label: 'Projects', link: 'projects' },
-    { num: `${totalCompanies}`, label: 'Companies', link: 'journey' },
-  ]
+    const vertical = animate(focusY, [50, 40, 57, 45, 50], {
+      duration: 11,
+      repeat: Infinity,
+      ease: 'easeInOut',
+    })
+    return () => {
+      horizontal.stop()
+      vertical.stop()
+    }
+  }, [focusX, focusY, reduceMotion])
 
   return (
-    <section className="t-hero relative min-h-[100dvh] flex flex-col items-center justify-center px-6 text-center overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-accent/10 via-transparent to-transparent pointer-events-none" />
+    <section id="home" className="t-hero relative min-h-[100dvh] flex flex-col items-center justify-center px-5 text-center overflow-hidden">
+      <div className="mist-hero-title relative" aria-label="Portfolio">
+        <motion.span
+          initial={reduceMotion ? false : { opacity: 0, filter: 'blur(16px)', letterSpacing: '0.13em' }}
+          animate={{ opacity: 1, filter: 'blur(0px)', letterSpacing: '0.035em' }}
+          transition={{ duration: 1.25, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
+        >PORTFOLIO</motion.span>
+      </div>
 
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-accent text-sm md:text-base font-medium tracking-wider uppercase mb-6"
-      >
-        {hero.tagline}
-      </motion.p>
+      <div className="notebook-ornaments notebook-ornaments--hero" aria-hidden="true">
+        <i className="notebook-mark notebook-mark--star" />
+        <i className="notebook-mark notebook-mark--dot" />
+        <i className="notebook-mark notebook-mark--cross" />
+        <i className="notebook-mark notebook-mark--clover" />
+      </div>
 
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold leading-tight max-w-4xl text-balance"
-      >
-        {hero.headline.includes('\n') ? (
-          <>
-            {hero.headline.split('\n')[0]}
-            <br />
-            <span className="text-accent">{hero.headline.split('\n').slice(1).join('\n')}</span>
-          </>
-        ) : (
-          hero.headline
-        )}
-      </motion.h1>
-
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-        className="mt-4 sm:mt-6 text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl text-balance"
-      >
-        {hero.subtitle}
-      </motion.p>
-
-      {/* Stats — clickable */}
-      {statItems.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.55 }}
-          className="t-stats mt-8 sm:mt-10 flex gap-5 sm:gap-6 md:gap-12 flex-wrap justify-center"
-        >
-          {statItems.map((stat, i) => (
-            <motion.button
-              key={i}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => scrollTo(stat.link || 'projects')}
-              className="text-center cursor-pointer group"
-            >
-              <div className="t-num text-2xl sm:text-3xl md:text-4xl font-bold text-white group-hover:text-accent transition-colors">{stat.num}</div>
-              <div className="text-[10px] sm:text-xs text-gray-500 group-hover:text-gray-400 tracking-wide mt-1 transition-colors">{stat.label}</div>
-            </motion.button>
-          ))}
-        </motion.div>
-      )}
-
-      {/* Scroll indicator */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
-        className="absolute bottom-6 md:bottom-10"
+        aria-hidden="true"
+        className="mist-fog-layer absolute inset-0 pointer-events-none"
+        style={{ maskImage: fogMask, WebkitMaskImage: fogMask }}
+      />
+
+      <motion.div
+        initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.55 }}
+        className="mist-hero-meta absolute left-5 sm:left-8 md:left-11 bottom-7 sm:bottom-9 text-left"
       >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5 }}
-          className="w-6 h-10 border-2 border-gray-600 rounded-full flex justify-center pt-2"
-        >
-          <div className="w-1 h-2 bg-gray-400 rounded-full" />
-        </motion.div>
+        <p className="font-semibold">{hero.tagline}</p>
+        <h1 className="max-w-[28ch] mt-1 whitespace-pre-line">{hero.headline}</h1>
+        <p className="mt-2 text-gray-500 max-w-[34ch]">{hero.subtitle}</p>
       </motion.div>
+
+      <motion.dl
+        initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.7 }}
+        className="mist-hero-stats"
+        aria-label="Portfolio highlights"
+      >
+        {statItems.map((stat) => (
+          <button key={`${stat.label}-${stat.num}`} type="button" onClick={() => scrollTo(stat.link || 'projects')}>
+            <dd>{stat.num}</dd>
+            <dt>{stat.label}</dt>
+          </button>
+        ))}
+      </motion.dl>
+
     </section>
   )
 }

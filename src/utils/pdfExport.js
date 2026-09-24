@@ -89,7 +89,7 @@ export async function exportPortfolioPDF({ resume, projects, achievements, hero,
         if (p.solution) card += `<div style="font-size:8px;color:#555;line-height:1.6;margin-bottom:3px;"><span style="color:#3b82f6;font-weight:600;">Solution</span> ${md(p.solution)}</div>`
         if (p.collaboration) card += `<div style="font-size:8px;color:#555;line-height:1.6;margin-bottom:3px;"><span style="color:#3b82f6;font-weight:600;">Collab</span> ${md(p.collaboration)}</div>`
         if (p.result) card += `<div style="font-size:8px;color:#3b82f6;line-height:1.6;margin-bottom:3px;"><b>Result</b> ${md(p.result)}</div>`
-        if (p.insight) card += `<div style="font-size:7.5px;color:#888;font-style:italic;margin-top:3px;">💡 ${md(p.insight)}</div>`
+        if (p.insight) card += `<div style="font-size:7.5px;color:#888;font-style:italic;margin-top:3px;">${md(p.insight)}</div>`
         card += '</div>'
         sections.push(sec(card))
       })

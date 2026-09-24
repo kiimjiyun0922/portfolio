@@ -26,28 +26,28 @@ export const sampleAbout = {
 export const sampleAchievements = {
   items: [
     {
-      icon: '🤖',
+      icon: '',
       iconBg: '#1e293b',
       title: 'AI 상담 어시스턴트 출시',
       description: '상담 처리 시간 **-42%**, 상담사 CSAT **4.6/5.0** — 9주 만에 MVP 출시 후 전사 확대',
       linkTo: 'projects',
     },
     {
-      icon: '📈',
+      icon: '',
       iconBg: '#1c2a22',
       title: '추천 피드 전환율 개선',
       description: '홈 피드 개인화 실험 17회 누적으로 구매 전환율 **+31%**, 재방문율 **+18%**',
       linkTo: 'projects',
     },
     {
-      icon: '🧭',
+      icon: '',
       iconBg: '#2a2320',
       title: '온보딩 리디자인',
       description: '가입 완료율 **58% → 79%** — 리서치 기반 단계 축소와 빈 상태 재설계',
       linkTo: 'experience',
     },
     {
-      icon: '🤝',
+      icon: '',
       iconBg: '#241d2e',
       title: '크로스펑셔널 조직 리드',
       description: '개발 6 · 디자인 2 · 데이터 2로 구성된 스쿼드의 분기 로드맵과 실험 파이프라인 운영',
@@ -58,9 +58,9 @@ export const sampleAchievements = {
 
 export const sampleJourney = {
   items: [
-    { year: '2018', org: 'Brightline Edu', emoji: '🎓', field: 'EdTech PM', color: '#34d399', companyId: 'Brightline Edu' },
-    { year: '2021', org: 'Novabridge', emoji: '🛒', field: 'Commerce PM', color: '#f59e0b', companyId: 'Novabridge' },
-    { year: '2023', org: 'Lumen Labs', emoji: '🤖', field: 'AI Product', color: '#60a5fa', current: true, companyId: 'Lumen Labs' },
+    { year: '2018', org: 'Brightline Edu', emoji: '', field: 'EdTech PM', color: '#34d399', companyId: 'Brightline Edu' },
+    { year: '2021', org: 'Novabridge', emoji: '', field: 'Commerce PM', color: '#f59e0b', companyId: 'Novabridge' },
+    { year: '2023', org: 'Lumen Labs', emoji: '', field: 'AI Product', color: '#60a5fa', current: true, companyId: 'Lumen Labs' },
   ],
 }
 

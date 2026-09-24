@@ -15,6 +15,8 @@ const Achievements = lazy(() => import('./components/Achievements'))
 const Resume = lazy(() => import('./components/Resume'))
 const Contact = lazy(() => import('./components/Contact'))
 const ScrollToTop = lazy(() => import('./components/ui/ScrollToTop'))
+const PortfolioRail = lazy(() => import('./components/PortfolioRail'))
+const NotebookCursor = lazy(() => import('./components/NotebookCursor'))
 
 function ScreenLoader() {
   return (
@@ -109,6 +111,7 @@ function TokenExpiryBanner({ expiresAt }) {
 
 function App() {
   const adminHash = `#${ADMIN_PATH}`
+  const isLocalPreview = import.meta.env.DEV && new URLSearchParams(window.location.search).has('preview')
   const [isAdmin, setIsAdmin] = useState(window.location.hash === adminHash)
   // Visitor auth is memory-only: refresh = re-auth required
   const [visitorAuth, setVisitorAuth] = useState(false)
@@ -268,6 +271,26 @@ function App() {
     return <ScreenLoader />
   }
 
+  if (isLocalPreview) {
+    return (
+      <div className="t-page min-h-screen bg-gray-950 text-gray-100 font-sans">
+        <Suspense fallback={<ScreenLoader />}>
+          <Hero />
+          <About />
+          <Journey />
+          <Achievements />
+          <Projects />
+          <Experience />
+          <Resume />
+          <Contact />
+          <PortfolioRail />
+          <ScrollToTop />
+          <NotebookCursor />
+        </Suspense>
+      </div>
+    )
+  }
+
   // Admin theme preview: real visitor screens + fixed preview bar
   if (themePreview && adminAuth) {
     return (
@@ -284,7 +307,9 @@ function App() {
             <Experience />
             <Resume />
             <Contact />
+            <PortfolioRail />
             <ScrollToTop />
+            <NotebookCursor />
           </div>
         )}
         <ThemePreviewBar preview={themePreview} onChange={setThemePreview} onClose={() => setThemePreview(null)} />
@@ -339,7 +364,9 @@ function App() {
         <Experience />
         <Resume />
         <Contact />
+        <PortfolioRail />
         <ScrollToTop />
+        <NotebookCursor />
       </Suspense>
     </div>
   )

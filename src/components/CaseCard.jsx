@@ -20,7 +20,6 @@ export default function CaseCard({ study }) {
     <div id={study.id} className="bg-gray-900 rounded-2xl p-6 md:p-8 scroll-mt-24">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <span className="text-3xl">{study.icon}</span>
         <div>
           <h3 className="text-xl md:text-2xl font-bold">{study.title}</h3>
           <p className="text-gray-400 text-sm">

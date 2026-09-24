@@ -4,6 +4,13 @@
 
 export const THEMES = [
   {
+    id: 'mist',
+    name: 'Mist',
+    desc: '소프트 포커스 - 페일 그레이, 코럴 컬러 필드, 에디토리얼 타이포',
+    dark: false,
+    swatch: ['#f2f2f0', '#222321', '#c84f45'],
+  },
+  {
     id: 'default',
     name: '기본',
     desc: '다크 네이비 + Toss 블루 (현재 디자인)',
@@ -55,7 +62,7 @@ export const THEMES = [
 export const THEME_IDS = THEMES.map((t) => t.id)
 
 export function getTheme(id) {
-  return THEMES.find((t) => t.id === id) || THEMES[0]
+  return THEMES.find((t) => t.id === id) || THEMES.find((t) => t.id === 'default')
 }
 
 // Google Fonts are loaded lazily, once per font spec

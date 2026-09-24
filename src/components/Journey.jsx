@@ -29,19 +29,18 @@ function Item({ item, i }) {
       <div
         className="w-3 h-3 rounded-full border-2 mb-3 relative z-10 group-hover:scale-150 transition-transform"
         style={{
-          borderColor: item.color,
-          backgroundColor: item.current ? item.color : '#030712',
-          boxShadow: item.current ? `0 0 10px ${item.color}60` : 'none',
+          borderColor: 'var(--color-accent)',
+          backgroundColor: item.current ? 'var(--color-accent)' : '#fbfbf8',
+          boxShadow: 'none',
         }}
       />
       <span className="text-[11px] font-mono text-gray-500 mb-1">{item.year}</span>
       <span className="text-[11px] font-semibold text-white leading-tight mb-1 group-hover:text-accent transition-colors">
-        <span className="mr-0.5">{item.emoji}</span>
         {item.org}
       </span>
       <span
         className="text-[9px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap"
-        style={{ backgroundColor: item.color + '15', color: item.color }}
+        style={{ color: 'var(--color-gray-500)' }}
       >
         {item.field}
       </span>
@@ -113,7 +112,7 @@ function DesktopJourney({ journey }) {
       {/* SVG path overlay */}
       {path && (
         <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" fill="none">
-          <path d={path} stroke="#1f2937" strokeWidth="1.5" strokeLinecap="round" />
+          <path d={path} stroke="#aaa79d" strokeWidth="1" strokeLinecap="round" />
         </svg>
       )}
 
@@ -179,9 +178,9 @@ export default function Journey() {
             <div
               className="absolute left-[5px] top-[18px] w-[13px] h-[13px] rounded-full border-2"
               style={{
-                borderColor: item.color,
-                backgroundColor: item.current ? item.color : 'transparent',
-                boxShadow: item.current ? `0 0 8px ${item.color}60` : 'none',
+                borderColor: 'var(--color-accent)',
+                backgroundColor: item.current ? 'var(--color-accent)' : '#fbfbf8',
+                boxShadow: 'none',
               }}
             />
             <div className="flex items-center gap-3">
@@ -195,9 +194,8 @@ export default function Journey() {
               <span className="w-10 shrink-0" />
               <span
                 className="text-xs font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1"
-                style={{ backgroundColor: item.color + '18', color: item.color }}
+                style={{ color: 'var(--color-gray-500)' }}
               >
-                <span>{item.emoji}</span>
                 {item.field}
               </span>
             </div>

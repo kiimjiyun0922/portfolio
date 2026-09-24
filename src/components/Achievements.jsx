@@ -32,15 +32,11 @@ export default function Achievements() {
         {config.items.map((item, i) => (
           <div
             key={i}
+            data-note-cursor="VIEW NOTE ↓"
             onClick={() => scrollToTarget(item.linkTo)}
             className="t-card flex items-start gap-3 md:gap-4 bg-gray-900 border border-gray-800 rounded-2xl p-5 md:p-6 hover:border-accent/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/5 cursor-pointer"
           >
-            <div
-              className="w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-lg md:text-xl shrink-0"
-              style={{ background: item.iconBg || '#1f2937' }}
-            >
-              {item.icon}
-            </div>
+            <div className="achievement-index shrink-0">{String(i + 1).padStart(2, '0')}</div>
             <div className="flex-1 min-w-0">
               <h4 className="text-base font-bold text-white mb-1 leading-snug">{item.title}</h4>
               <div className="text-sm text-gray-400 leading-relaxed"><MarkdownRenderer content={item.description} /></div>

@@ -43,14 +43,18 @@ export default function Projects() {
     <SectionWrapper id="projects">
       <p className="text-accent text-xs font-mono tracking-widest uppercase mb-2">Projects</p>
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-8 sm:mb-12">Featured Projects</h2>
+      <div className="notebook-ornaments notebook-ornaments--projects" aria-hidden="true">
+        <i className="notebook-mark notebook-mark--star" />
+        <i className="notebook-mark notebook-mark--clover" />
+      </div>
 
-      <div className="space-y-16">
+      <div className="projects-archive space-y-16">
         {data.groups.map((group, gi) => {
           const expId = group.linkToExperience || findExperienceId(group.title, work)
           return (
-          <div key={gi}>
+          <div key={gi} className="projects-archive-group">
             {/* Group Header */}
-            <div className="mb-6">
+            <div className="projects-archive-heading mb-6">
               {expId ? (
                 <h3
                   className="text-lg md:text-xl font-bold text-white inline-flex items-center gap-2 cursor-pointer hover:text-accent transition-colors group"
@@ -68,11 +72,11 @@ export default function Projects() {
             </div>
 
             {/* Project Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {group.projects.map((project) => {
+            <div className="projects-archive-list grid grid-cols-1 md:grid-cols-2 gap-4">
+              {group.projects.map((project, projectIndex) => {
                 const span = project.fullWidth ? 'md:col-span-2' : ''
                 return (
-                  <div key={project.id} id={`project-${project.id}`} className={`${span} transition-all duration-500`}>
+                  <div key={project.id || `${group.title}-${project.title}-${projectIndex}`} id={project.id ? `project-${project.id}` : undefined} className={`projects-archive-item ${span} transition-all duration-500`}>
                     <ProjectCard project={project} />
                   </div>
                 )

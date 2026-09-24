@@ -128,7 +128,7 @@ async function sha256Hex(str) {
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
-export async function createAccessToken(label, expiresAt, theme = 'default') {
+export async function createAccessToken(label, expiresAt, theme = 'mist') {
   // Tokens are stored as SHA-256 hashes — the plaintext is returned once for copying
   // and can never be recovered from Firestore afterwards.
   const token = generateToken()
@@ -512,8 +512,8 @@ export function resetAuthGateConfig() {
 const THEME_SETTINGS_KEY = 'portfolio_theme_settings'
 
 const defaultThemeSettings = {
-  entryTheme: 'default',
-  defaultVisitorTheme: 'default',
+  entryTheme: 'mist',
+  defaultVisitorTheme: 'mist',
 }
 
 export function loadThemeSettings() {
