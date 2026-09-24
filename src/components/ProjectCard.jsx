@@ -100,7 +100,7 @@ export default function ProjectCard({ project }) {
   return (
     <div
       data-note-cursor="CASE NOTE ↗"
-      className="t-card h-full flex flex-col bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6 md:p-8 hover:border-accent/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/5"
+      className="t-card h-full flex flex-col bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6 md:p-8 hover:border-accent/40 transition-colors duration-300"
     >
       {/* Header */}
       <div>

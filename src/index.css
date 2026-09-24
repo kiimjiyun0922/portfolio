@@ -721,7 +721,12 @@ body {
   box-shadow: none;
   transform: none;
 }
-[data-theme="mist"] #projects .t-card:hover { border-color: transparent; box-shadow: none; transform: none; }
+[data-theme="mist"] #projects .t-card:hover {
+  border-color: transparent;
+  box-shadow: none;
+  translate: none;
+  transform: none;
+}
 [data-theme="mist"] #projects .t-card > div:first-child {
   display: grid;
   grid-template-columns: minmax(120px, .45fr) minmax(240px, 1fr) minmax(180px, .8fr);
