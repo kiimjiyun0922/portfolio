@@ -5,16 +5,43 @@ service cloud.firestore {
     // TEMPLATE: 아래 이메일을 본인 Google 계정으로 교체하세요 (src/site.config.js의 ownerEmail과 일치)
     function isOwner() {
       return request.auth != null
-        && request.auth.token.email == 'your-google-account@gmail.com'
+        && request.auth.token.email == 'kiimjiyun0922@gmail.com'
         && request.auth.token.email_verified == true;
     }
 
+    function isVisitor() {
+      return request.auth != null
+        && request.auth.token.visitor == true
+        && request.auth.token.accessExpiresAt is number
+        && request.time.toMillis() < request.auth.token.accessExpiresAt;
+    }
+
+    function isPublicConfig(doc) {
+      return doc in ['authgate', 'theme_settings'];
+    }
+
+    function isPortfolioContent(doc) {
+      return doc in [
+        'hero',
+        'resume',
+        'contact',
+        'about',
+        'achievements',
+        'journey',
+        'projects',
+        'case_studies'
+      ];
+    }
+
     match /site/{doc} {
-      // Portfolio data is read by the client app (content, hashed tokens, logs)
-      allow read: if true;
-      // Content writes: owner only. Visitor-generated logs stay open
-      // (gate visits, access heartbeats, security alerts must be writable pre-auth).
-      allow write: if isOwner() || doc in ['access_log', 'gate_log', 'alert_log'];
+      // The entry screen needs only these non-sensitive settings before login.
+      allow read: if isOwner() || isPublicConfig(doc)
+        || (isVisitor() && isPortfolioContent(doc));
+
+      // Tokens, analytics, and all content mutations remain owner-only.
+      // Visitor analytics should be accepted by a trusted server endpoint,
+      // not by granting clients permission to overwrite shared log documents.
+      allow write: if isOwner();
 
       // Version history snapshots: owner only (read and write)
       match /history/{snap} {

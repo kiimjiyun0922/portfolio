@@ -3,6 +3,30 @@
 // Dependency-free: JWT signing via node:crypto, Firestore via REST.
 import { createSign, createHash } from 'node:crypto'
 
+const MAX_TOKEN_LENGTH = 256
+const RATE_LIMIT_WINDOW_MS = 60_000
+const RATE_LIMIT_MAX = 20
+const VISITOR_CLAIM_TTL_MS = 6 * 60_000
+const attempts = new Map()
+
+function clientIp(req) {
+  return String(req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown')
+    .split(',')[0]
+    .trim()
+}
+
+function isRateLimited(req) {
+  const key = clientIp(req)
+  const now = Date.now()
+  const current = attempts.get(key)
+  if (!current || now - current.startedAt >= RATE_LIMIT_WINDOW_MS) {
+    attempts.set(key, { startedAt: now, count: 1 })
+    return false
+  }
+  current.count += 1
+  return current.count > RATE_LIMIT_MAX
+}
+
 function b64url(input) {
   return Buffer.from(input).toString('base64url')
 }
@@ -83,20 +107,26 @@ function mintCustomToken(sa, uid, claims) {
 }
 
 export default async function handler(req, res) {
+  res.setHeader('Cache-Control', 'no-store')
   if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST')
     res.status(405).json({ error: 'method-not-allowed' })
     return
   }
+  if (isRateLimited(req)) {
+    res.status(429).json({ error: 'too-many-requests' })
+    return
+  }
   if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
-    // Not configured yet — client falls back to legacy verification
+    // Production clients fail closed when server verification is unavailable.
     res.status(501).json({ error: 'not-configured' })
     return
   }
   try {
     const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
     const token = String(req.body?.token || '').trim()
-    if (!token) {
-      res.status(400).json({ error: 'missing-token' })
+    if (!token || token.length > MAX_TOKEN_LENGTH) {
+      res.status(400).json({ error: 'invalid-request' })
       return
     }
     const items = await fetchTokens(sa)
@@ -113,14 +143,20 @@ export default async function handler(req, res) {
       res.status(401).json({ error: 'invalid-token' })
       return
     }
+    const accessExpiresAt = Math.min(match.expiresAt, now + VISITOR_CLAIM_TTL_MS)
     res.status(200).json({
-      customToken: mintCustomToken(sa, `visitor-${match.id}`, { visitor: true, tokenId: match.id }),
+      customToken: mintCustomToken(sa, `visitor-${match.id}`, {
+        visitor: true,
+        tokenId: match.id,
+        accessExpiresAt,
+      }),
       id: match.id,
       label: match.label,
       expiresAt: match.expiresAt,
       theme: match.theme || '',
     })
   } catch (e) {
-    res.status(500).json({ error: 'server-error', message: String(e?.message || e) })
+    console.error('[verify-token]', e)
+    res.status(500).json({ error: 'server-error' })
   }
 }

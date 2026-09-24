@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { lazy, Suspense, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Hero from './components/Hero'
 import About from './components/About'
@@ -8,12 +8,21 @@ import Experience from './components/Experience'
 import Achievements from './components/Achievements'
 import Resume from './components/Resume'
 import Contact from './components/Contact'
-import Admin from './components/Admin'
 import AuthGate from './components/AuthGate'
 import AdminLogin from './components/AdminLogin'
 import ScrollToTop from './components/ui/ScrollToTop'
 import { recordHeartbeat, trackAction, setActiveSession, loadThemeSettings, ADMIN_PATH } from './utils/crypto'
 import { applyTheme, THEMES } from './themes'
+
+const Admin = lazy(() => import('./components/Admin'))
+
+function ScreenLoader() {
+  return (
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <div className="text-gray-500 text-sm animate-pulse">Loading...</div>
+    </div>
+  )
+}
 
 // Fixed-color bar (independent of the active theme) shown while the admin
 // previews a theme on the real visitor screens.
@@ -46,7 +55,7 @@ function ThemePreviewBar({ preview, onChange, onClose }) {
   )
 }
 import { syncFromCloud, isCloudEnabled, cloudGet } from './utils/db'
-import { watchOwnerAuth, signOutOwner, OWNER_EMAIL } from './utils/firebase'
+import { watchOwnerAuth, signInVisitor, signOutOwner, OWNER_EMAIL } from './utils/firebase'
 
 function TokenExpiryBanner({ expiresAt }) {
   const [visible, setVisible] = useState(true)
@@ -159,9 +168,15 @@ function App() {
           if (r.status === 401) { kick(); return }
           if (r.ok) {
             const d = await r.json()
+            // Refresh the short-lived visitor claim so Firestore access cannot
+            // outlive the server-side token re-verification window.
+            if (d.customToken) await signInVisitor(d.customToken)
             if (d.expiresAt !== currentExpiry) { currentExpiry = d.expiresAt; setTokenExpiresAt(d.expiresAt) }
           }
-        } catch {} // network hiccup — keep the session, retry next cycle
+        } catch {
+          // Keep the UI session briefly; Firestore rules still expire the
+          // visitor claim if server re-verification cannot renew it.
+        }
       } else if (tokenId && isCloudEnabled) {
         // Legacy fallback (client-verified sessions)
         const data = await cloudGet('tokens')
@@ -250,11 +265,7 @@ function App() {
   }, [adminHash])
 
   if (!cloudReady) {
-    return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-gray-500 text-sm animate-pulse">Loading...</div>
-      </div>
-    )
+    return <ScreenLoader />
   }
 
   // Admin theme preview: real visitor screens + fixed preview bar
@@ -284,21 +295,19 @@ function App() {
   if (isAdmin) {
     if (adminUser === undefined) {
       // Firebase is restoring the signed-in session — avoid flashing the login screen
-      return (
-        <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-          <div className="text-gray-500 text-sm animate-pulse">Loading...</div>
-        </div>
-      )
+      return <ScreenLoader />
     }
     if (!adminAuth) {
       return <AdminLogin />
     }
     return (
-      <Admin
-        onLogout={() => signOutOwner()}
-        onViewPortfolio={() => { setVisitorAuth(true); window.location.hash = '' }}
-        onPreviewTheme={(view, theme) => setThemePreview({ view, theme })}
-      />
+      <Suspense fallback={<ScreenLoader />}>
+        <Admin
+          onLogout={() => signOutOwner()}
+          onViewPortfolio={() => { setVisitorAuth(true); window.location.hash = '' }}
+          onPreviewTheme={(view, theme) => setThemePreview({ view, theme })}
+        />
+      </Suspense>
     )
   }
 

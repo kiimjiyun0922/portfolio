@@ -4,6 +4,9 @@ import { verifyAccessToken, recordAccess, recordGateVisit, recordSecurityAlert, 
 import { signInVisitor } from '../utils/firebase'
 import { syncFromCloud } from '../utils/db'
 
+const ALLOW_CLIENT_FALLBACK = import.meta.env.DEV
+  && import.meta.env.VITE_ALLOW_CLIENT_TOKEN_FALLBACK === 'true'
+
 // Server-side verification (Vercel function). Returns:
 //  { ok, data }         — verified, custom auth token issued
 //  { ok:false, invalid} — server checked and rejected the token
@@ -59,14 +62,18 @@ export default function AuthGate({ onSuccess }) {
       recordSecurityAlert('token_fail', `${t.slice(0, 4)}…(${t.length}자)`)
       return { error: 'Invalid or expired access token.' }
     }
-    // Fallback: legacy client-side verification (local dev / not yet configured)
-    const result = await verifyAccessToken(t)
-    if (result) {
-      const sid = recordAccess(result.id, result.label)
-      return { result: { id: result.id, expiresAt: result.expiresAt, sid, plainToken: t, theme: result.theme || '' } }
+    // Legacy verification is opt-in for local development only. Production
+    // must fail closed when the authoritative server cannot be reached.
+    if (ALLOW_CLIENT_FALLBACK) {
+      const result = await verifyAccessToken(t)
+      if (result) {
+        const sid = recordAccess(result.id, result.label)
+        return { result: { id: result.id, expiresAt: result.expiresAt, sid, plainToken: t, theme: result.theme || '' } }
+      }
+      recordSecurityAlert('token_fail', `${t.slice(0, 4)}…(${t.length}자)`)
+      return { error: 'Invalid or expired access token.' }
     }
-    recordSecurityAlert('token_fail', `${t.slice(0, 4)}…(${t.length}자)`)
-    return { error: 'Invalid or expired access token.' }
+    return { error: 'Authentication service is temporarily unavailable. Please try again shortly.' }
   }
 
   // Auto-submit if token came from URL
