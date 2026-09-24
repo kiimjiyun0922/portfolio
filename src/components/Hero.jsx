@@ -8,7 +8,7 @@ export default function Hero() {
   const reduceMotion = useReducedMotion()
   const focusX = useMotionValue(50)
   const focusY = useMotionValue(48)
-  const fogMask = useMotionTemplate`radial-gradient(circle 270px at ${focusX}% ${focusY}%, transparent 0%, rgba(0,0,0,.03) 18%, rgba(0,0,0,.14) 38%, rgba(0,0,0,.42) 66%, rgba(0,0,0,.78) 88%, black 100%)`
+  const fogMask = useMotionTemplate`radial-gradient(circle clamp(92px, 24vw, 270px) at ${focusX}% ${focusY}%, transparent 0%, rgba(0,0,0,.04) 18%, rgba(0,0,0,.16) 38%, rgba(0,0,0,.46) 66%, rgba(0,0,0,.8) 88%, black 100%)`
 
   const workYears = (() => {
     const work = resume.work?.filter((item) => item.company && item.period) || []

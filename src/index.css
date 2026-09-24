@@ -373,6 +373,18 @@ body {
 [data-theme="mist"] .mist-nav-link:focus-visible::after { right: 0; }
 
 [data-theme="mist"] .mist-hero-title { z-index: 1; }
+[data-theme="mist"] #home::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 12% 8% 18%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 47% 48%, rgba(188, 105, 95, .5) 0 14%, rgba(188, 105, 95, .22) 31%, transparent 58%),
+    radial-gradient(circle at 61% 55%, rgba(223, 169, 119, .3), transparent 48%),
+    radial-gradient(circle at 58% 39%, rgba(132, 142, 164, .2), transparent 42%);
+  filter: blur(24px);
+}
 [data-theme="mist"] .mist-hero-title span {
   display: block;
   font-family: var(--font-display);
@@ -1358,9 +1370,11 @@ body {
     right: var(--paper-gutter);
     bottom: 28px;
     left: var(--paper-gutter);
-    gap: 20px;
+    gap: 16px;
   }
+  [data-theme="mist"] .mist-hero-title { transform: translateY(-7dvh); }
   [data-theme="mist"] .mist-hero-stats {
+    order: 2;
     width: 100%;
     margin-left: 0;
   }
@@ -1370,8 +1384,12 @@ body {
     width: 100%;
     max-width: none;
   }
-  [data-theme="mist"] .mist-hero-meta { font-size: 13px; }
-  [data-theme="mist"] .mist-hero-title span { font-size: clamp(2.35rem, 13vw, 4rem); }
+  [data-theme="mist"] .mist-hero-meta { order: 1; font-size: 13px; }
+  [data-theme="mist"] .mist-hero-title span { font-size: clamp(2.35rem, 12vw, 4rem); }
+  [data-theme="mist"] #home::before {
+    inset: 20% -18% 25%;
+    filter: blur(20px);
+  }
   [data-theme="mist"] .section-wrap { padding-block: var(--section-inset); }
   [data-theme="mist"] #about { padding-top: var(--section-inset); padding-bottom: var(--section-inset); }
   [data-theme="mist"] #about > div { margin-left: 0; }
@@ -1475,9 +1493,9 @@ body {
 
 @media (hover: none), (pointer: coarse) {
   [data-theme="mist"] .mist-fog-layer {
-    background: rgba(242, 242, 240, .34);
-    backdrop-filter: blur(7px) saturate(.78);
-    -webkit-backdrop-filter: blur(7px) saturate(.78);
+    background: rgba(242, 242, 240, .6);
+    backdrop-filter: blur(24px) saturate(.62) contrast(.98);
+    -webkit-backdrop-filter: blur(24px) saturate(.62) contrast(.98);
   }
 }
 
