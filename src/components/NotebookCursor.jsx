@@ -1,5 +1,8 @@
 import { useEffect, useRef } from 'react'
 
+const CURSOR_MARKS = ['clover', 'spark', 'ring', 'cross']
+const RANDOM_CURSOR_MARK = CURSOR_MARKS[Math.floor(Math.random() * CURSOR_MARKS.length)]
+
 export default function NotebookCursor() {
   const cursorRef = useRef(null)
   const labelRef = useRef(null)
@@ -36,7 +39,7 @@ export default function NotebookCursor() {
 
   return (
     <div ref={cursorRef} className="notebook-cursor" aria-hidden="true">
-      <span className="notebook-cursor__mark" />
+      <span className={`notebook-cursor__mark notebook-cursor__mark--${RANDOM_CURSOR_MARK}`} />
       <span ref={labelRef} className="notebook-cursor__label" />
     </div>
   )

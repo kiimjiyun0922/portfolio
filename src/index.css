@@ -371,15 +371,49 @@ body {
 [data-theme="mist"] .notebook-cursor.is-visible { opacity: 1; }
 [data-theme="mist"] .notebook-cursor__mark {
   position: relative;
+  display: block;
+  width: 13px;
+  height: 13px;
+  animation: notebook-cursor-spin 2.8s steps(20) infinite;
+}
+[data-theme="mist"] .notebook-cursor__mark--clover::before {
+  content: '';
+  position: absolute;
+  left: 1px;
+  top: 1px;
   width: 4px;
   height: 4px;
-  margin: 4px;
   border-radius: 50%;
   background: #30312d;
   box-shadow: 7px 0 #30312d, 0 7px #30312d, 7px 7px #30312d;
-  transform-origin: 5.5px 5.5px;
-  animation: notebook-cursor-spin 2.8s steps(20) infinite;
 }
+[data-theme="mist"] .notebook-cursor__mark--spark {
+  background: #30312d;
+  clip-path: polygon(50% 0, 59% 40%, 100% 50%, 59% 60%, 50% 100%, 41% 60%, 0 50%, 41% 40%);
+}
+[data-theme="mist"] .notebook-cursor__mark--ring {
+  border: 1px solid #30312d;
+  border-radius: 50%;
+}
+[data-theme="mist"] .notebook-cursor__mark--ring::before,
+[data-theme="mist"] .notebook-cursor__mark--ring::after {
+  content: '';
+  position: absolute;
+  background: #30312d;
+}
+[data-theme="mist"] .notebook-cursor__mark--ring::before { left: 5px; top: -3px; width: 1px; height: 5px; }
+[data-theme="mist"] .notebook-cursor__mark--ring::after { right: -3px; top: 5px; width: 5px; height: 1px; }
+[data-theme="mist"] .notebook-cursor__mark--cross::before,
+[data-theme="mist"] .notebook-cursor__mark--cross::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 0;
+  width: 1px;
+  height: 13px;
+  background: #30312d;
+}
+[data-theme="mist"] .notebook-cursor__mark--cross::after { transform: rotate(90deg); }
 [data-theme="mist"] .notebook-cursor__label {
   display: none;
   padding: 7px 11px 6px;
