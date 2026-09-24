@@ -14,17 +14,17 @@ export default function ScrollToTop() {
     <AnimatePresence>
       {show && (
         <motion.button
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.8 }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 8 }}
           transition={{ duration: 0.2 }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 w-11 h-11 rounded-full bg-gray-800/80 backdrop-blur border border-gray-700 hover:border-accent text-gray-400 hover:text-accent flex items-center justify-center transition-colors cursor-pointer shadow-lg"
+          className="notebook-top-button fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 cursor-pointer"
           aria-label="Scroll to top"
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-          </svg>
+          <span aria-hidden="true" className="notebook-top-button__index">00</span>
+          <span>Top</span>
+          <span aria-hidden="true">↑</span>
         </motion.button>
       )}
     </AnimatePresence>

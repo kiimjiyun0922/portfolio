@@ -690,6 +690,42 @@ body {
 [data-theme="mist"] .notebook-footer__link:hover,
 [data-theme="mist"] .notebook-footer__strong:hover { text-decoration: underline; text-underline-offset: 3px; }
 
+[data-theme="mist"] .notebook-top-button {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  gap: 7px;
+  min-width: 82px;
+  padding: 7px 9px 6px;
+  border: 1px solid rgba(43, 44, 40, .44);
+  border-radius: 0;
+  background: rgba(251, 251, 248, .9);
+  color: #30312d;
+  box-shadow: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  transition: border-color 180ms ease, translate 180ms ease;
+}
+[data-theme="mist"] .notebook-top-button:hover {
+  border-color: rgba(43, 44, 40, .82);
+  translate: 0 -1px;
+}
+[data-theme="mist"] .notebook-top-button__index {
+  padding-right: 7px;
+  border-right: 1px solid rgba(43, 44, 40, .2);
+  color: #85857f;
+  font-size: 7px;
+}
+[data-theme="mist"] .notebook-top-button:focus-visible {
+  outline: 1px solid #30312d;
+  outline-offset: 3px;
+}
+
 @media (max-width: 767px) {
   [data-theme="mist"] .notebook-footer {
     grid-template-columns: 1fr;
