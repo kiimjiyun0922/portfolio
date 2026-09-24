@@ -2,13 +2,27 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function ScrollToTop() {
-  const [show, setShow] = useState(false)
+  const [homeVisible, setHomeVisible] = useState(true)
+  const [footerVisible, setFooterVisible] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => setShow(window.scrollY > 400)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    const home = document.getElementById('home')
+    const footer = document.getElementById('contact')
+    if (!home || !footer) return undefined
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.target.id === 'home') setHomeVisible(entry.isIntersecting)
+        if (entry.target.id === 'contact') setFooterVisible(entry.isIntersecting)
+      })
+    }, { threshold: 0.05 })
+
+    observer.observe(home)
+    observer.observe(footer)
+    return () => observer.disconnect()
   }, [])
+
+  const show = !homeVisible && !footerVisible
 
   return (
     <AnimatePresence>

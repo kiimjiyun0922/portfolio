@@ -18,7 +18,6 @@ export default function Contact() {
       </div>
 
       <div className="notebook-footer__column notebook-footer__column--center">
-        <p className="notebook-footer__label">{config.heading}</p>
         <p>{config.message}</p>
         {config.linkedinUrl && (
           <a href={config.linkedinUrl} target="_blank" rel="noopener noreferrer" className="notebook-footer__strong">
