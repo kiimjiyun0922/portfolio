@@ -55,7 +55,7 @@ import { ImportExportBar } from './admin/JsonTransfer'
 import { downloadJson, importJson } from './admin/JsonTransferUtils'
 import { ACTION_LABELS, LOG_FILTERS, SECTION_LABELS, buildLogRows, countLogRows } from './admin/logModel'
 import { filterTokens, getTokenStatus, isActiveToken } from './admin/tokenModel'
-import { ActionBar, Field, FloatingJumpNav, ResetButton, SaveButton, SectionHeader, Toast } from './admin/AdminUI'
+import { ActionBar, AutoTextarea, Field, FloatingJumpNav, ResetButton, SaveButton, SectionHeader, Toast } from './admin/AdminUI'
 
 /* ─── Navigation ─── */
 
