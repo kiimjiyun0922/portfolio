@@ -1490,10 +1490,35 @@ body {
     font-size: 16px;
     line-height: 1.7;
   }
-  [data-theme="mist"] #achievements .t-card h4 { font-size: 17px; }
-  [data-theme="mist"] #achievements .t-card .text-sm {
-    font-size: 15px;
-    line-height: 1.65;
+  [data-theme="mist"] #achievements .t-card {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+    padding-block: 22px;
+  }
+  [data-theme="mist"] #achievements .achievement-index {
+    width: auto;
+    padding-top: 4px;
+    font-size: 12px;
+  }
+  [data-theme="mist"] #achievements .t-card h4 {
+    margin-bottom: 5px;
+    font-size: 18px;
+    line-height: 1.45;
+  }
+  [data-theme="mist"] #achievements .t-card .text-sm,
+  [data-theme="mist"] #achievements .t-card .text-sm p {
+    font-size: 16px;
+    line-height: 1.75;
+  }
+  [data-theme="mist"] #achievements .t-card .text-sm strong {
+    color: #343530;
+    font-weight: 400;
+    text-decoration: underline;
+    text-decoration-color: rgba(117, 104, 77, .55);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
   }
   [data-theme="mist"] #projects > h2 { margin-bottom: 30px; }
   [data-theme="mist"] #projects .projects-archive { gap: 36px; }
@@ -1549,6 +1574,9 @@ body {
   }
   [data-theme="mist"] #projects .project-story__insight .text-\[13px\],
   [data-theme="mist"] #projects .project-story__insight p { font-size: 15px; }
+  [data-theme="mist"] #projects .project-story__nav button { font-size: 13px; }
+  [data-theme="mist"] #projects .project-story__label { font-size: 12px; }
+  [data-theme="mist"] #projects .t-card > div:first-child > span { font-size: 12px; }
   [data-theme="mist"] #projects .project-story__highlights { width: 100%; }
   [data-theme="mist"] #projects .project-story__highlight { min-width: 0; flex: 1; padding-inline: 10px; }
   [data-theme="mist"] #projects .projects-archive-heading h3,
@@ -1613,7 +1641,10 @@ body {
     font-size: 15px;
     line-height: 1.5;
   }
-  [data-theme="mist"] .experience-entry__projects button p + p { font-size: 12px; }
+  [data-theme="mist"] .experience-entry__identity > p:first-child,
+  [data-theme="mist"] .experience-entry__projects button p + p { font-size: 13px; }
+  [data-theme="mist"] .experience-entry__index { font-size: 12px; }
+  [data-theme="mist"] #experience [class~="text-[10px]"] { font-size: 12px; }
   [data-theme="mist"] .experience-entry__other {
     margin-top: 12px;
     padding-left: 0;
@@ -1647,6 +1678,11 @@ body {
     font-size: 13px;
     line-height: 1.55;
   }
+  [data-theme="mist"] .journey-index__number { font-size: 12px; }
+  [data-theme="mist"] .journey-index__field { font-size: 14px; line-height: 1.5; }
+  [data-theme="mist"] .resume-index { font-size: 12px; }
+  [data-theme="mist"] #about .rounded-full { font-size: 13px; }
+  [data-theme="mist"] .notebook-footer { font-size: 12px; }
 }
 
 @media (max-width: 359px) {

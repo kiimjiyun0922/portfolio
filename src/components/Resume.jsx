@@ -21,7 +21,7 @@ export default function Resume() {
     <SectionWrapper id="resume">
       <NotebookOrnaments variant="resume" marks={['clover']} />
       <p className="text-accent text-xs font-mono tracking-widest uppercase mb-2">Education</p>
-      <h2 className="text-2xl md:text-3xl font-bold mb-12">Education & Activity</h2>
+      <h2 className="text-2xl md:text-3xl font-bold mb-12">Background</h2>
 
       <div className="resume-sheet max-w-3xl mx-auto space-y-12">
         {/* Education */}
