@@ -3,6 +3,7 @@ import SectionWrapper from './ui/SectionWrapper'
 import ProjectCard from './ProjectCard'
 import { loadProjects } from '../data/projects'
 import { loadResumeConfig } from '../utils/crypto'
+import NotebookOrnaments from './ui/NotebookOrnaments'
 
 // Map group title to experience company index
 function findExperienceId(groupTitle, work) {
@@ -43,10 +44,7 @@ export default function Projects() {
     <SectionWrapper id="projects">
       <p className="text-accent text-xs font-mono tracking-widest uppercase mb-2">Projects</p>
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-8 sm:mb-12">Featured Projects</h2>
-      <div className="notebook-ornaments notebook-ornaments--projects" aria-hidden="true">
-        <i className="notebook-mark notebook-mark--star" />
-        <i className="notebook-mark notebook-mark--clover" />
-      </div>
+      <NotebookOrnaments variant="projects" marks={['star', 'clover']} />
 
       <div className="projects-archive space-y-16">
         {data.groups.map((group, gi) => {

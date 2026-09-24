@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import SectionWrapper from './ui/SectionWrapper'
 import MarkdownRenderer from './ui/MarkdownRenderer'
+import NotebookOrnaments from './ui/NotebookOrnaments'
 import { loadAchievementsConfig } from '../utils/crypto'
 
 function scrollToTarget(linkTo) {
@@ -25,6 +26,7 @@ export default function Achievements() {
 
   return (
     <SectionWrapper id="achievements">
+      <NotebookOrnaments variant="achievements" marks={['star']} />
       <p className="text-accent text-xs font-mono tracking-widest uppercase mb-2">Achievements</p>
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-8 sm:mb-10">Key Achievements</h2>
 

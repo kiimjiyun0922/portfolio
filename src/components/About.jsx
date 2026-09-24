@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import SectionWrapper from './ui/SectionWrapper'
 import MarkdownRenderer from './ui/MarkdownRenderer'
+import NotebookOrnaments from './ui/NotebookOrnaments'
 import { loadAboutConfig } from '../utils/crypto'
 
 const SKILL_COLORS = {
@@ -20,6 +21,7 @@ export default function About() {
 
   return (
     <SectionWrapper id="about">
+      <NotebookOrnaments variant="about" marks={['cross']} />
       <div className="max-w-3xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

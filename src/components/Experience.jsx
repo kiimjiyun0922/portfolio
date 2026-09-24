@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import SectionWrapper from './ui/SectionWrapper'
 import MarkdownRenderer from './ui/MarkdownRenderer'
+import NotebookOrnaments from './ui/NotebookOrnaments'
 import { loadResumeConfig, trackAction } from '../utils/crypto'
 
 function ProjectDetail({ project }) {
@@ -73,6 +74,7 @@ export default function Experience() {
 
   return (
     <SectionWrapper id="experience">
+      <NotebookOrnaments variant="experience" marks={['cross']} />
       <p className="text-accent text-xs font-mono tracking-widest uppercase mb-2">Experience</p>
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-8 sm:mb-12">Work Experience</h2>
 

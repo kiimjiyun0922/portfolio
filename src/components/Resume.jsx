@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import SectionWrapper from './ui/SectionWrapper'
 import { loadResumeConfig } from '../utils/crypto'
+import NotebookOrnaments from './ui/NotebookOrnaments'
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -18,6 +19,7 @@ export default function Resume() {
 
   return (
     <SectionWrapper id="resume">
+      <NotebookOrnaments variant="resume" marks={['clover']} />
       <p className="text-accent text-xs font-mono tracking-widest uppercase mb-2">Education</p>
       <h2 className="text-2xl md:text-3xl font-bold mb-12">Education & Activity</h2>
 

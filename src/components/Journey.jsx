@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import SectionWrapper from './ui/SectionWrapper'
+import NotebookOrnaments from './ui/NotebookOrnaments'
 import { loadJourneyConfig, trackAction } from '../utils/crypto'
 
 function scrollToCompany(id, org) {
@@ -22,6 +23,7 @@ export default function Journey() {
 
   return (
     <SectionWrapper id="journey">
+      <NotebookOrnaments variant="journey" marks={['dot']} />
       <p className="text-accent text-xs font-mono tracking-widest uppercase mb-2">Journey</p>
       <h2 className="text-2xl md:text-3xl font-bold mb-8 md:mb-10">Career Journey</h2>
 

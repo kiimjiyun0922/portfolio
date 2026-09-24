@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { animate, motion, useMotionTemplate, useMotionValue, useReducedMotion } from 'framer-motion'
 import { loadHeroConfig, loadResumeConfig } from '../utils/crypto'
+import NotebookOrnaments from './ui/NotebookOrnaments'
 
 export default function Hero() {
   const [hero] = useState(loadHeroConfig)
@@ -86,12 +87,7 @@ export default function Hero() {
         >PORTFOLIO</motion.span>
       </div>
 
-      <div className="notebook-ornaments notebook-ornaments--hero" aria-hidden="true">
-        <i className="notebook-mark notebook-mark--star" />
-        <i className="notebook-mark notebook-mark--dot" />
-        <i className="notebook-mark notebook-mark--cross" />
-        <i className="notebook-mark notebook-mark--clover" />
-      </div>
+      <NotebookOrnaments variant="hero" marks={['star', 'dot', 'cross', 'clover']} />
 
       <motion.div
         aria-hidden="true"

@@ -586,14 +586,45 @@ body {
   transform-origin: 6px 6px;
   animation: notebook-spin 7s steps(24) infinite;
 }
-[data-theme="mist"] .notebook-ornaments--hero .notebook-mark--star { left: 26%; top: 23%; }
-[data-theme="mist"] .notebook-ornaments--hero .notebook-mark--dot { right: 27%; top: 27%; }
-[data-theme="mist"] .notebook-ornaments--hero .notebook-mark--cross { right: 25%; bottom: 24%; }
-[data-theme="mist"] .notebook-ornaments--hero .notebook-mark--clover { left: 29%; bottom: 21%; }
+[data-theme="mist"] .notebook-ornaments--hero .notebook-mark--star { left: 15%; top: 31%; }
+[data-theme="mist"] .notebook-ornaments--hero .notebook-mark--dot { right: 18%; top: 19%; }
+[data-theme="mist"] .notebook-ornaments--hero .notebook-mark--cross { right: 11%; top: 53%; }
+[data-theme="mist"] .notebook-ornaments--hero .notebook-mark--clover { left: 20%; bottom: 16%; }
+[data-theme="mist"] .notebook-ornaments--about,
+[data-theme="mist"] .notebook-ornaments--journey,
+[data-theme="mist"] .notebook-ornaments--achievements,
+[data-theme="mist"] .notebook-ornaments--experience,
+[data-theme="mist"] .notebook-ornaments--resume,
+[data-theme="mist"] .notebook-ornaments--projects { inset: 0; }
+[data-theme="mist"] .notebook-ornaments--about .notebook-mark--cross {
+  right: max(14px, calc((100% - var(--editorial-rail)) / 2 - 42px));
+  top: 36%;
+}
+[data-theme="mist"] .notebook-ornaments--journey .notebook-mark--dot {
+  left: max(14px, calc((100% - var(--editorial-rail)) / 2 - 34px));
+  top: 56%;
+}
+[data-theme="mist"] .notebook-ornaments--achievements .notebook-mark--star {
+  right: max(14px, calc((100% - var(--editorial-rail)) / 2 - 40px));
+  bottom: 22%;
+}
 [data-theme="mist"] #projects { position: relative; overflow: hidden; }
-[data-theme="mist"] .notebook-ornaments--projects { top: 4.5rem; right: clamp(2rem, 8vw, 7rem); width: 90px; height: 80px; }
-[data-theme="mist"] .notebook-ornaments--projects .notebook-mark--star { right: 0; top: 0; }
-[data-theme="mist"] .notebook-ornaments--projects .notebook-mark--clover { left: 0; bottom: 0; }
+[data-theme="mist"] .notebook-ornaments--projects .notebook-mark--star {
+  left: max(14px, calc((100% - var(--editorial-rail)) / 2 - 42px));
+  top: 6.5rem;
+}
+[data-theme="mist"] .notebook-ornaments--projects .notebook-mark--clover {
+  right: max(16px, calc((100% - var(--editorial-rail)) / 2 - 32px));
+  top: 46%;
+}
+[data-theme="mist"] .notebook-ornaments--experience .notebook-mark--cross {
+  right: max(14px, calc((100% - var(--editorial-rail)) / 2 - 38px));
+  top: 34%;
+}
+[data-theme="mist"] .notebook-ornaments--resume .notebook-mark--clover {
+  left: max(14px, calc((100% - var(--editorial-rail)) / 2 - 36px));
+  bottom: 18%;
+}
 
 @keyframes notebook-spin { to { transform: rotate(360deg); } }
 @keyframes notebook-drift { to { transform: translate(7px, -5px); } }
@@ -1421,8 +1452,15 @@ body {
   [data-theme="mist"] .mist-hero-title span { font-size: clamp(2.35rem, 12vw, 4rem); }
   [data-theme="mist"] .mist-fog-layer::before { opacity: .42; }
   [data-theme="mist"] .mist-fog-layer::after { opacity: .34; }
-  [data-theme="mist"] .notebook-ornaments--hero .notebook-mark--cross,
+  [data-theme="mist"] .notebook-ornaments--hero .notebook-mark--star { left: 12%; top: 20%; }
+  [data-theme="mist"] .notebook-ornaments--hero .notebook-mark--dot { right: 12%; top: 28%; }
+  [data-theme="mist"] .notebook-ornaments--hero .notebook-mark--cross { right: 8%; top: 53%; }
   [data-theme="mist"] .notebook-ornaments--hero .notebook-mark--clover { display: none; }
+  [data-theme="mist"] .notebook-ornaments--about .notebook-mark--cross { right: 7px; top: 31%; }
+  [data-theme="mist"] .notebook-ornaments--journey .notebook-mark--dot { left: 8px; top: 58%; }
+  [data-theme="mist"] .notebook-ornaments--achievements .notebook-mark--star { right: 7px; bottom: 19%; }
+  [data-theme="mist"] .notebook-ornaments--experience .notebook-mark--cross { right: 7px; top: 29%; }
+  [data-theme="mist"] .notebook-ornaments--resume .notebook-mark--clover { left: 8px; bottom: 16%; }
   [data-theme="mist"] .section-wrap { padding-block: var(--section-inset); }
   [data-theme="mist"] .section-wrap > h2,
   [data-theme="mist"] .section-wrap > div > div:first-child h2,
@@ -1446,12 +1484,11 @@ body {
   [data-theme="mist"] #projects > h2 { margin-bottom: 30px; }
   [data-theme="mist"] #projects .projects-archive { gap: 36px; }
   [data-theme="mist"] .notebook-ornaments--projects {
-    top: 92px;
-    right: 6px;
     display: block;
-    width: 14px;
-    height: 124px;
+    inset: 0;
   }
+  [data-theme="mist"] .notebook-ornaments--projects .notebook-mark--star { left: 7px; top: 112px; }
+  [data-theme="mist"] .notebook-ornaments--projects .notebook-mark--clover { right: 7px; top: 46%; }
   [data-theme="mist"] #projects .projects-archive-group {
     border-top: 2px solid rgba(49, 44, 31, .52);
   }
