@@ -31,6 +31,7 @@ if (hasConfig) {
 export async function signInOwner() {
   if (!auth) throw new Error('Firebase가 설정되지 않았습니다')
   const provider = new GoogleAuthProvider()
+  provider.setCustomParameters({ prompt: 'select_account' })
   const res = await signInWithPopup(auth, provider)
   return res.user
 }
