@@ -132,9 +132,9 @@ body {
 [data-theme="mist"] ::selection { background: #add8f2; color: #20211f; }
 [data-theme="mist"] .t-gate {
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(320px, .7fr);
+  grid-template-columns: minmax(0, 1fr) minmax(400px, .72fr);
   grid-template-rows: auto auto auto;
-  column-gap: clamp(48px, 6vw, 96px);
+  column-gap: clamp(32px, 4vw, 64px);
   align-content: center;
   align-items: start;
   min-height: 100dvh;
@@ -240,7 +240,10 @@ body {
   margin-top: 20px;
   text-align: left;
 }
-[data-theme="mist"] .t-gate .gate-contact > p:first-child { color: #5f605a; }
+[data-theme="mist"] .t-gate .gate-contact > p:first-child {
+  color: #5f605a;
+  white-space: nowrap;
+}
 [data-theme="mist"] .t-gate .gate-contact > a {
   justify-self: end;
   color: #34352f;
@@ -276,6 +279,7 @@ body {
   [data-theme="mist"] .t-gate .gate-panel { margin-top: 46px; }
   [data-theme="mist"] .t-gate .gate-card { padding: 22px 0; }
   [data-theme="mist"] .t-gate .gate-contact { grid-template-columns: 1fr; }
+  [data-theme="mist"] .t-gate .gate-contact > p:first-child { white-space: normal; }
   [data-theme="mist"] .t-gate .gate-contact > a { justify-self: start; }
 }
 [data-theme="mist"] ::-webkit-scrollbar-track { background: #e6e6e2; }
