@@ -1,20 +1,20 @@
 import { lazy, Suspense, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import Hero from './components/Hero'
-import About from './components/About'
-import Journey from './components/Journey'
-import Projects from './components/Projects'
-import Experience from './components/Experience'
-import Achievements from './components/Achievements'
-import Resume from './components/Resume'
-import Contact from './components/Contact'
-import AuthGate from './components/AuthGate'
-import AdminLogin from './components/AdminLogin'
-import ScrollToTop from './components/ui/ScrollToTop'
 import { recordHeartbeat, trackAction, setActiveSession, loadThemeSettings, ADMIN_PATH } from './utils/crypto'
 import { applyTheme, THEMES } from './themes'
 
 const Admin = lazy(() => import('./components/Admin'))
+const AuthGate = lazy(() => import('./components/AuthGate'))
+const AdminLogin = lazy(() => import('./components/AdminLogin'))
+const Hero = lazy(() => import('./components/Hero'))
+const About = lazy(() => import('./components/About'))
+const Journey = lazy(() => import('./components/Journey'))
+const Projects = lazy(() => import('./components/Projects'))
+const Experience = lazy(() => import('./components/Experience'))
+const Achievements = lazy(() => import('./components/Achievements'))
+const Resume = lazy(() => import('./components/Resume'))
+const Contact = lazy(() => import('./components/Contact'))
+const ScrollToTop = lazy(() => import('./components/ui/ScrollToTop'))
 
 function ScreenLoader() {
   return (
@@ -298,7 +298,7 @@ function App() {
       return <ScreenLoader />
     }
     if (!adminAuth) {
-      return <AdminLogin />
+      return <Suspense fallback={<ScreenLoader />}><AdminLogin /></Suspense>
     }
     return (
       <Suspense fallback={<ScreenLoader />}>
@@ -313,7 +313,7 @@ function App() {
 
   if (!visitorAuth) {
     return (
-      <AuthGate
+      <Suspense fallback={<ScreenLoader />}><AuthGate
         onSuccess={(expiresAt, id, sid, plain, theme) => {
           setTokenExpiresAt(expiresAt)
           setTokenId(id || null)
@@ -323,22 +323,24 @@ function App() {
           setVisitorTheme(theme || '')
           setVisitorAuth(true)
         }}
-      />
+      /></Suspense>
     )
   }
 
   return (
     <div className="t-page min-h-screen bg-gray-950 text-gray-100 font-sans">
       <TokenExpiryBanner expiresAt={tokenExpiresAt} />
-      <Hero />
-      <About />
-      <Journey />
-      <Achievements />
-      <Projects />
-      <Experience />
-      <Resume />
-      <Contact />
-      <ScrollToTop />
+      <Suspense fallback={<ScreenLoader />}>
+        <Hero />
+        <About />
+        <Journey />
+        <Achievements />
+        <Projects />
+        <Experience />
+        <Resume />
+        <Contact />
+        <ScrollToTop />
+      </Suspense>
     </div>
   )
 }

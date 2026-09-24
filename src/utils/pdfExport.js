@@ -1,4 +1,3 @@
-import QRCode from 'qrcode'
 import { createAccessToken } from './crypto'
 import { SITE } from '../site.config'
 
@@ -20,6 +19,7 @@ const sec = (html) => `<div class="pdf-section" style="padding-bottom:18px;">${h
 const h2 = (text) => `<div style="font-size:13px;font-weight:700;color:#3b82f6;padding-bottom:4px;border-bottom:1px solid #e5e7eb;margin-bottom:10px;padding-top:12px;">${text}</div>`
 
 export async function exportPortfolioPDF({ resume, projects, achievements, hero, about, contact, recipient }) {
+  const QRCode = (await import('qrcode')).default
   let tokenValue = ''
   try {
     const expiry = new Date(Date.now() + 10 * 86400000)

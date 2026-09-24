@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { loadProjects, saveProjects, resetProjects, defaultProjects } from '../data/projects'
-import { exportPortfolioPDF } from '../utils/pdfExport'
 import { watchOwnerAuth, hasConfig as cloudConfigured } from '../utils/firebase'
 import { cloudListSnapshots, cloudGetSnapshot, cloudSaveSnapshot, applyRestoredData } from '../utils/db'
 import {
@@ -2350,6 +2349,7 @@ export default function Admin({ onLogout, onViewPortfolio, onPreviewTheme }) {
     const recipient = prompt('이 PDF의 수신자(회사명)를 입력하세요.\n토큰 라벨로 남아 접속 로그에서 문서별 열람을 추적할 수 있습니다.', '')
     if (recipient === null) return // cancelled
     try {
+      const { exportPortfolioPDF } = await import('../utils/pdfExport')
       const tokenVal = await exportPortfolioPDF({
         resume: loadResumeConfig(),
         projects: loadProjects(),
