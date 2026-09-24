@@ -194,8 +194,6 @@ export default function AuthGate({ onSuccess }) {
             <motion.button
               type="submit"
               disabled={loading || !token.trim()}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
               className="w-full py-3.5 bg-accent hover:bg-accent-light disabled:bg-gray-700 disabled:text-gray-500 text-white font-medium rounded-xl transition-colors cursor-pointer"
             >
               {loading ? 'Verifying...' : config.buttonText}

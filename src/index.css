@@ -227,6 +227,11 @@ body {
   font-size: 11px;
   letter-spacing: .08em;
   text-transform: uppercase;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+[data-theme="mist"] .t-gate .gate-form button:not(:disabled):hover {
+  border-color: #242520;
+  background: #242520;
 }
 [data-theme="mist"] .t-gate .gate-form button:disabled {
   border-color: rgba(54, 55, 50, .18);
