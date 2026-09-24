@@ -109,7 +109,7 @@ export default function Experience() {
               <div className="experience-entry__body">
                 {/* Projects — always visible, no toggle */}
                 {job.projects?.length > 0 && (
-                  <div className="experience-entry__projects space-y-0 divide-y divide-gray-800/40">
+                  <div className="experience-entry__projects space-y-0">
                     {job.projects.map((p, j) => (
                       <ProjectDetail key={j} project={p} />
                     ))}
