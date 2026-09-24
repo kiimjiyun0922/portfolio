@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 
 export default function NotebookCursor() {
   const cursorRef = useRef(null)
+  const labelRef = useRef(null)
 
   useEffect(() => {
     const cursor = cursorRef.current
@@ -13,11 +14,14 @@ export default function NotebookCursor() {
       cancelAnimationFrame(frame)
       frame = requestAnimationFrame(() => {
         cursor.style.transform = `translate3d(${event.clientX + 14}px, ${event.clientY + 14}px, 0)`
-        cursor.textContent = target?.dataset.noteCursor || ''
-        cursor.classList.toggle('is-visible', Boolean(target))
+        labelRef.current.textContent = target?.dataset.noteCursor || ''
+        cursor.classList.add('is-visible')
+        cursor.classList.toggle('has-label', Boolean(target))
       })
     }
-    const hide = () => cursor.classList.remove('is-visible')
+    const hide = () => {
+      cursor.classList.remove('is-visible', 'has-label')
+    }
 
     window.addEventListener('pointermove', move, { passive: true })
     window.addEventListener('blur', hide)
@@ -30,5 +34,10 @@ export default function NotebookCursor() {
     }
   }, [])
 
-  return <div ref={cursorRef} className="notebook-cursor" aria-hidden="true" />
+  return (
+    <div ref={cursorRef} className="notebook-cursor" aria-hidden="true">
+      <span className="notebook-cursor__mark" />
+      <span ref={labelRef} className="notebook-cursor__label" />
+    </div>
+  )
 }
