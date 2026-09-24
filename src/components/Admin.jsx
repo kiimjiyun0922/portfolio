@@ -175,7 +175,7 @@ function ResetButton({ onClick, label = '초기화' }) {
 function Toast({ message }) {
   if (!message) return null
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:right-6 bg-gray-900 border border-accent/40 text-white pl-3 pr-4 py-2.5 rounded-xl shadow-xl shadow-black/40 text-sm z-50 animate-fade-in flex items-center gap-2 whitespace-nowrap">
+    <div role="status" aria-live="polite" className="fixed bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:right-6 bg-gray-900 border border-accent/40 text-white pl-3 pr-4 py-2.5 rounded-xl shadow-xl shadow-black/40 text-sm z-50 animate-fade-in flex items-center gap-2 whitespace-nowrap">
       <span className="w-5 h-5 rounded-full bg-accent/20 text-accent flex items-center justify-center shrink-0">
         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
@@ -270,7 +270,7 @@ function WorkProjectEditor({ project, onChange, onRemove, onMoveUp, onMoveDown, 
   const [open, setOpen] = useState(false)
   return (
     <div className="bg-gray-900/50 rounded border border-gray-700/30 overflow-hidden">
-      <div className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-800/40" onClick={() => setOpen(!open)}>
+      <div role="button" tabIndex={0} aria-expanded={open} className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-800/40" onClick={() => setOpen(!open)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setOpen(!open) } }}>
         <svg className={`w-3 h-3 text-gray-500 shrink-0 transition-transform ${open ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
         </svg>
@@ -745,7 +745,7 @@ function TokensSection({ onPreviewTheme }) {
   const [hoverStat, setHoverStat] = useState(null) // hovered day index on the stats chart
   const [tokenTab, setTokenTab] = useState('active') // 'active' | 'expired' | 'revoked'
 
-  const closeCreate = () => {
+  const closeCreate = useCallback(() => {
     setCreateOpen(false)
     setCreatedToken(null)
     setLabel('')
@@ -753,7 +753,14 @@ function TokensSection({ onPreviewTheme }) {
     setExpDays(7)
     setExpDatetime('')
     setNewTheme('mist')
-  }
+  }, [])
+
+  useEffect(() => {
+    if (!createOpen) return undefined
+    const closeOnEscape = (event) => { if (event.key === 'Escape') closeCreate() }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [createOpen, closeCreate])
 
   const flash = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2000) }
   const refresh = () => setTokens(getAccessTokens())
@@ -985,13 +992,13 @@ function TokensSection({ onPreviewTheme }) {
       {/* Create Token Modal */}
       {createOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={closeCreate} />
-          <div className="relative bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/60">
+          <div aria-hidden="true" className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={closeCreate} />
+          <div role="dialog" aria-modal="true" aria-labelledby="create-token-title" className="relative bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/60">
             {!createdToken ? (
               <>
                 <div className="flex items-center justify-between mb-5">
-                  <h3 className="text-base font-bold text-white">새 토큰 생성</h3>
-                  <button onClick={closeCreate} className="text-gray-500 hover:text-white cursor-pointer p-1">✕</button>
+                  <h3 id="create-token-title" className="text-base font-bold text-white">새 토큰 생성</h3>
+                  <button aria-label="토큰 생성 창 닫기" onClick={closeCreate} className="text-gray-500 hover:text-white cursor-pointer p-1">✕</button>
                 </div>
                 <div className="space-y-4">
                   <Field label="라벨 (예: 홍길동)" value={label} onChange={setLabel} />
@@ -1119,7 +1126,7 @@ function TokensSection({ onPreviewTheme }) {
                         className="font-medium text-sm bg-gray-800 border border-accent rounded px-1.5 py-0.5 text-white outline-none w-32"
                       />
                     ) : (
-                      <span className="font-medium text-sm cursor-pointer hover:text-accent transition-colors" onClick={() => startRename(t)} title="클릭하여 이름 변경">{t.label}</span>
+                      <button className="font-medium text-sm cursor-pointer hover:text-accent transition-colors text-left" onClick={() => startRename(t)} title="클릭하여 이름 변경">{t.label}</button>
                     )}
                     <span className={`text-xs ${status.cls}`}>{status.text}</span>
                   </div>
