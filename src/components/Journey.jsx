@@ -43,7 +43,13 @@ export default function Journey() {
             <span className="journey-index__year">{item.year}</span>
             <span className="admin-copy journey-index__company">{item.org}</span>
             <span className="admin-copy journey-index__field">{item.field}</span>
-            <span className="journey-index__status">{item.current ? 'Now' : ''}</span>
+            {item.current && (
+              <span
+                className="journey-index__status"
+                aria-label="현재 재직 중"
+                title="현재 재직 중"
+              />
+            )}
           </motion.button>
         ))}
       </div>

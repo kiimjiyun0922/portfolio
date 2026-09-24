@@ -1125,7 +1125,15 @@ body {
 }
 [data-theme="mist"] .journey-index__row:hover .journey-index__company { translate: 4px 0; }
 [data-theme="mist"] .journey-index__field { color: #66675f; font-size: 13px; line-height: 1.4; }
-[data-theme="mist"] .journey-index__status { justify-self: end; color: #75684d; font-weight: 700; }
+[data-theme="mist"] .journey-index__status {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: start;
+  width: 10px;
+  height: 10px;
+  border: 1px solid #75684d;
+  background: #75684d;
+}
 
 @media (max-width: 767px) {
   [data-theme="mist"] #about .about-heading__line { white-space: normal; }
@@ -1157,7 +1165,7 @@ body {
   [data-theme="mist"] .journey-index__year { grid-column: 2; grid-row: 1; font-size: 20px; }
   [data-theme="mist"] .journey-index__company { grid-column: 3; grid-row: 1; font-size: 16px; }
   [data-theme="mist"] .journey-index__field { grid-column: 3; grid-row: 2; font-size: 12px; }
-  [data-theme="mist"] .journey-index__status { grid-column: 2; grid-row: 2; justify-self: start; font-size: 11px; }
+  [data-theme="mist"] .journey-index__status { grid-column: 2; grid-row: 2; justify-self: start; }
 }
 [data-theme="mist"] .notebook-footer {
   display: grid;
