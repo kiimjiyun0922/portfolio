@@ -1152,9 +1152,13 @@ body {
   font-size: 18px;
   font-weight: 600;
   line-height: 1.2;
-  transition: translate 220ms cubic-bezier(.16, 1, .3, 1);
 }
-[data-theme="mist"] .journey-index__row:hover .journey-index__company { translate: 4px 0; }
+@media (hover: hover) and (pointer: fine) {
+  [data-theme="mist"] .journey-index__company {
+    transition: translate 220ms cubic-bezier(.16, 1, .3, 1);
+  }
+  [data-theme="mist"] .journey-index__row:hover .journey-index__company { translate: 4px 0; }
+}
 [data-theme="mist"] .journey-index__field { color: #66675f; font-size: 13px; line-height: 1.4; }
 [data-theme="mist"] .journey-index__status {
   grid-column: 2;
@@ -1280,6 +1284,16 @@ body {
   border-right: 1px solid rgba(43, 44, 40, .2);
   color: #85857f;
   font-size: 10px;
+}
+
+@media (hover: none), (pointer: coarse) {
+  [data-theme="mist"] .journey-index__row:hover .journey-index__company,
+  [data-theme="mist"] .journey-index__row:active .journey-index__company,
+  [data-theme="mist"] .notebook-top-button:hover,
+  [data-theme="mist"] .notebook-top-button:active {
+    translate: none;
+    transform: none;
+  }
 }
 [data-theme="mist"] .notebook-top-button:focus-visible {
   outline: 1px solid #30312d;
