@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { loadProjects, saveProjects, resetProjects, defaultProjects } from '../data/projects'
 import { watchOwnerAuth, hasConfig as cloudConfigured } from '../utils/firebase'
 import { cloudListSnapshots, cloudGetSnapshot, cloudSaveSnapshot, applyRestoredData } from '../utils/db'
@@ -55,6 +55,7 @@ import { ImportExportBar } from './admin/JsonTransfer'
 import { downloadJson, importJson } from './admin/JsonTransferUtils'
 import { ACTION_LABELS, LOG_FILTERS, SECTION_LABELS, buildLogRows, countLogRows } from './admin/logModel'
 import { filterTokens, getTokenStatus, isActiveToken } from './admin/tokenModel'
+import { ActionBar, Field, FloatingJumpNav, ResetButton, SaveButton, SectionHeader, Toast } from './admin/AdminUI'
 
 /* ─── Navigation ─── */
 
@@ -84,167 +85,6 @@ const NAV_ITEMS = [
     { id: 'account', label: '관리자 계정', icon: '⚙️' },
   ]},
 ]
-
-/* ─── Shared UI ─── */
-
-function AutoTextarea({ value, onChange, minRows = 2, className = '' }) {
-  const ref = useRef(null)
-  const resize = useCallback(() => {
-    const el = ref.current
-    if (!el) return
-    // Save scroll position to prevent jump
-    const scrollY = window.scrollY
-    el.style.height = 'auto'
-    el.style.height = el.scrollHeight + 'px'
-    // Restore scroll position
-    window.scrollTo(0, scrollY)
-  }, [])
-  useEffect(() => { resize() }, [value, resize])
-  return (
-    <textarea
-      ref={ref}
-      value={value}
-      onChange={(e) => { onChange(e.target.value); resize() }}
-      rows={minRows}
-      className={className}
-      style={{ overflow: 'hidden' }}
-    />
-  )
-}
-
-function Field({ label, value, onChange, type = 'text', className = '', rows }) {
-  const cls = 'w-full bg-gray-800/60 border border-gray-700/70 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 hover:border-gray-600 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all'
-  if (rows) {
-    return (
-      <div className={className}>
-        {label && <label className="block text-[11px] font-medium text-gray-400 mb-1.5">{label}</label>}
-        <AutoTextarea value={value} onChange={onChange} minRows={rows} className={`${cls} resize-y`} />
-      </div>
-    )
-  }
-  return (
-    <div className={className}>
-      {label && <label className="block text-[11px] font-medium text-gray-400 mb-1.5">{label}</label>}
-      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} step={type === 'number' ? 'any' : undefined} className={cls} />
-    </div>
-  )
-}
-
-function SectionHeader({ title, description }) {
-  return (
-    <div className="mb-6 pb-5 border-b border-gray-800/80">
-      <h2 className="text-xl md:text-2xl font-bold tracking-tight">{title}</h2>
-      {description && <p className="text-sm text-gray-500 mt-1.5">{description}</p>}
-    </div>
-  )
-}
-
-function ActionBar({ children }) {
-  return (
-    <div className="sticky top-[60px] md:top-3 z-20 mb-6">
-      <div className="flex flex-wrap items-center gap-2 bg-gray-900/95 backdrop-blur-md border border-gray-800 rounded-xl px-3 py-2.5 shadow-lg shadow-black/30">
-        {children}
-      </div>
-    </div>
-  )
-}
-
-function SaveButton({ onClick, label = '저장' }) {
-  const handleClick = (e) => {
-    e.preventDefault()
-    onClick()
-  }
-  return (
-    <button onClick={handleClick} data-save-btn title="⌘S / Ctrl+S" className="px-4 py-2 bg-accent hover:bg-accent-light text-white text-sm font-semibold rounded-lg transition-all cursor-pointer shadow-md shadow-accent/20 hover:shadow-accent/35 active:scale-[0.98] flex items-center gap-1.5">
-      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-      </svg>
-      {label}
-    </button>
-  )
-}
-
-function ResetButton({ onClick, label = '초기화' }) {
-  return (
-    <button onClick={onClick} className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700/60 text-gray-300 hover:text-white text-sm rounded-lg transition-colors cursor-pointer">
-      {label}
-    </button>
-  )
-}
-
-function Toast({ message }) {
-  if (!message) return null
-  return (
-    <div role="status" aria-live="polite" className="fixed bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:right-6 bg-gray-900 border border-accent/40 text-white pl-3 pr-4 py-2.5 rounded-xl shadow-xl shadow-black/40 text-sm z-50 animate-fade-in flex items-center gap-2 whitespace-nowrap">
-      <span className="w-5 h-5 rounded-full bg-accent/20 text-accent flex items-center justify-center shrink-0">
-        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-        </svg>
-      </span>
-      {message}
-    </div>
-  )
-}
-
-/* ─── Floating Jump Nav — visible after scrolling, jump without going back to top ─── */
-
-function FloatingJumpNav({ items = [] }) {
-  const [open, setOpen] = useState(false)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const onScroll = () => {
-      const v = window.scrollY > 300
-      setVisible(v)
-      if (!v) setOpen(false)
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  if (!visible) return null
-
-  return (
-    <div className="fixed bottom-6 right-5 md:right-8 z-40 flex flex-col items-end gap-2">
-      {open && items.length > 0 && (
-        <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-2xl shadow-black/50 py-1.5 max-h-72 overflow-y-auto min-w-44">
-          {items.map((it, i) => (
-            <button
-              key={i}
-              onClick={() => { it.onClick(); setOpen(false) }}
-              className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-gray-800 hover:text-white cursor-pointer truncate"
-            >
-              {it.label}
-            </button>
-          ))}
-        </div>
-      )}
-      <div className="flex gap-2">
-        {items.length > 0 && (
-          <button
-            onClick={() => setOpen(!open)}
-            title="바로가기"
-            className={`w-10 h-10 rounded-full border shadow-lg shadow-black/40 flex items-center justify-center cursor-pointer transition-colors ${open ? 'bg-accent border-accent text-white' : 'bg-gray-900 border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-            </svg>
-          </button>
-        )}
-        <button
-          onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setOpen(false) }}
-          title="맨 위로"
-          className="w-10 h-10 rounded-full bg-accent text-white shadow-lg shadow-accent/30 flex items-center justify-center cursor-pointer hover:bg-accent-light transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
-          </svg>
-        </button>
-      </div>
-    </div>
-  )
-}
 
 /* ─── Sub-editors ─── */
 
