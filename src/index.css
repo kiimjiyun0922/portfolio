@@ -372,6 +372,13 @@ body {
 [data-theme="mist"] .mist-nav-link:hover::after,
 [data-theme="mist"] .mist-nav-link:focus-visible::after { right: 0; }
 
+[data-theme="mist"] .mist-hero-lockup {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  max-width: min(760px, calc(100vw - (var(--paper-gutter) * 2)));
+}
 [data-theme="mist"] .mist-hero-title { z-index: 1; }
 [data-theme="mist"] .mist-hero-title span {
   display: block;
@@ -400,6 +407,32 @@ body {
   inset: -24%;
   pointer-events: none;
   will-change: transform, opacity;
+}
+[data-theme="mist"] .mist-hero-intro {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  color: #31322f;
+  text-align: center;
+}
+[data-theme="mist"] .mist-hero-role {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.3;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+[data-theme="mist"] .mist-hero-intro h1 {
+  max-width: 30ch;
+  margin: 0;
+  color: #41423e;
+  font-family: var(--font-display);
+  font-size: clamp(17px, 1.8vw, 23px);
+  font-weight: 400;
+  line-height: 1.25;
 }
 [data-theme="mist"] .mist-fog-layer::before {
   background:
@@ -857,6 +890,7 @@ body {
   background: transparent;
 }
 [data-theme="mist"] #projects .project-story__inner { grid-column: 2 / -1; }
+[data-theme="mist"] #projects .project-story__quicklook { display: none; }
 [data-theme="mist"] #projects .project-story__nav {
   justify-content: flex-start;
   gap: 2px;
@@ -1450,7 +1484,14 @@ body {
     left: var(--paper-gutter);
     gap: 16px;
   }
-  [data-theme="mist"] .mist-hero-title { transform: translateY(-16dvh); }
+  [data-theme="mist"] .mist-hero-lockup { top: -13dvh; gap: 15px; }
+  [data-theme="mist"] .mist-hero-intro { gap: 6px; }
+  [data-theme="mist"] .mist-hero-role { font-size: 12px; }
+  [data-theme="mist"] .mist-hero-intro h1 {
+    max-width: 24ch;
+    font-size: 17px;
+    line-height: 1.35;
+  }
   [data-theme="mist"] .mist-hero-stats {
     order: 2;
     width: 100%;
@@ -1567,6 +1608,49 @@ body {
     border-top: 0;
   }
   [data-theme="mist"] #projects .project-story__inner { grid-column: 1; }
+  [data-theme="mist"] #projects .project-story__quicklook {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 12px 0 13px;
+    border-top: 1px solid rgba(49, 44, 31, .28);
+    border-bottom: 1px solid rgba(49, 44, 31, .28);
+  }
+  [data-theme="mist"] #projects .project-story__quicklook > p {
+    margin: 0;
+    color: #6b654f;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  [data-theme="mist"] #projects .project-story__quicklook dl {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 0;
+  }
+  [data-theme="mist"] #projects .project-story__quicklook dl > div {
+    min-width: 0;
+    padding: 0 10px;
+    border-left: 1px solid rgba(49, 44, 31, .22);
+  }
+  [data-theme="mist"] #projects .project-story__quicklook dl > div:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+  [data-theme="mist"] #projects .project-story__quicklook dd {
+    margin: 0 0 3px;
+    color: #393527;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  [data-theme="mist"] #projects .project-story__quicklook dt {
+    color: #6f6954;
+    font-size: 12px;
+    line-height: 1.35;
+  }
   [data-theme="mist"] #projects .project-story__copy,
   [data-theme="mist"] #projects .project-story__copy p {
     font-size: 16px;
@@ -1578,6 +1662,7 @@ body {
   [data-theme="mist"] #projects .project-story__label { font-size: 12px; }
   [data-theme="mist"] #projects .t-card > div:first-child > span { font-size: 12px; }
   [data-theme="mist"] #projects .project-story__highlights { width: 100%; }
+  [data-theme="mist"] #projects .project-story__result > .project-story__highlights { display: none; }
   [data-theme="mist"] #projects .project-story__highlight { min-width: 0; flex: 1; padding-inline: 10px; }
   [data-theme="mist"] #projects .projects-archive-heading h3,
   [data-theme="mist"] #projects .projects-archive-heading p { grid-column: 1; }

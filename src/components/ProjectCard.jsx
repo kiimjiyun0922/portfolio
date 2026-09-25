@@ -28,6 +28,19 @@ function StoryTabs({ project }) {
 
   return (
     <div className="project-story__inner">
+      {project.highlights && project.highlights.length > 0 && (
+        <div className="project-story__quicklook" aria-label="Project outcomes at a glance">
+          <p>At a glance</p>
+          <dl>
+            {project.highlights.slice(0, 3).map((highlight, index) => (
+              <div key={`${highlight.value}-${highlight.label}-${index}`}>
+                <dd>{highlight.value}</dd>
+                <dt>{highlight.label}</dt>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )}
       {/* Tab bar */}
       <div className="project-story__nav flex flex-wrap items-center justify-center gap-0.5 pb-4 mb-5 border-b border-gray-700/40">
         {availableTabs.map((tab, i) => (

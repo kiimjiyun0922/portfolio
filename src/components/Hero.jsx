@@ -79,12 +79,23 @@ export default function Hero() {
 
   return (
     <section id="home" className="t-hero relative min-h-[100dvh] flex flex-col items-center justify-center px-5 text-center overflow-hidden">
-      <div className="mist-hero-title relative" aria-label="Portfolio">
-        <motion.span
-          initial={reduceMotion ? false : { opacity: 0, filter: 'blur(16px)', letterSpacing: '0.13em' }}
-          animate={{ opacity: 1, filter: 'blur(0px)', letterSpacing: '0.035em' }}
-          transition={{ duration: 1.25, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
-        >PORTFOLIO</motion.span>
+      <div className="mist-hero-lockup">
+        <div className="mist-hero-title relative" aria-label="Portfolio">
+          <motion.span
+            initial={reduceMotion ? false : { opacity: 0, filter: 'blur(16px)', letterSpacing: '0.13em' }}
+            animate={{ opacity: 1, filter: 'blur(0px)', letterSpacing: '0.035em' }}
+            transition={{ duration: 1.25, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
+          >PORTFOLIO</motion.span>
+        </div>
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.48 }}
+          className="mist-hero-intro"
+        >
+          <p className="admin-copy mist-hero-role">{hero.tagline}</p>
+          <h1 className="admin-copy">{hero.headline}</h1>
+        </motion.div>
       </div>
 
       <NotebookOrnaments variant="hero" marks={['star', 'dot', 'cross', 'clover']} />
@@ -102,9 +113,7 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 0.55 }}
           className="mist-hero-meta text-left"
         >
-          <p className="admin-copy font-semibold">{hero.tagline}</p>
-          <h1 className="admin-copy max-w-[28ch] mt-1">{hero.headline}</h1>
-          <p className="admin-copy mt-2 text-gray-500 max-w-[34ch]">{hero.subtitle}</p>
+          <p className="admin-copy text-gray-500 max-w-[42ch]">{hero.subtitle}</p>
         </motion.div>
 
         <motion.dl
