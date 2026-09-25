@@ -45,6 +45,26 @@ test('career journey keeps its text position on hover', async ({ page }) => {
   expect(after.y).toBeCloseTo(before.y, 1)
 })
 
+for (const width of [390, 1024, 1280]) {
+  test(`project detail columns align at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 })
+    await page.goto('/projects/sample-noma-launch?preview')
+    await expect(page.locator('.project-detail-brief h2')).toBeVisible()
+    const positions = await page.evaluate(() => {
+      const left = (selector) => document.querySelector(selector).getBoundingClientRect().left
+      return {
+        briefTitle: left('.project-detail-brief h2'),
+        briefBody: left('.project-detail-brief > div'),
+        storyTitle: left('.project-detail-story section h2'),
+        storyBody: left('.project-detail-story section > div'),
+      }
+    })
+
+    expect(positions.briefTitle).toBeCloseTo(positions.storyTitle, 1)
+    expect(positions.briefBody).toBeCloseTo(positions.storyBody, 1)
+  })
+}
+
 for (const viewport of viewports) {
   test(`portfolio spacing follows the responsive contract at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport)
