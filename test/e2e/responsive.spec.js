@@ -30,6 +30,21 @@ for (const viewport of viewports) {
   }
 }
 
+for (const width of [390, 768, 1280]) {
+  test(`project archive includes the common footer at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 })
+    await page.goto('/projects?preview')
+    const footer = page.locator('.notebook-footer')
+    await expect(footer).toBeAttached()
+    await expect(footer.getByRole('button', { name: /Back to top/i })).toBeVisible()
+    const layout = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+    }))
+    expect(layout.scrollWidth).toBeLessThanOrEqual(layout.clientWidth)
+  })
+}
+
 test('career journey keeps its text position on hover', async ({ page }) => {
   await page.setViewportSize({ width: 1024, height: 768 })
   await page.goto('/?preview')
