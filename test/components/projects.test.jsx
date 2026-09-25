@@ -15,6 +15,17 @@ describe('design project data migration', () => {
     expect(project.coverAlt).toMatch(/NOMA/)
   })
 
+  it('restores sample images when persisted data retained only the title', () => {
+    const [project] = migrateDesignProjects([{
+      title: 'PULSE Festival Campaign',
+      coverImage: '',
+      gallery: [],
+    }])
+
+    expect(project.coverImage).toBe('/assets/campaign-pulse.webp')
+    expect(project.gallery.length).toBeGreaterThan(0)
+  })
+
   it('does not attach sample images to custom projects', () => {
     const [project] = migrateDesignProjects([{
       id: 'custom-project',

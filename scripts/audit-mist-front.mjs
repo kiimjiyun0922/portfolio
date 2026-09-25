@@ -1,7 +1,7 @@
 import { chromium } from '@playwright/test'
 
 const baseUrl = process.env.MIST_BASE_URL || 'http://127.0.0.1:5176'
-const widths = [390, 768, 1024, 1440]
+const widths = [360, 390, 430, 768, 1024, 1440]
 const failures = []
 
 function check(condition, message) {
@@ -16,7 +16,7 @@ try {
     await page.goto(`${baseUrl}/?preview`, { waitUntil: 'domcontentloaded' })
     await page.locator('#home').waitFor({ state: 'visible' })
     await page.evaluate(() => document.fonts.ready)
-    await page.waitForTimeout(500)
+    await page.waitForTimeout(1400)
 
     const metrics = await page.evaluate(() => {
       const rect = (selector) => {
@@ -42,6 +42,16 @@ try {
         bodySize: size('#about .prose-dark p'),
         journeyYearSize: size('.journey-index__year'),
         heroTitleSize: size('.mist-hero-title span'),
+        heroTitleText: (() => {
+          const element = document.querySelector('.mist-hero-title span')
+          if (!element) return null
+          const box = element.getBoundingClientRect()
+          return {
+            left: box.left,
+            right: box.right,
+            opacity: Number.parseFloat(getComputedStyle(element).opacity),
+          }
+        })(),
         fogContract: (() => {
           const title = document.querySelector('.mist-hero-title')
           const fog = document.querySelector('.mist-fog-layer')
@@ -79,6 +89,20 @@ try {
           if (!row || !index) return null
           return index.getBoundingClientRect().left - row.getBoundingClientRect().left
         })(),
+        projectColumns: (() => {
+          const groupTitle = document.querySelector('#projects .projects-archive-heading h3')?.getBoundingClientRect()
+          const groupCopy = document.querySelector('#projects .projects-archive-heading p')?.getBoundingClientRect()
+          const cardMeta = document.querySelector('#projects .t-card > div:first-child > span')?.getBoundingClientRect()
+          const cardTitle = document.querySelector('#projects .t-card > div:first-child > h3')?.getBoundingClientRect()
+          return groupTitle && groupCopy && cardMeta && cardTitle
+            ? { groupTitle: groupTitle.left, groupCopy: groupCopy.left, cardMeta: cardMeta.left, cardTitle: cardTitle.left }
+            : null
+        })(),
+        projectHeadingGap: (() => {
+          const heading = document.querySelector('#projects > h2')?.getBoundingClientRect()
+          const firstGroup = document.querySelector('#projects .projects-archive-group')?.getBoundingClientRect()
+          return heading && firstGroup ? firstGroup.top - heading.bottom : null
+        })(),
         sampleCoverLoaded: (() => {
           const image = document.querySelector('.design-projects__feature .design-project-visual img')
           return image ? image.complete && image.naturalWidth > 0 : false
@@ -91,6 +115,17 @@ try {
           return previousRow && nextHeading ? nextHeading.top - previousRow.bottom : null
         })(),
         mobileStatus: getComputedStyle(document.querySelector('.portfolio-mobile-status')).display,
+        footer: (() => {
+          const footer = document.querySelector('.notebook-footer')
+          const message = footer?.querySelector('.notebook-footer__column--center > p')
+          if (!footer || !message) return null
+          const style = getComputedStyle(message)
+          const lineHeight = Number.parseFloat(style.lineHeight)
+          return {
+            overflow: footer.scrollWidth - footer.clientWidth,
+            messageLines: lineHeight ? message.getBoundingClientRect().height / lineHeight : null,
+          }
+        })(),
         hiddenContent: [...document.querySelectorAll('#about > div > div, .journey-index__row, .experience-entry, .resume-block')]
           .filter((element) => Number.parseFloat(getComputedStyle(element).opacity) < .99).length,
       }
@@ -103,6 +138,8 @@ try {
     check(metrics.bodySize === null || metrics.bodySize >= 15, `${width}px: body text is below 15px`)
     check(metrics.journeyYearSize === null || metrics.journeyYearSize <= 12.5, `${width}px: journey year is incorrectly promoted above metadata size`)
     check(metrics.heroTitleSize === null || metrics.heroTitleSize <= 120.5, `${width}px: hero title exceeds the 120px cap`)
+    check(metrics.heroTitleText && metrics.heroTitleText.left >= -1 && metrics.heroTitleText.right <= width + 1, `${width}px: hero title escapes the viewport`)
+    check(metrics.heroTitleText && metrics.heroTitleText.opacity >= .99, `${width}px: hero title is visually suppressed`)
     check(metrics.fogContract && metrics.fogContract.fogZ > metrics.fogContract.titleZ, `${width}px: Mist fog is not layered above the hero title`)
     check(metrics.fogContract && metrics.fogContract.maskLayers >= 3, `${width}px: Mist fog is missing its cloud mask`)
     check(metrics.fogContract && metrics.fogContract.filter.includes('blur('), `${width}px: Mist fog has no backdrop blur`)
@@ -110,9 +147,14 @@ try {
     check(!metrics.heroStatOverlap, `${width}px: hero stat index overlaps its label`)
     check(!metrics.ornamentOverlap, `${width}px: a decorative mark overlaps protected content`)
     check(metrics.selectedIndexInset === null || metrics.selectedIndexInset >= 19, `${width}px: selected design index content is too close to its state marker`)
+    check(metrics.projectColumns === null || Math.abs(metrics.projectColumns.groupTitle - metrics.projectColumns.cardMeta) <= 1, `${width}px: project group and item labels do not share a column`)
+    check(metrics.projectColumns === null || Math.abs(metrics.projectColumns.groupCopy - metrics.projectColumns.cardTitle) <= 1, `${width}px: project group copy and item titles do not share a column`)
+    check(metrics.projectHeadingGap === null || (metrics.projectHeadingGap >= 16 && metrics.projectHeadingGap <= 36), `${width}px: project title-to-list gap is ${metrics.projectHeadingGap}px`)
     check(metrics.sampleCoverLoaded, `${width}px: selected sample cover is missing`)
     check(metrics.resumeBoundary === null || Math.abs(metrics.resumeBoundary) <= 1, `${width}px: resume blocks have an arbitrary ${metrics.resumeBoundary}px gap`)
     check(metrics.mobileStatus === 'none', `${width}px: undocumented mobile status control is visible`)
+    check(metrics.footer && metrics.footer.overflow <= 1, `${width}px: footer overflows by ${metrics.footer?.overflow}px`)
+    if (width >= 390 && width < 768) check(metrics.footer?.messageLines <= 1.25, `${width}px: footer message wraps to ${metrics.footer?.messageLines} lines`)
     check(metrics.hiddenContent === 0, `${width}px: ${metrics.hiddenContent} content blocks remain hidden before scrolling`)
 
     await page.screenshot({ path: `/tmp/mist-hero-${width}.png`, fullPage: false })

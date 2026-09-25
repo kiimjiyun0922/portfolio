@@ -184,10 +184,10 @@
 [data-theme="mist"] .mist-fog-layer {
   inset: -20px;
   z-index: 2;
-  background: rgba(251, 251, 248, .3);
-  filter: blur(16px);
-  -webkit-backdrop-filter: blur(34px) saturate(0) contrast(.98);
-  backdrop-filter: blur(34px) saturate(0) contrast(.98);
+  background: rgba(251, 251, 248, .018);
+  filter: blur(28px);
+  -webkit-backdrop-filter: blur(3px) saturate(0) contrast(.99);
+  backdrop-filter: blur(3px) saturate(0) contrast(.99);
 }
 
 [data-theme="mist"] .mist-fog-layer::before,
@@ -704,23 +704,36 @@
 }
 
 [data-theme="mist"] #projects .projects-archive-group {
-  padding-top: 20px;
+  padding-top: 0;
   border-top: 1px solid var(--mist-line-strong);
 }
 
 [data-theme="mist"] #projects .projects-archive-heading {
   display: grid;
-  grid-template-columns: minmax(220px, .7fr) minmax(0, 1.3fr);
-  gap: 32px;
+  grid-template-columns: minmax(150px, .55fr) minmax(240px, 1fr) minmax(260px, 1.1fr);
+  gap: 24px;
   align-items: first baseline;
-  margin: 0 0 20px;
-  padding-bottom: 20px;
+  margin: 0;
+  padding: 18px 0;
   border-bottom: 1px solid var(--mist-line);
 }
+
+[data-theme="mist"] #projects .projects-archive-heading h3 { grid-column: 1; }
+[data-theme="mist"] #projects .projects-archive-heading p { grid-column: 2 / -1; }
 
 [data-theme="mist"] #projects .projects-archive-heading h3,
 [data-theme="mist"] #projects .projects-archive-heading p {
   margin: 0;
+}
+
+[data-theme="mist"] #projects > h2 {
+  margin-bottom: 28px;
+}
+
+[data-theme="mist"] #projects .t-card > div:first-child,
+[data-theme="mist"] #projects .project-story {
+  grid-template-columns: minmax(150px, .55fr) minmax(240px, 1fr) minmax(260px, 1.1fr);
+  gap: 24px;
 }
 
 [data-theme="mist"] #projects .projects-archive-heading h3 {
@@ -1604,5 +1617,380 @@
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
+  }
+}
+
+/* Responsive quality lock: mobile and tablet are independent compositions. */
+@media (max-width: 1023px) {
+  [data-theme="mist"] { --mist-section-y: 64px; }
+
+  [data-theme="mist"] .mist-fog-layer {
+    inset: -32px;
+    background: rgba(251, 251, 248, .015);
+    filter: blur(32px);
+    -webkit-backdrop-filter: blur(2px) saturate(0) contrast(.99);
+    backdrop-filter: blur(2px) saturate(0) contrast(.99);
+  }
+
+  [data-theme="mist"] .section-wrap { padding-block: var(--mist-section-y); }
+
+  [data-theme="mist"] #projects .projects-archive-heading,
+  [data-theme="mist"] #projects .t-card > div:first-child,
+  [data-theme="mist"] #projects .project-story {
+    grid-template-columns: minmax(116px, .48fr) minmax(190px, .9fr) minmax(0, 1.12fr);
+    gap: 16px;
+  }
+
+  [data-theme="mist"] .mist-hero-footer {
+    grid-template-columns: minmax(0, .9fr) minmax(320px, 1.1fr);
+    gap: 32px;
+  }
+
+  [data-theme="mist"] .journey-index__row {
+    grid-template-columns: 32px 88px minmax(0, 1fr);
+    gap: 12px 16px;
+  }
+  [data-theme="mist"] .journey-index__number { grid-column: 1; grid-row: 1 / span 2; }
+  [data-theme="mist"] .journey-index__year { grid-column: 2; grid-row: 1; }
+  [data-theme="mist"] .journey-index__company { grid-column: 3; grid-row: 1; }
+  [data-theme="mist"] .journey-index__field { grid-column: 3; grid-row: 2; }
+
+  [data-theme="mist"] .experience-entry {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 16px;
+    padding-block: 24px;
+  }
+  [data-theme="mist"] .experience-entry__index { grid-column: 1; grid-row: 1 / span 2; }
+  [data-theme="mist"] .experience-entry__identity { grid-column: 2; grid-row: 1; }
+  [data-theme="mist"] .experience-entry__body {
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: 8px;
+  }
+  [data-theme="mist"] .experience-entry__other { margin-top: 16px; }
+
+  [data-theme="mist"] .resume-activity__row {
+    grid-template-columns: 40px 80px minmax(0, 1fr);
+    gap: 8px 16px;
+  }
+  [data-theme="mist"] .resume-activity__year { grid-column: 2; }
+  [data-theme="mist"] .resume-activity__category { grid-column: 3; }
+  [data-theme="mist"] .resume-activity__copy {
+    grid-column: 2 / -1;
+    padding-top: 4px;
+  }
+
+  [data-theme="mist"] .project-archive-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 40px 24px;
+  }
+  [data-theme="mist"] .project-archive-card,
+  [data-theme="mist"] .project-archive-card:nth-child(3n + 2),
+  [data-theme="mist"] .project-archive-card:nth-child(3n) {
+    grid-column: auto;
+    padding-top: 0;
+  }
+  [data-theme="mist"] .project-archive-card .design-project-visual { min-height: 0; }
+
+  [data-theme="mist"] .notebook-footer,
+  [data-theme="mist"] .project-detail-footer .notebook-footer,
+  [data-theme="mist"] .portfolio-subpage + .notebook-footer {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 20px 32px;
+    align-items: baseline;
+  }
+  [data-theme="mist"] .notebook-footer__column--center {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    justify-self: stretch;
+  }
+  [data-theme="mist"] .notebook-footer__column--start { grid-column: 1; grid-row: 2; }
+  [data-theme="mist"] .notebook-footer__column--end {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+    text-align: right;
+  }
+  [data-theme="mist"] .notebook-footer__contacts {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  [data-theme="mist"] .notebook-footer__strong,
+  [data-theme="mist"] .notebook-footer__link { white-space: nowrap; }
+}
+
+@media (max-width: 767px) {
+  [data-theme="mist"] {
+    --mist-gutter: 20px;
+    --mist-section-y: 48px;
+  }
+
+  [data-theme="mist"] .section-wrap > h2,
+  [data-theme="mist"] #about .about-heading,
+  [data-theme="mist"] .design-projects__header h2,
+  [data-theme="mist"] .portfolio-subpage__header h1 {
+    margin-bottom: 28px;
+    font-size: clamp(38px, 10.6vw, 48px);
+    line-height: 1.04;
+  }
+
+  [data-theme="mist"] .t-hero {
+    min-height: max(680px, 100svh);
+    padding-inline: var(--mist-gutter);
+  }
+  [data-theme="mist"] .mist-hero-lockup {
+    top: -6svh;
+    width: 100%;
+  }
+  [data-theme="mist"] .mist-hero-title { width: 100%; }
+  [data-theme="mist"] .mist-hero-title span {
+    width: 100%;
+    font-size: clamp(44px, 13vw, 58px);
+    letter-spacing: .015em !important;
+    white-space: nowrap;
+  }
+  [data-theme="mist"] .mist-fog-layer {
+    inset: -32px;
+    opacity: .68;
+    background: rgba(251, 251, 248, .012);
+    filter: blur(34px);
+    -webkit-backdrop-filter: blur(2px) saturate(0) contrast(.99);
+    backdrop-filter: blur(2px) saturate(0) contrast(.99);
+  }
+  [data-theme="mist"] .mist-fog-layer::before,
+  [data-theme="mist"] .mist-fog-layer::after { filter: blur(46px) grayscale(1); }
+  [data-theme="mist"] .mist-hero-footer {
+    right: var(--mist-gutter);
+    bottom: max(20px, env(safe-area-inset-bottom));
+    left: var(--mist-gutter);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  [data-theme="mist"] .mist-hero-meta {
+    order: 2;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  [data-theme="mist"] .mist-hero-stats {
+    order: 1;
+    padding-block: 10px;
+  }
+  [data-theme="mist"] .mist-hero-stats button {
+    grid-template-columns: 32px minmax(0, 1fr) minmax(36px, auto);
+    gap: 12px;
+    min-height: 34px;
+  }
+
+  [data-theme="mist"] #projects > h2 { margin-bottom: 24px; }
+  [data-theme="mist"] #projects > h2 {
+    font-size: clamp(38px, 10.6vw, 48px);
+  }
+  [data-theme="mist"] #projects .projects-archive-item {
+    padding-inline: 0;
+    border-right: 0;
+    border-left: 0;
+    background: transparent;
+  }
+  [data-theme="mist"] #projects .projects-archive-heading,
+  [data-theme="mist"] #projects .t-card > div:first-child,
+  [data-theme="mist"] #projects .project-story {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  [data-theme="mist"] #projects .projects-archive-heading h3,
+  [data-theme="mist"] #projects .projects-archive-heading p,
+  [data-theme="mist"] #projects .project-story__inner {
+    grid-column: 1;
+  }
+
+  [data-theme="mist"] .notebook-ornaments--journey .notebook-mark--dot,
+  [data-theme="mist"] .notebook-ornaments--achievements .notebook-mark--star,
+  [data-theme="mist"] .notebook-ornaments--experience .notebook-mark--cross,
+  [data-theme="mist"] .notebook-ornaments--resume .notebook-mark--clover {
+    top: 16px;
+    right: var(--mist-gutter);
+    bottom: auto;
+    left: auto;
+  }
+
+  [data-theme="mist"] .journey-index__row {
+    grid-template-columns: 28px 72px minmax(0, 1fr);
+    gap: 8px 12px;
+    padding-block: 18px;
+  }
+  [data-theme="mist"] .journey-index__company,
+  [data-theme="mist"] .journey-index__field { min-width: 0; }
+  [data-theme="mist"] .journey-index__company { font-size: 16px; line-height: 22px; }
+  [data-theme="mist"] .journey-index__field { font-size: 12px; line-height: 18px; }
+
+  [data-theme="mist"] #achievements .t-card {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 12px;
+    padding-block: 18px;
+  }
+
+  [data-theme="mist"] .experience-entry {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 12px;
+    padding-block: 20px;
+  }
+  [data-theme="mist"] .experience-entry__body { margin-top: 4px; }
+  [data-theme="mist"] .experience-entry__projects button {
+    min-height: 48px;
+    padding-block: 8px;
+  }
+  [data-theme="mist"] .experience-entry__other ul { gap: 2px; }
+
+  [data-theme="mist"] .resume-block__heading {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 12px;
+    padding-block: 18px;
+  }
+  [data-theme="mist"] .resume-block__heading .resume-index {
+    position: static;
+    grid-column: 1;
+    grid-row: 1;
+  }
+  [data-theme="mist"] .resume-block__heading > :last-child {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  [data-theme="mist"] .resume-education__row {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 6px 12px;
+    padding-block: 18px;
+  }
+  [data-theme="mist"] .resume-education__copy,
+  [data-theme="mist"] .resume-education__period { grid-column: 2; }
+  [data-theme="mist"] .resume-activity__row {
+    grid-template-columns: 60px minmax(0, 1fr);
+    gap: 8px 12px;
+    padding-block: 18px;
+  }
+  [data-theme="mist"] .resume-activity__year { grid-column: 1; grid-row: 1; }
+  [data-theme="mist"] .resume-activity__category { grid-column: 2; grid-row: 1; }
+  [data-theme="mist"] .resume-activity__copy {
+    grid-column: 2;
+    grid-row: 2;
+    padding-top: 0;
+  }
+
+  [data-theme="mist"] .portfolio-subpage,
+  [data-theme="mist"] .project-detail-page { padding-inline: var(--mist-gutter); }
+  [data-theme="mist"] .portfolio-subpage__nav {
+    gap: 10px;
+    min-height: 52px;
+    padding-right: 84px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  [data-theme="mist"] .project-detail-page .portfolio-subpage__nav span:last-child { display: none; }
+  [data-theme="mist"] .portfolio-subpage__nav > * + *::before { margin-right: 10px; }
+  [data-theme="mist"] .project-detail-close {
+    top: 12px;
+    right: 12px;
+    min-width: 76px;
+    height: 44px;
+    border: 0;
+    border-bottom: 1px solid var(--mist-line-strong);
+    background: rgba(251, 251, 248, .94);
+  }
+  [data-theme="mist"] .portfolio-subpage__header,
+  [data-theme="mist"] .project-detail-hero {
+    padding-top: 36px;
+    padding-bottom: 32px;
+  }
+  [data-theme="mist"] .project-detail-hero__copy { margin-bottom: 28px; }
+  [data-theme="mist"] .project-detail-hero__copy h1 {
+    margin-block: 14px;
+    font-size: clamp(42px, 12vw, 52px);
+    line-height: 1;
+    text-wrap: balance;
+  }
+  [data-theme="mist"] .project-archive-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+  }
+  [data-theme="mist"] .project-archive-card__copy {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 12px;
+  }
+  [data-theme="mist"] .project-detail-meta { grid-template-columns: minmax(0, 1fr); }
+  [data-theme="mist"] .project-detail-meta > div {
+    min-height: 0;
+    padding: 16px 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--mist-line);
+  }
+  [data-theme="mist"] .project-detail-meta > div:last-child { border-bottom: 0; }
+  [data-theme="mist"] .project-detail-meta dt { margin-bottom: 4px; }
+  [data-theme="mist"] .project-detail-brief {
+    gap: 12px;
+    padding-block: 24px;
+  }
+  [data-theme="mist"] .project-detail-brief > * { padding-inline: 0; }
+  [data-theme="mist"] .project-detail-story section {
+    gap: 10px;
+    padding-block: 24px;
+  }
+  [data-theme="mist"] .project-detail-next { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  [data-theme="mist"] .project-detail-next a {
+    min-width: 0;
+    padding: 18px 0;
+  }
+  [data-theme="mist"] .project-detail-next a:nth-child(2) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    border-top: 1px solid var(--mist-line);
+    border-left: 0;
+  }
+  [data-theme="mist"] .project-detail-next strong {
+    overflow-wrap: break-word;
+    word-break: keep-all;
+  }
+
+  [data-theme="mist"] .notebook-footer,
+  [data-theme="mist"] .project-detail-footer .notebook-footer,
+  [data-theme="mist"] .portfolio-subpage + .notebook-footer {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px 16px;
+    padding: 24px var(--mist-gutter) max(28px, env(safe-area-inset-bottom));
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: .01em;
+  }
+  [data-theme="mist"] .notebook-footer__column--center {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    gap: 4px;
+    white-space: nowrap;
+  }
+  [data-theme="mist"] .notebook-footer__column--start { grid-column: 1; grid-row: 2; }
+  [data-theme="mist"] .notebook-footer__column--end {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+    text-align: right;
+  }
+  [data-theme="mist"] .notebook-footer__contacts {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2px 14px;
+  }
+  [data-theme="mist"] .notebook-footer__column p,
+  [data-theme="mist"] .notebook-footer__strong,
+  [data-theme="mist"] .notebook-footer__link {
+    margin: 0;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 374px) {
+  [data-theme="mist"] .notebook-footer,
+  [data-theme="mist"] .project-detail-footer .notebook-footer,
+  [data-theme="mist"] .portfolio-subpage + .notebook-footer {
+    font-size: 11px;
+    letter-spacing: 0;
   }
 }

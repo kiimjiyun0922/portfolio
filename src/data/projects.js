@@ -17,6 +17,7 @@ const SAMPLE_DESIGN_PROJECTS_BY_KEY = new Map(
   defaultProjects.designProjects.flatMap((project) => [
     [project.id, project],
     [project.slug, project],
+    [project.title, project],
   ]),
 )
 
@@ -28,6 +29,7 @@ function isLegacyDesignSample(project) {
 function hydrateSampleDesignProject(project) {
   const sample = SAMPLE_DESIGN_PROJECTS_BY_KEY.get(project?.id)
     || SAMPLE_DESIGN_PROJECTS_BY_KEY.get(project?.slug)
+    || SAMPLE_DESIGN_PROJECTS_BY_KEY.get(project?.title)
   if (!sample) return project
 
   return {
@@ -73,8 +75,8 @@ export function loadProjects() {
           ...defaultProjects,
           ...parsed,
           designArchive: { ...defaultProjects.designArchive, ...(parsed.designArchive || {}) },
-          // Existing PM data remains authoritative. The design sample is only
-          // seeded when this new collection has never been saved before.
+          // Existing structured project data remains authoritative. Archive
+          // samples are seeded only when that collection has not been saved.
           designProjects: migrateDesignProjects(parsed.designProjects),
         }
       }

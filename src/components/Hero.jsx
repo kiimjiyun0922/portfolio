@@ -62,7 +62,7 @@ export default function Hero() {
   useEffect(() => {
     if (reduceMotion) {
       focusX.set(50)
-      focusY.set(isMobile ? 33 : 48)
+      focusY.set(isMobile ? 43 : 48)
       return undefined
     }
     const horizontal = animate(focusX, [42, 58, 54, 46, 42], {
@@ -70,7 +70,7 @@ export default function Hero() {
       repeat: Infinity,
       ease: 'easeInOut',
     })
-    const vertical = animate(focusY, isMobile ? [33, 29, 37, 31, 33] : [44, 40, 48, 42, 44], {
+    const vertical = animate(focusY, isMobile ? [43, 39, 47, 41, 43] : [44, 40, 48, 42, 44], {
       duration: 11,
       repeat: Infinity,
       ease: 'easeInOut',
@@ -85,11 +85,7 @@ export default function Hero() {
     <section id="home" className="t-hero relative min-h-[100dvh] flex flex-col items-center justify-center px-5 text-center overflow-hidden">
       <div className="mist-hero-lockup">
         <div className="mist-hero-title relative" aria-label="Portfolio">
-          <motion.span
-            initial={reduceMotion ? false : { opacity: 0, filter: 'blur(16px)', letterSpacing: '0.13em' }}
-            animate={{ opacity: 1, filter: 'blur(0px)', letterSpacing: '0.035em' }}
-            transition={{ duration: 1.25, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
-          >PORTFOLIO</motion.span>
+          <span>PORTFOLIO</span>
         </div>
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 8 }}
