@@ -50,7 +50,10 @@ export default function Journey() {
                 className="journey-index__status"
                 aria-label="현재 재직 중"
                 title="현재 재직 중"
-              />
+              >
+                <i className="journey-index__status-mark" aria-hidden="true" />
+                <span aria-hidden="true">Now</span>
+              </span>
             )}
           </motion.button>
         ))}

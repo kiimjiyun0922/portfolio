@@ -69,6 +69,52 @@ body {
   color: var(--color-gray-100);
 }
 
+/* Admin concept — dense enough for operations, calm enough for long editing sessions. */
+.admin-shell {
+  --color-gray-950: #0b0e12;
+  --color-gray-900: #11151b;
+  --color-gray-800: #20262f;
+  --color-gray-700: #343d49;
+  --color-gray-600: #667180;
+  --color-gray-500: #8b95a3;
+  --color-gray-400: #aeb6c0;
+  --color-accent: #79e0b5;
+  --color-accent-light: #a0edcd;
+  --color-accent-dark: #4bb88b;
+  font-family: 'Instrument Sans', 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: radial-gradient(circle at 76% -10%, rgba(121, 224, 181, .06), transparent 28rem), #0b0e12;
+}
+.admin-shell button:focus-visible,
+.admin-shell input:focus-visible,
+.admin-shell textarea:focus-visible { outline: 2px solid #79e0b5; outline-offset: 2px; }
+.admin-primary-button, .admin-secondary-button { min-height: 42px; padding: 0 16px; border-radius: 10px; font-size: 13px; font-weight: 600; transition: transform .2s ease, background .2s ease, border-color .2s ease; }
+.admin-primary-button { background: #79e0b5; color: #0b0e12; }
+.admin-primary-button:hover { background: #a0edcd; transform: translateY(-1px); }
+.admin-secondary-button { border: 1px solid #343d49; color: #d7dce2; background: rgba(17,21,27,.7); }
+.admin-secondary-button:hover { border-color: #667180; background: #20262f; }
+.admin-status-strip { display: grid; grid-template-columns: 1fr 1fr auto; align-items: center; gap: 20px; margin-bottom: 18px; padding: 13px 16px; border: 1px solid #20262f; border-radius: 12px; background: rgba(17,21,27,.75); }
+.admin-status-strip > div { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.admin-status-strip p { display: flex; flex-direction: column; min-width: 0; }
+.admin-status-strip b { color: #d7dce2; font-size: 12px; font-weight: 600; }
+.admin-status-strip small { color: #667180; font-size: 10px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.admin-status-strip button { color: #8b95a3; font-size: 11px; white-space: nowrap; }
+.admin-status-strip button:hover { color: #79e0b5; }
+.admin-status-dot { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: #79e0b5; box-shadow: 0 0 0 4px rgba(121,224,181,.09); }
+.admin-panel { padding: 20px; border: 1px solid #20262f; border-radius: 16px; background: rgba(17,21,27,.9); }
+.admin-panel--accent { background: linear-gradient(145deg, rgba(121,224,181,.09), rgba(17,21,27,.9) 55%); }
+.admin-panel-heading { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.admin-panel-heading h3 { margin-top: 3px; color: #fff; font-size: 14px; font-weight: 600; }
+.admin-panel-heading button { color: #8b95a3; font-size: 11px; }
+.admin-panel-heading button:hover { color: #79e0b5; }
+.admin-kicker { color: #667180; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 9px; letter-spacing: .14em; }
+.admin-vault-cell { display: flex; min-height: 104px; flex-direction: column; padding: 16px; background: #11151b; }
+.admin-vault-cell span, .admin-vault-cell small { color: #667180; font-size: 10px; }
+.admin-vault-cell b { margin: 8px 0 3px; color: #d7dce2; font-size: 15px; font-weight: 600; }
+@media (max-width: 720px) {
+  .admin-status-strip { grid-template-columns: 1fr; gap: 12px; }
+  .admin-status-strip button { text-align: left; }
+}
+
 /* Admin-authored copy keeps intentional line breaks; long lines may still
    wrap when the available viewport or column becomes narrower. */
 .admin-copy {
@@ -1541,10 +1587,22 @@ body {
   grid-column: 2;
   grid-row: 2;
   justify-self: start;
-  width: 10px;
-  height: 10px;
-  border: 1px solid #75684d;
-  background: #75684d;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: auto;
+  min-height: 18px;
+  line-height: 1;
+  color: #75684d;
+}
+[data-theme="mist"] .journey-index__status-mark {
+  width: 12px;
+  height: 12px;
+  display: block;
+  flex: 0 0 12px;
+  background: currentColor;
+  clip-path: polygon(50% 0, 59% 40%, 100% 50%, 59% 60%, 50% 100%, 41% 60%, 0 50%, 41% 40%);
+  animation: notebook-spin 9s linear infinite;
 }
 
 @media (max-width: 767px) {
