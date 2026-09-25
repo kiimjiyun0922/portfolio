@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import MarkdownRenderer from './ui/MarkdownRenderer'
-import { loadTaxonomyConfig, trackAction } from '../utils/crypto'
+import { trackAction } from '../utils/crypto'
 
 const TABS = [
   { key: 'problem', label: 'Problem' },
@@ -100,8 +100,6 @@ function StoryTabs({ project }) {
 }
 
 export default function ProjectCard({ project }) {
-  const taxonomy = loadTaxonomyConfig()
-  const badgeColor = (taxonomy.categories || []).find((item) => item.key === project.badgeType)?.color || '#6b7280'
   const hasStory = project.problem || project.solution || project.collaboration || project.result
 
   return (
@@ -111,7 +109,7 @@ export default function ProjectCard({ project }) {
     >
       {/* Header */}
       <div>
-        <span className="inline-block text-[11px] font-mono font-medium tracking-wider uppercase px-2.5 py-1 rounded mb-3" style={{ color: badgeColor, backgroundColor: `color-mix(in srgb, ${badgeColor} 10%, transparent)` }}>
+        <span className="inline-block text-[11px] font-mono font-medium tracking-wider uppercase px-2.5 py-1 rounded mb-3 text-accent bg-accent/10">
           {project.badge}
         </span>
         <h3 className="admin-copy text-lg md:text-xl font-bold text-white mb-2 leading-snug">{project.title}</h3>

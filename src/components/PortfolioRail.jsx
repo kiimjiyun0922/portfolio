@@ -15,8 +15,10 @@ const SECTIONS = [
 export default function PortfolioRail() {
   const [active, setActive] = useState('home')
   const [open, setOpen] = useState(false)
+  const [hoverIndex, setHoverIndex] = useState(null)
   const reduceMotion = useReducedMotion()
   const current = SECTIONS.find((section) => section.id === active) || SECTIONS[0]
+  const preview = hoverIndex === null ? current : SECTIONS[hoverIndex]
 
   useEffect(() => {
     const elements = SECTIONS.map((section) => document.getElementById(section.id)).filter(Boolean)
@@ -42,7 +44,7 @@ export default function PortfolioRail() {
         className="portfolio-rail"
         aria-label="Portfolio sections"
         onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
+        onMouseLeave={() => { setOpen(false); setHoverIndex(null) }}
         onFocusCapture={() => setOpen(true)}
         onBlurCapture={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false)
@@ -56,8 +58,10 @@ export default function PortfolioRail() {
               aria-label={`${section.label} 섹션으로 이동`}
               aria-current={section.id === active ? 'location' : undefined}
               onClick={() => navigate(section.id)}
+              onMouseEnter={() => setHoverIndex(index)}
+              onFocus={() => setHoverIndex(index)}
               className={`portfolio-rail-tick ${section.id === active ? 'is-active' : ''}`}
-              style={{ '--tick-width': `${index % 3 === 0 ? 16 : index % 2 === 0 ? 11 : 7}px` }}
+              style={{ '--tick-width': `${hoverIndex === null ? (section.id === active ? 31 : 8) : [32, 22, 14, 9][Math.min(Math.abs(index - hoverIndex), 3)]}px` }}
             />
           ))}
         </div>
@@ -65,17 +69,17 @@ export default function PortfolioRail() {
         <AnimatePresence mode="wait">
           {open && (
             <motion.button
-              key={current.id}
+              key={preview.id}
               type="button"
-              onClick={() => navigate(current.id)}
+              onClick={() => navigate(preview.id)}
               className="portfolio-rail-card text-left"
               initial={reduceMotion ? false : { opacity: 0, x: -8, filter: 'blur(5px)' }}
               animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
               exit={reduceMotion ? undefined : { opacity: 0, x: -8, filter: 'blur(4px)' }}
               transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
             >
-              <span className="portfolio-rail-label">{current.label}</span>
-              <span className="portfolio-rail-detail">{current.detail}</span>
+              <span className="portfolio-rail-label">{preview.label}</span>
+              <span className="portfolio-rail-detail">{preview.detail}</span>
             </motion.button>
           )}
         </AnimatePresence>

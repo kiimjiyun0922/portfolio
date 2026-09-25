@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import MarkdownRenderer from './ui/MarkdownRenderer'
 import Contact from './Contact'
 import { loadProjects } from '../data/projects'
@@ -15,6 +15,7 @@ const CASE_SECTIONS = [
 
 export default function ProjectDetailPage({ slug }) {
   const [galleryState, setGalleryState] = useState({ slug, index: 0 })
+  const galleryTouchStartX = useRef(null)
   const data = loadProjects()
   const projects = (data.designProjects || []).filter((project) => project.published)
   const projectIndex = projects.findIndex((project) => project.slug === slug)
@@ -38,6 +39,14 @@ export default function ProjectDetailPage({ slug }) {
   const setActiveGalleryIndex = (index) => setGalleryState({ slug, index })
   const showPreviousImage = () => setActiveGalleryIndex((activeGalleryIndex - 1 + gallery.length) % gallery.length)
   const showNextImage = () => setActiveGalleryIndex((activeGalleryIndex + 1) % gallery.length)
+  const handleGalleryTouchEnd = (event) => {
+    if (gallery.length < 2 || galleryTouchStartX.current === null) return
+    const distance = event.changedTouches[0].clientX - galleryTouchStartX.current
+    galleryTouchStartX.current = null
+    if (Math.abs(distance) < 48) return
+    if (distance < 0) showNextImage()
+    else showPreviousImage()
+  }
   return (
     <>
       <main className="portfolio-subpage project-detail-page">
@@ -90,7 +99,17 @@ export default function ProjectDetailPage({ slug }) {
 
       {gallery.length > 0 && (
         <section className="project-detail-gallery" aria-label="Project gallery">
-          <div className="project-detail-gallery__stage">
+          <div
+            className="project-detail-gallery__stage"
+            tabIndex={gallery.length > 1 ? 0 : undefined}
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowLeft') showPreviousImage()
+              if (event.key === 'ArrowRight') showNextImage()
+            }}
+            onTouchStart={(event) => { galleryTouchStartX.current = event.touches[0].clientX }}
+            onTouchEnd={handleGalleryTouchEnd}
+            aria-label={gallery.length > 1 ? 'Project image gallery. Use left and right arrow keys or swipe.' : undefined}
+          >
             <figure key={`${gallery[activeGalleryIndex].url}-${activeGalleryIndex}`}>
               <img src={gallery[activeGalleryIndex].url} alt={gallery[activeGalleryIndex].alt || ''} loading="lazy" />
               {gallery[activeGalleryIndex].caption && <figcaption>{gallery[activeGalleryIndex].caption}</figcaption>}

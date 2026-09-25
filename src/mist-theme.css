@@ -1,0 +1,1275 @@
+/*
+ * Mist public theme contract
+ *
+ * This file is intentionally loaded after the shared and accessibility layers.
+ * It is the single production override for the reviewed Mist guide. Keep admin
+ * styles and every other theme out of this file.
+ */
+
+[data-theme="mist"] {
+  --mist-paper: #fbfbf8;
+  --mist-paper-raised: #f4f3ee;
+  --mist-ink: #292824;
+  --mist-body: #59574f;
+  --mist-meta: #77746c;
+  --mist-taupe: #786f58;
+  --mist-project: #eee1a4;
+  --mist-selection: #ded7c4;
+  --mist-line: rgba(41, 40, 36, .22);
+  --mist-line-strong: rgba(41, 40, 36, .48);
+  --mist-gutter: clamp(20px, 5.55vw, 80px);
+  --mist-rail: 1280px;
+  --mist-section-y: clamp(72px, 8vw, 112px);
+  --mist-display: 'Newsreader', 'Gowun Batang', 'Batang', serif;
+  --mist-body-font: 'Gowun Batang', 'Batang', serif;
+  --mist-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --paper-gutter: var(--mist-gutter);
+  --editorial-rail: var(--mist-rail);
+  --section-inset: var(--mist-section-y);
+  --ink-title: var(--mist-ink);
+  --ink-body: var(--mist-body);
+  --ink-meta: var(--mist-meta);
+  --ink-action: var(--mist-taupe);
+  --color-accent: var(--mist-taupe);
+  --color-accent-light: #91866e;
+  --color-accent-dark: #5f5746;
+  --font-sans: var(--mist-body-font);
+  --font-display: var(--mist-display);
+}
+
+[data-theme="mist"] body,
+[data-theme="mist"] .t-page,
+[data-theme="mist"] .t-gate {
+  color: var(--mist-ink);
+  background: var(--mist-paper);
+  font-family: var(--mist-body-font);
+  font-size: 15px;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+[data-theme="mist"] ::selection {
+  color: var(--mist-ink);
+  background: var(--mist-selection);
+}
+
+[data-theme="mist"] .t-page {
+  overflow-x: clip;
+}
+
+[data-theme="mist"] .t-page::before {
+  background: var(--mist-paper);
+}
+
+[data-theme="mist"] .t-page::after {
+  z-index: 80;
+  opacity: .021;
+  mix-blend-mode: multiply;
+}
+
+/* A single focus indicator replaces browser blue rings and stacked shadows. */
+[data-theme="mist"] :where(a, button, [role="button"]):focus,
+[data-theme="mist"] :where(a, button, [role="button"]):focus-visible {
+  outline: 1px solid var(--mist-ink) !important;
+  outline-offset: 3px;
+  box-shadow: none !important;
+}
+
+[data-theme="mist"] :where(input, textarea, select):focus,
+[data-theme="mist"] :where(input, textarea, select):focus-visible {
+  outline: 0 !important;
+  border-color: var(--mist-ink) !important;
+  box-shadow: none !important;
+}
+
+[data-theme="mist"] :where(a, button, [role="button"]) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Shared page rail and section rhythm. */
+[data-theme="mist"] .section-wrap {
+  position: relative;
+  z-index: 1;
+  width: min(100%, calc(var(--mist-rail) + (var(--mist-gutter) * 2)));
+  max-width: none;
+  margin-inline: auto;
+  padding: var(--mist-section-y) var(--mist-gutter);
+  border-top: 1px solid var(--mist-line);
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+[data-theme="mist"] .section-wrap > :where(p:first-of-type),
+[data-theme="mist"] #about > div > div:first-child > p {
+  margin: 0 0 8px;
+  color: var(--mist-taupe);
+  font: 400 12px/20px var(--mist-mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+[data-theme="mist"] .section-wrap > h2,
+[data-theme="mist"] #about .about-heading,
+[data-theme="mist"] .design-projects__header h2,
+[data-theme="mist"] .portfolio-subpage__header h1 {
+  margin: 0 0 40px;
+  color: var(--mist-ink);
+  font-family: var(--mist-display);
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -.025em;
+}
+
+[data-theme="mist"] .section-wrap > :where(.max-w-3xl, .max-w-4xl),
+[data-theme="mist"] #about > .max-w-3xl,
+[data-theme="mist"] #achievements > .max-w-4xl,
+[data-theme="mist"] #experience > .max-w-3xl,
+[data-theme="mist"] #resume > .max-w-3xl {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+}
+
+[data-theme="mist"] .section-wrap :where(p, li) {
+  overflow-wrap: break-word;
+  word-break: keep-all;
+}
+
+/* Stored line breaks win on wide screens; small screens may wrap naturally. */
+[data-theme="mist"] .about-heading__line {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+/* Hero: neutral fog, one primary title, stable print-ledger footer. */
+[data-theme="mist"] .t-hero {
+  min-height: 100svh;
+  padding: 0 var(--mist-gutter);
+  color: var(--mist-ink);
+  background: transparent;
+}
+
+[data-theme="mist"] .mist-hero-lockup {
+  top: -2svh;
+  width: min(100%, 900px);
+  max-width: none;
+}
+
+[data-theme="mist"] .mist-hero-title {
+  z-index: 4;
+}
+
+[data-theme="mist"] .mist-hero-title span {
+  color: var(--mist-taupe);
+  font-family: var(--mist-display);
+  font-size: clamp(64px, 9vw, 144px);
+  font-weight: 400;
+  line-height: .94;
+  letter-spacing: .035em !important;
+}
+
+[data-theme="mist"] .mist-hero-intro {
+  display: none;
+}
+
+[data-theme="mist"] .mist-fog-layer {
+  z-index: 2;
+  background: rgba(251, 251, 248, .44);
+  -webkit-backdrop-filter: blur(34px) saturate(0) contrast(.97);
+  backdrop-filter: blur(34px) saturate(0) contrast(.97);
+}
+
+[data-theme="mist"] .mist-fog-layer::before,
+[data-theme="mist"] .mist-fog-layer::after {
+  background-color: transparent;
+  filter: blur(34px) grayscale(1);
+}
+
+[data-theme="mist"] .mist-hero-footer {
+  right: var(--mist-gutter);
+  bottom: 32px;
+  left: var(--mist-gutter);
+  z-index: 5;
+  display: grid;
+  grid-template-columns: minmax(260px, .8fr) minmax(480px, 1.2fr);
+  gap: clamp(32px, 6vw, 96px);
+  align-items: end;
+}
+
+[data-theme="mist"] .mist-hero-meta {
+  order: 1;
+  max-width: 44ch;
+  color: var(--mist-body);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+[data-theme="mist"] .mist-hero-stats {
+  order: 2;
+  width: 100%;
+  margin: 0;
+  padding: 16px 0;
+  border-top: 1px solid var(--mist-line-strong);
+  border-bottom: 1px solid var(--mist-line);
+}
+
+[data-theme="mist"] .mist-hero-stats li,
+[data-theme="mist"] .mist-hero-stats li + li {
+  margin: 0;
+  border: 0;
+}
+
+[data-theme="mist"] .mist-hero-stats button {
+  display: grid;
+  grid-template-columns: minmax(max-content, 1fr) minmax(48px, auto);
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+  min-height: 32px;
+  padding: 0;
+  color: var(--mist-ink);
+  background: transparent;
+  transform: none !important;
+}
+
+[data-theme="mist"] .mist-hero-stat-label {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  color: var(--mist-body);
+  font: 400 12px/20px var(--mist-mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+[data-theme="mist"] .mist-hero-stat-label::after {
+  content: '';
+  flex: 1;
+  border-top: 1px dotted rgba(41, 40, 36, .28);
+}
+
+[data-theme="mist"] .mist-hero-stat-value {
+  grid-column: 2;
+  grid-row: 1;
+  color: var(--mist-ink);
+  font: 600 14px/20px var(--mist-mono);
+  text-align: right;
+}
+
+/* About: wide editorial measure, monochrome skill tags. */
+[data-theme="mist"] #about > div {
+  width: 100%;
+}
+
+[data-theme="mist"] #about .about-heading {
+  max-width: 1000px;
+}
+
+[data-theme="mist"] #about .flex.flex-col.sm\:flex-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 280px) minmax(0, 1fr);
+  gap: clamp(32px, 6vw, 88px);
+  align-items: start;
+  margin-bottom: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--mist-line);
+}
+
+[data-theme="mist"] #about img {
+  width: 100%;
+  max-width: 280px;
+  border: 1px solid var(--mist-line);
+  border-radius: 0;
+  filter: saturate(.2) contrast(.95);
+}
+
+[data-theme="mist"] #about .prose-dark,
+[data-theme="mist"] #about .prose-dark p {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--mist-body);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+[data-theme="mist"] .about-skill {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid var(--mist-line);
+  border-radius: 0;
+  color: var(--mist-body);
+  background: transparent;
+  font-size: 13px;
+  line-height: 20px;
+  transform: none !important;
+}
+
+[data-theme="mist"] .about-skill:hover,
+[data-theme="mist"] .about-skill:focus-visible {
+  border-color: var(--mist-line-strong);
+  color: var(--mist-ink);
+  background: var(--mist-paper-raised);
+}
+
+/* Ledger components share a top rule, bottom rules and the same text baseline. */
+[data-theme="mist"] :where(.journey-index, .experience-list, #achievements > div:last-child, .resume-list) {
+  border-top: 1px solid var(--mist-line-strong);
+}
+
+[data-theme="mist"] .journey-index__row {
+  display: grid;
+  grid-template-columns: 40px 120px minmax(180px, 1fr) minmax(160px, .75fr);
+  gap: 24px;
+  align-items: first baseline;
+  min-height: 0;
+  padding: 20px 0;
+  border: 0;
+  border-bottom: 1px solid var(--mist-line);
+  color: var(--mist-ink);
+  background: transparent;
+  text-align: left;
+  transform: none !important;
+}
+
+[data-theme="mist"] .journey-index__number,
+[data-theme="mist"] .journey-index__year,
+[data-theme="mist"] .journey-index__field,
+[data-theme="mist"] .journey-index__status {
+  padding: 0;
+  color: var(--mist-meta);
+  font: 400 12px/20px var(--mist-mono);
+}
+
+[data-theme="mist"] .journey-index__number {
+  padding-top: 1px;
+}
+
+[data-theme="mist"] .journey-index__year {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+[data-theme="mist"] .journey-index__company {
+  color: var(--mist-ink);
+  font: 700 17px/20px var(--mist-display);
+}
+
+[data-theme="mist"] .journey-index__status {
+  color: var(--mist-taupe);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+[data-theme="mist"] .journey-index__status-mark {
+  width: 9px;
+  height: 9px;
+  flex-basis: 9px;
+  color: var(--mist-taupe);
+}
+
+[data-theme="mist"] #achievements > div:last-child {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  max-width: none;
+  margin: 0;
+}
+
+[data-theme="mist"] #achievements .t-card {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  min-height: 0;
+  padding: 20px 0;
+  border: 0;
+  border-bottom: 1px solid var(--mist-line);
+  border-radius: 0;
+  color: var(--mist-ink);
+  background: transparent;
+  box-shadow: none;
+  transform: none !important;
+}
+
+[data-theme="mist"] #achievements .achievement-index {
+  padding-top: 3px;
+  color: var(--mist-meta);
+  font: 400 12px/20px var(--mist-mono);
+}
+
+[data-theme="mist"] #achievements .t-card h4 {
+  margin: 0 0 4px;
+  color: var(--mist-ink);
+  font: 700 18px/24px var(--mist-display);
+}
+
+[data-theme="mist"] #achievements .t-card .text-sm,
+[data-theme="mist"] #achievements .t-card .text-sm p {
+  color: var(--mist-body);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+[data-theme="mist"] .experience-entry {
+  display: grid;
+  grid-template-columns: 40px minmax(220px, .62fr) minmax(0, 1.38fr);
+  column-gap: 24px;
+  align-items: start;
+  min-height: 0;
+  padding: 24px 0;
+  border: 0;
+  border-bottom: 1px solid var(--mist-line);
+  transform: none !important;
+}
+
+[data-theme="mist"] .experience-entry__index {
+  grid-column: 1;
+  grid-row: 1;
+  padding-top: 2px;
+  color: var(--mist-meta);
+  font: 400 12px/20px var(--mist-mono);
+}
+
+[data-theme="mist"] .experience-entry__identity {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+[data-theme="mist"] .experience-entry__body {
+  grid-column: 3;
+  grid-row: 1;
+  min-width: 0;
+}
+
+[data-theme="mist"] .experience-entry__identity > p:first-child,
+[data-theme="mist"] .experience-entry__projects button p + p {
+  margin: 0 0 4px;
+  color: var(--mist-meta);
+  font: 400 12px/20px var(--mist-mono);
+}
+
+[data-theme="mist"] .experience-entry__identity h3 {
+  margin: 0;
+  color: var(--mist-ink);
+  font: 700 18px/24px var(--mist-display);
+}
+
+[data-theme="mist"] .experience-entry__identity h3 + p {
+  margin: 2px 0 0;
+  color: var(--mist-taupe);
+  font-size: 15px;
+  line-height: 22px;
+}
+
+[data-theme="mist"] .experience-entry__projects button {
+  min-height: 44px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--mist-line);
+  color: var(--mist-body);
+  transform: none !important;
+}
+
+[data-theme="mist"] .experience-entry__projects button p:first-child {
+  color: var(--mist-ink);
+  font-size: 15px;
+  line-height: 22px;
+}
+
+[data-theme="mist"] .experience-entry__other {
+  margin-top: 20px;
+}
+
+[data-theme="mist"] .experience-entry__other > p {
+  margin: 0 0 8px;
+  color: var(--mist-meta);
+  font: 400 12px/20px var(--mist-mono);
+}
+
+[data-theme="mist"] .experience-entry__other ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+[data-theme="mist"] .experience-entry__other li,
+[data-theme="mist"] .experience-entry__other li p {
+  margin: 0;
+  color: var(--mist-body);
+  font-size: 15px;
+  line-height: 24px;
+}
+
+/* Resume uses the same 40px index column and 20px symmetric row padding. */
+[data-theme="mist"] .resume-sheet {
+  width: 100%;
+}
+
+[data-theme="mist"] .resume-sheet > * + * {
+  margin-top: 40px;
+}
+
+[data-theme="mist"] .resume-block__heading {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 24px;
+  align-items: first baseline;
+  margin: 0;
+  padding: 20px 0;
+  border-top: 1px solid var(--mist-line-strong);
+  border-bottom: 1px solid var(--mist-line);
+  color: var(--mist-ink);
+  font: 700 18px/24px var(--mist-display);
+}
+
+[data-theme="mist"] .resume-index {
+  padding-top: 2px;
+  color: var(--mist-meta);
+  font: 400 12px/20px var(--mist-mono);
+}
+
+[data-theme="mist"] .resume-list {
+  border-top: 0;
+}
+
+[data-theme="mist"] :where(.resume-education__row, .resume-activity__row) {
+  min-height: 0;
+  margin: 0;
+  padding: 20px 0;
+  border: 0;
+  border-bottom: 1px solid var(--mist-line);
+  border-radius: 0;
+  background: transparent;
+}
+
+[data-theme="mist"] .resume-education__row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  gap: 24px;
+}
+
+[data-theme="mist"] .resume-education__copy {
+  grid-column: 2;
+}
+
+[data-theme="mist"] .resume-education__period {
+  grid-column: 3;
+  color: var(--mist-meta);
+  font: 400 12px/20px var(--mist-mono);
+}
+
+[data-theme="mist"] .resume-activity__row {
+  display: grid;
+  grid-template-columns: 40px 96px 96px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+[data-theme="mist"] .resume-activity__year {
+  grid-column: 2;
+  color: var(--mist-meta);
+  font: 400 12px/20px var(--mist-mono);
+}
+
+[data-theme="mist"] .resume-activity__category {
+  grid-column: 3;
+  color: var(--mist-taupe);
+  font-size: 15px;
+  line-height: 22px;
+}
+
+[data-theme="mist"] .resume-activity__copy {
+  grid-column: 4;
+}
+
+[data-theme="mist"] .resume-education__copy p:first-child,
+[data-theme="mist"] .resume-activity__copy p:first-child {
+  margin: 0;
+  color: var(--mist-ink);
+  font-size: 16px;
+  line-height: 24px;
+}
+
+[data-theme="mist"] .resume-education__copy p + p,
+[data-theme="mist"] .resume-activity__copy p + p {
+  margin: 4px 0 0;
+  color: var(--mist-body);
+  font-size: 15px;
+  line-height: 24px;
+}
+
+/* Product work is the one tinted paper surface. */
+[data-theme="mist"] #projects {
+  width: 100%;
+  max-width: none;
+  background: var(--mist-project);
+}
+
+[data-theme="mist"] #projects > :where(p, h2, .projects-archive, .design-projects, .notebook-ornaments) {
+  width: min(var(--mist-rail), calc(100% - (var(--mist-gutter) * 2)));
+  margin-right: auto;
+  margin-left: auto;
+}
+
+[data-theme="mist"] #projects .projects-archive {
+  display: grid;
+  gap: 40px;
+}
+
+[data-theme="mist"] #projects .projects-archive-group,
+[data-theme="mist"] #projects .projects-archive-item,
+[data-theme="mist"] #projects .t-card,
+[data-theme="mist"] .design-projects__editorial,
+[data-theme="mist"] .design-projects__archive-link {
+  border-color: rgba(41, 40, 36, .26);
+}
+
+[data-theme="mist"] #projects .projects-archive-group {
+  padding-top: 20px;
+  border-top: 1px solid var(--mist-line-strong);
+}
+
+[data-theme="mist"] #projects .projects-archive-heading {
+  display: grid;
+  grid-template-columns: minmax(220px, .7fr) minmax(0, 1.3fr);
+  gap: 32px;
+  align-items: first baseline;
+  margin: 0 0 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--mist-line);
+}
+
+[data-theme="mist"] #projects .projects-archive-heading h3,
+[data-theme="mist"] #projects .projects-archive-heading p {
+  margin: 0;
+}
+
+[data-theme="mist"] #projects .projects-archive-heading h3 {
+  color: var(--mist-ink);
+  font: 400 20px/28px var(--mist-display);
+}
+
+[data-theme="mist"] #projects .projects-archive-heading p {
+  color: var(--mist-body);
+  font-size: 15px;
+  line-height: 24px;
+}
+
+[data-theme="mist"] #projects :where(.t-card, button, a) {
+  transform: none !important;
+}
+
+[data-theme="mist"] .design-projects {
+  margin-top: 64px;
+  padding-top: 64px;
+  border-top: 1px solid var(--mist-line-strong);
+}
+
+[data-theme="mist"] .design-projects__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(260px, .85fr);
+  gap: 48px;
+  align-items: end;
+  margin-bottom: 40px;
+}
+
+[data-theme="mist"] .design-projects__header h2 {
+  margin: 0;
+}
+
+[data-theme="mist"] .design-projects__header p {
+  margin: 0 0 6px;
+  color: var(--mist-body);
+  font-size: 15px;
+  line-height: 24px;
+}
+
+[data-theme="mist"] .design-projects__index-row,
+[data-theme="mist"] .design-projects__archive-link,
+[data-theme="mist"] .project-detail-next a {
+  transform: none !important;
+}
+
+/* Rail and ornaments are Mist-only and never cover readable content. */
+[data-theme="mist"] .notebook-ornaments {
+  z-index: 0;
+  pointer-events: none;
+}
+
+[data-theme="mist"] .section-wrap > :not(.notebook-ornaments) {
+  position: relative;
+  z-index: 1;
+}
+
+[data-theme="mist"] .notebook-mark {
+  color: var(--mist-ink);
+  opacity: .82;
+}
+
+[data-theme="mist"] .portfolio-mobile-status {
+  display: none !important;
+}
+
+[data-theme="mist"] .portfolio-rail-card {
+  border: 1px solid var(--mist-line);
+  color: var(--mist-ink);
+  background: rgba(251, 251, 248, .94);
+  box-shadow: none;
+}
+
+/* Session state belongs to document flow and must never cover content. */
+[data-theme="mist"] .visitor-session-banner {
+  position: relative !important;
+  inset: auto !important;
+  z-index: 70;
+  display: grid;
+  grid-template-columns: 20px max-content minmax(0, 1fr) 44px;
+  justify-content: stretch;
+  gap: 16px;
+  min-height: 64px;
+  padding: 10px var(--mist-gutter);
+  border: 0;
+  border-bottom: 1px solid var(--mist-line-strong);
+  color: var(--mist-ink);
+  background: var(--mist-paper-raised);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* Backward-compatible hook for the existing live banner markup. */
+[data-theme="mist"] .t-page > div[class~="fixed"][class~="top-0"][class~="left-0"][class~="right-0"]:not(.theme-preview-toolbar) {
+  position: relative !important;
+  inset: auto !important;
+  z-index: 70;
+  min-height: 64px;
+  padding: 10px var(--mist-gutter);
+  border: 0;
+  border-bottom: 1px solid var(--mist-line-strong);
+  color: var(--mist-body);
+  background: var(--mist-paper-raised);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+[data-theme="mist"] .t-page > div[class~="fixed"][class~="top-0"][class~="left-0"][class~="right-0"]:not(.theme-preview-toolbar) > button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  border: 1px solid var(--mist-line);
+  color: var(--mist-ink);
+  background: transparent;
+}
+
+[data-theme="mist"] .visitor-session-banner__icon {
+  color: var(--mist-taupe);
+}
+
+[data-theme="mist"] .visitor-session-banner__copy {
+  display: contents;
+  color: var(--mist-body);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+[data-theme="mist"] .visitor-session-banner__label {
+  color: var(--mist-ink);
+  font: 400 11px/20px var(--mist-mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+[data-theme="mist"] .visitor-session-banner__date {
+  align-self: center;
+  color: var(--mist-body);
+  font-weight: 400;
+}
+
+[data-theme="mist"] .visitor-session-banner__remaining {
+  margin: 0;
+  color: var(--mist-taupe);
+}
+
+[data-theme="mist"] .visitor-session-banner__close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  border: 1px solid var(--mist-line);
+  color: var(--mist-ink);
+  background: transparent;
+}
+
+/* Gate: two clear reading columns and no expanding button hover. */
+[data-theme="mist"] .t-gate {
+  grid-template-columns: minmax(0, 1fr) minmax(360px, .72fr);
+  gap: clamp(40px, 7vw, 104px);
+  padding-inline: var(--mist-gutter);
+}
+
+[data-theme="mist"] .t-gate .gate-title {
+  font-family: var(--mist-display);
+  font-size: clamp(44px, 5vw, 72px);
+  line-height: 1.02;
+  letter-spacing: -.025em;
+}
+
+[data-theme="mist"] .t-gate .gate-title__line--accent {
+  color: var(--mist-taupe);
+}
+
+[data-theme="mist"] .t-gate .gate-deck,
+[data-theme="mist"] .t-gate .gate-contact {
+  font-size: 15px;
+  line-height: 24px;
+}
+
+[data-theme="mist"] .t-gate .gate-form button,
+[data-theme="mist"] .t-gate .gate-form button:hover,
+[data-theme="mist"] .t-gate .gate-form button:focus-visible {
+  transform: none !important;
+}
+
+/* Archive and detail keep the reviewed paper, 3:2 stage and common footer. */
+[data-theme="mist"] .portfolio-subpage,
+[data-theme="mist"] .project-detail-page {
+  width: min(100%, calc(var(--mist-rail) + (var(--mist-gutter) * 2)));
+  margin-inline: auto;
+  padding-inline: var(--mist-gutter);
+  color: var(--mist-ink);
+  background: transparent;
+}
+
+[data-theme="mist"] .project-detail-close {
+  min-width: 96px;
+  height: 44px;
+  border: 1px solid var(--mist-line-strong);
+  border-radius: 0;
+  color: var(--mist-ink);
+  background: var(--mist-paper);
+  transform: none !important;
+}
+
+[data-theme="mist"] .project-detail-brief {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 40px;
+  padding: 32px 0;
+  border-top: 1px solid var(--mist-line-strong);
+  border-bottom: 1px solid var(--mist-line);
+  background: var(--mist-paper-raised);
+}
+
+[data-theme="mist"] .project-detail-brief > * {
+  padding-inline: 24px;
+}
+
+[data-theme="mist"] .project-detail-story section {
+  display: grid;
+  grid-template-columns: 40px 220px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  padding: 32px 0;
+  border-top: 1px solid var(--mist-line-strong);
+  border-bottom: 0;
+}
+
+[data-theme="mist"] .project-detail-story section:last-child {
+  border-bottom: 1px solid var(--mist-line);
+}
+
+[data-theme="mist"] .project-detail-gallery__stage,
+[data-theme="mist"] .project-detail-gallery img,
+[data-theme="mist"] .design-project-visual {
+  aspect-ratio: 3 / 2;
+  min-height: 0;
+}
+
+[data-theme="mist"] .project-detail-gallery__controls button,
+[data-theme="mist"] .project-detail-gallery__thumbs button,
+[data-theme="mist"] .project-detail-next a {
+  min-height: 44px;
+  transform: none !important;
+}
+
+/* Common footer: related information stays together; Back to top remains right. */
+[data-theme="mist"] .notebook-footer,
+[data-theme="mist"] .project-detail-footer .notebook-footer,
+[data-theme="mist"] .portfolio-subpage + .notebook-footer {
+  display: grid;
+  grid-template-columns: minmax(180px, .7fr) minmax(320px, 1.3fr) auto;
+  gap: clamp(32px, 6vw, 96px);
+  align-items: end;
+  padding: 32px var(--mist-gutter);
+  border-top: 1px solid var(--mist-line-strong);
+  color: var(--mist-body);
+  background: var(--mist-paper);
+  font: 400 12px/20px var(--mist-mono);
+  letter-spacing: .025em;
+}
+
+[data-theme="mist"] .notebook-footer__column--start { order: 1; }
+[data-theme="mist"] .notebook-footer__column--center { order: 2; }
+[data-theme="mist"] .notebook-footer__column--end {
+  order: 3;
+  justify-self: end;
+  text-align: right;
+}
+
+[data-theme="mist"] .notebook-footer__contacts {
+  display: flex;
+  gap: 4px 16px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+[data-theme="mist"] .notebook-footer__link,
+[data-theme="mist"] .notebook-footer__strong {
+  min-height: 24px;
+  color: var(--mist-ink);
+  transform: none !important;
+}
+
+/* Scroll reveals never translate content or create layout movement in Mist. */
+[data-theme="mist"] :where(
+  #about > div > [style],
+  .journey-index__row,
+  #achievements .t-card,
+  .experience-entry,
+  .resume-block
+) {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+[data-theme="mist"] #about > div > div,
+[data-theme="mist"] #about > div > div > div {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+@media (max-width: 1023px) {
+  [data-theme="mist"] {
+    --mist-gutter: 32px;
+    --mist-section-y: 80px;
+  }
+
+  [data-theme="mist"] .mist-hero-footer {
+    grid-template-columns: minmax(220px, .7fr) minmax(400px, 1.3fr);
+    gap: 40px;
+  }
+
+  [data-theme="mist"] .experience-entry {
+    grid-template-columns: 40px minmax(190px, .72fr) minmax(0, 1.28fr);
+  }
+
+  [data-theme="mist"] .design-projects__header {
+    gap: 32px;
+  }
+}
+
+@media (max-width: 767px) {
+  [data-theme="mist"] {
+    --mist-gutter: 20px;
+    --mist-section-y: 64px;
+  }
+
+  [data-theme="mist"] body,
+  [data-theme="mist"] .t-page,
+  [data-theme="mist"] .t-gate {
+    font-size: 15px;
+  }
+
+  [data-theme="mist"] .section-wrap {
+    width: 100%;
+    padding: var(--mist-section-y) var(--mist-gutter);
+  }
+
+  [data-theme="mist"] .section-wrap > h2,
+  [data-theme="mist"] #about .about-heading,
+  [data-theme="mist"] .design-projects__header h2,
+  [data-theme="mist"] .portfolio-subpage__header h1 {
+    margin-bottom: 32px;
+    font-size: clamp(38px, 11vw, 52px);
+    line-height: 1.02;
+  }
+
+  [data-theme="mist"] .about-heading__line {
+    width: auto;
+    white-space: normal;
+  }
+
+  [data-theme="mist"] .t-hero {
+    min-height: max(720px, 100svh);
+  }
+
+  [data-theme="mist"] .mist-hero-lockup {
+    top: -10svh;
+  }
+
+  [data-theme="mist"] .mist-hero-title span {
+    font-size: clamp(46px, 13.5vw, 68px);
+    letter-spacing: .025em !important;
+  }
+
+  [data-theme="mist"] .mist-hero-footer {
+    right: var(--mist-gutter);
+    bottom: 24px;
+    left: var(--mist-gutter);
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  [data-theme="mist"] .mist-hero-meta {
+    order: 2;
+    max-width: none;
+    font-size: 15px;
+  }
+
+  [data-theme="mist"] .mist-hero-stats {
+    order: 1;
+    padding: 12px 0;
+  }
+
+  [data-theme="mist"] .mist-hero-stats button {
+    min-height: 36px;
+  }
+
+  [data-theme="mist"] #about .flex.flex-col.sm\:flex-row {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  [data-theme="mist"] #about img {
+    width: min(56vw, 220px);
+  }
+
+  [data-theme="mist"] #about .prose-dark,
+  [data-theme="mist"] #about .prose-dark p {
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  [data-theme="mist"] .journey-index__row {
+    grid-template-columns: 32px 72px minmax(0, 1fr);
+    gap: 12px;
+    padding: 20px 0;
+  }
+
+  [data-theme="mist"] .journey-index__number {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  [data-theme="mist"] .journey-index__year {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 12px;
+  }
+
+  [data-theme="mist"] .journey-index__company {
+    grid-column: 3;
+    grid-row: 1;
+    font-size: 16px;
+  }
+
+  [data-theme="mist"] .journey-index__field {
+    grid-column: 3;
+    grid-row: 2;
+    font-size: 12px;
+  }
+
+  [data-theme="mist"] .journey-index__status {
+    font-size: 9px;
+  }
+
+  [data-theme="mist"] #achievements .t-card {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 16px;
+    padding: 20px 0;
+  }
+
+  [data-theme="mist"] #achievements .t-card h4 {
+    font-size: 17px;
+  }
+
+  [data-theme="mist"] .experience-entry {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 16px;
+    padding: 24px 0;
+  }
+
+  [data-theme="mist"] .experience-entry__index {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  [data-theme="mist"] .experience-entry__identity {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  [data-theme="mist"] .experience-entry__body {
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: 20px;
+  }
+
+  [data-theme="mist"] .experience-entry__projects button {
+    min-height: 52px;
+  }
+
+  [data-theme="mist"] .resume-block__heading {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  [data-theme="mist"] .resume-education__row {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 6px 16px;
+  }
+
+  [data-theme="mist"] .resume-education__copy,
+  [data-theme="mist"] .resume-education__period {
+    grid-column: 2;
+  }
+
+  [data-theme="mist"] .resume-activity__row {
+    grid-template-columns: 32px 64px minmax(0, 1fr);
+    gap: 8px 16px;
+  }
+
+  [data-theme="mist"] .resume-activity__year {
+    grid-column: 2;
+  }
+
+  [data-theme="mist"] .resume-activity__category {
+    grid-column: 3;
+  }
+
+  [data-theme="mist"] .resume-activity__copy {
+    grid-column: 2 / -1;
+    padding-top: 8px;
+  }
+
+  [data-theme="mist"] #projects {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  [data-theme="mist"] #projects > :where(p, h2, .projects-archive, .design-projects, .notebook-ornaments) {
+    width: calc(100% - (var(--mist-gutter) * 2));
+  }
+
+  [data-theme="mist"] #projects .projects-archive-heading,
+  [data-theme="mist"] .design-projects__header {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  [data-theme="mist"] .design-projects {
+    margin-top: 48px;
+    padding-top: 48px;
+  }
+
+  [data-theme="mist"] .visitor-session-banner {
+    grid-template-columns: 20px minmax(0, 1fr) 44px;
+    gap: 10px;
+    padding: 10px var(--mist-gutter);
+  }
+
+  [data-theme="mist"] .visitor-session-banner__copy {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0 8px;
+  }
+
+  [data-theme="mist"] .visitor-session-banner__label {
+    grid-column: 1 / -1;
+  }
+
+  [data-theme="mist"] .visitor-session-banner__date {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  [data-theme="mist"] .t-gate {
+    display: flex;
+    gap: 0;
+    padding: 72px var(--mist-gutter) 40px;
+  }
+
+  [data-theme="mist"] .t-gate .gate-title {
+    font-size: clamp(36px, 10vw, 48px);
+  }
+
+  [data-theme="mist"] .t-gate .gate-title__line {
+    white-space: normal;
+  }
+
+  [data-theme="mist"] .t-gate .gate-deck,
+  [data-theme="mist"] .t-gate .gate-contact {
+    font-size: 15px;
+  }
+
+  [data-theme="mist"] .portfolio-subpage,
+  [data-theme="mist"] .project-detail-page {
+    width: 100%;
+    padding-inline: var(--mist-gutter);
+  }
+
+  [data-theme="mist"] .project-detail-brief,
+  [data-theme="mist"] .project-detail-story section {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 16px;
+  }
+
+  [data-theme="mist"] .project-detail-brief > * {
+    padding-inline: 20px;
+  }
+
+  [data-theme="mist"] .project-detail-story section > * {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+
+  [data-theme="mist"] .notebook-footer,
+  [data-theme="mist"] .project-detail-footer .notebook-footer,
+  [data-theme="mist"] .portfolio-subpage + .notebook-footer {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 32px var(--mist-gutter) max(32px, env(safe-area-inset-bottom));
+  }
+
+  [data-theme="mist"] .notebook-footer__column--start { order: 3; }
+  [data-theme="mist"] .notebook-footer__column--center { order: 1; }
+  [data-theme="mist"] .notebook-footer__column--end {
+    order: 2;
+    justify-self: start;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="mist"] *,
+  [data-theme="mist"] *::before,
+  [data-theme="mist"] *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

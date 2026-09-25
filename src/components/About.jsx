@@ -3,11 +3,10 @@ import { motion } from 'framer-motion'
 import SectionWrapper from './ui/SectionWrapper'
 import MarkdownRenderer from './ui/MarkdownRenderer'
 import NotebookOrnaments from './ui/NotebookOrnaments'
-import { loadAboutConfig, loadTaxonomyConfig } from '../utils/crypto'
+import { loadAboutConfig } from '../utils/crypto'
 
 export default function About() {
   const [config] = useState(loadAboutConfig)
-  const [taxonomy] = useState(loadTaxonomyConfig)
   const headingLines = (config.heading || 'Designing the balance\nbetween users and business').split('\n')
 
   if (!config.bio && (!config.skills || config.skills.length === 0)) return null
@@ -61,13 +60,10 @@ export default function About() {
           >
             {config.skills.map((skill, i) => {
               const s = typeof skill === 'string' ? { label: skill, category: 'default' } : skill
-              const category = (taxonomy.categories || []).find((item) => item.key === s.category)
-              const color = category?.color || '#6b7280'
               return (
                 <span
                   key={i}
-                  className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border"
-                  style={{ color, borderColor: `color-mix(in srgb, ${color} 30%, transparent)`, backgroundColor: `color-mix(in srgb, ${color} 10%, transparent)` }}
+                  className="about-skill inline-flex items-center px-3 py-1.5 text-xs font-medium border"
                 >
                   {s.label}
                 </span>
