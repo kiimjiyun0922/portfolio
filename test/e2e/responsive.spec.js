@@ -46,22 +46,30 @@ test('career journey keeps its text position on hover', async ({ page }) => {
 })
 
 for (const width of [390, 1024, 1280]) {
-  test(`project detail columns align at ${width}px`, async ({ page }) => {
+  test(`project detail brief has a distinct responsive layout at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 })
     await page.goto('/projects/sample-noma-launch?preview')
     await expect(page.locator('.project-detail-brief h2')).toBeVisible()
     const positions = await page.evaluate(() => {
       const left = (selector) => document.querySelector(selector).getBoundingClientRect().left
+      const brief = document.querySelector('.project-detail-brief')
       return {
         briefTitle: left('.project-detail-brief h2'),
         briefBody: left('.project-detail-brief > div'),
         storyTitle: left('.project-detail-story section h2'),
         storyBody: left('.project-detail-story section > div'),
+        briefBackground: getComputedStyle(brief).backgroundColor,
+        scrollWidth: document.documentElement.scrollWidth,
+        clientWidth: document.documentElement.clientWidth,
       }
     })
 
-    expect(positions.briefTitle).toBeCloseTo(positions.storyTitle, 1)
-    expect(positions.briefBody).toBeCloseTo(positions.storyBody, 1)
+    if (width < 768) expect(positions.briefBody).toBeCloseTo(positions.briefTitle, 1)
+    else expect(positions.briefBody).toBeGreaterThan(positions.briefTitle + 80)
+    if (width < 1180) expect(positions.storyBody).toBeCloseTo(positions.storyTitle, 1)
+    else expect(positions.storyBody).toBeGreaterThan(positions.storyTitle)
+    expect(positions.briefBackground).not.toBe('rgba(0, 0, 0, 0)')
+    expect(positions.scrollWidth).toBeLessThanOrEqual(positions.clientWidth)
   })
 }
 
@@ -97,6 +105,48 @@ for (const width of [390, 1024]) {
     const box = await close.boundingBox()
     expect(box.width).toBeGreaterThanOrEqual(44)
     expect(box.height).toBeGreaterThanOrEqual(44)
+  })
+}
+
+test('gate keeps the request hint attached to the email channel', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.goto('/')
+  const email = page.locator('.gate-contact__channel a')
+  const hint = page.locator('.gate-contact__channel p')
+  await expect(email).toBeVisible()
+  const emailBox = await email.boundingBox()
+  const hintBox = await hint.boundingBox()
+  expect(hintBox.x).toBeCloseTo(emailBox.x, 1)
+  expect(hintBox.y - (emailBox.y + emailBox.height)).toBeLessThanOrEqual(10)
+})
+
+for (const width of [390, 768, 1280]) {
+  test(`project gallery advances without overflow at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 })
+    await page.addInitScript(() => {
+      localStorage.setItem('portfolio_projects', JSON.stringify({
+        groups: [{ title: 'PM', projects: [{ title: 'Placeholder' }] }],
+        designProjects: [{
+          id: 'gallery-test', slug: 'gallery-test', published: true, featured: true,
+          category: 'Campaign', year: '2026', title: 'Gallery Test', summary: 'Gallery test project',
+          coverImage: '/assets/campaign-pulse.webp', coverAlt: 'Campaign cover', brief: 'Brief', problem: 'Problem',
+          gallery: [
+            { url: '/assets/campaign-noma.webp', alt: 'First campaign image', caption: 'First' },
+            { url: '/assets/campaign-still.webp', alt: 'Second campaign image', caption: 'Second' },
+          ],
+        }],
+      }))
+    })
+    await page.goto('/projects/gallery-test?preview')
+    const stageImage = page.locator('.project-detail-gallery__stage img')
+    await expect(stageImage).toHaveAttribute('src', '/assets/campaign-noma.webp')
+    await page.getByRole('button', { name: 'Next project image' }).click()
+    await expect(stageImage).toHaveAttribute('src', '/assets/campaign-still.webp')
+    const layout = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+    }))
+    expect(layout.scrollWidth).toBeLessThanOrEqual(layout.clientWidth)
   })
 }
 

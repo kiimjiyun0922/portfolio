@@ -3,18 +3,11 @@ import { motion } from 'framer-motion'
 import SectionWrapper from './ui/SectionWrapper'
 import MarkdownRenderer from './ui/MarkdownRenderer'
 import NotebookOrnaments from './ui/NotebookOrnaments'
-import { loadAboutConfig } from '../utils/crypto'
-
-const SKILL_COLORS = {
-  data: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  ux: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  ai: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-  ops: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-  default: 'bg-gray-800 text-gray-300 border-gray-700',
-}
+import { loadAboutConfig, loadTaxonomyConfig } from '../utils/crypto'
 
 export default function About() {
   const [config] = useState(loadAboutConfig)
+  const [taxonomy] = useState(loadTaxonomyConfig)
   const headingLines = (config.heading || 'Designing the balance\nbetween users and business').split('\n')
 
   if (!config.bio && (!config.skills || config.skills.length === 0)) return null
@@ -68,11 +61,13 @@ export default function About() {
           >
             {config.skills.map((skill, i) => {
               const s = typeof skill === 'string' ? { label: skill, category: 'default' } : skill
-              const colorCls = SKILL_COLORS[s.category] || SKILL_COLORS.default
+              const category = (taxonomy.categories || []).find((item) => item.key === s.category)
+              const color = category?.color || '#6b7280'
               return (
                 <span
                   key={i}
-                  className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border ${colorCls}`}
+                  className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border"
+                  style={{ color, borderColor: `color-mix(in srgb, ${color} 30%, transparent)`, backgroundColor: `color-mix(in srgb, ${color} 10%, transparent)` }}
                 >
                   {s.label}
                 </span>

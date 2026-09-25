@@ -47,6 +47,9 @@ import {
   loadThemeSettings,
   saveThemeSettings,
   resetThemeSettings,
+  loadTaxonomyConfig,
+  saveTaxonomyConfig,
+  resetTaxonomyConfig,
 } from '../utils/crypto'
 import { THEMES, getTheme } from '../themes'
 import { SITE, SITE_HOST } from '../site.config'
@@ -55,7 +58,7 @@ import { ImportExportBar } from './admin/JsonTransfer'
 import { downloadJson, importJson } from './admin/JsonTransferUtils'
 import { ACTION_LABELS, LOG_FILTERS, SECTION_LABELS, buildLogRows, countLogRows } from './admin/logModel'
 import { filterTokens, getTokenStatus, isActiveToken } from './admin/tokenModel'
-import { ActionBar, AutoTextarea, Field, FloatingJumpNav, ResetButton, SaveButton, SectionHeader, Toast } from './admin/AdminUI'
+import { ActionBar, AutoTextarea, ColorField, Field, FloatingJumpNav, JsonBulkEditor, ResetButton, SaveButton, SectionHeader, SelectField, Toast, YearField } from './admin/AdminUI'
 
 /* ─── Navigation ─── */
 
@@ -65,10 +68,11 @@ const NAV_ITEMS = [
   ]},
   { group: '콘텐츠', items: [
     { id: 'projects', label: '프로젝트', icon: '02' },
-    { id: 'resume', label: '경력·학력', icon: '03' },
-    { id: 'about', label: '소개', icon: '04' },
-    { id: 'achievements', label: '핵심 성과', icon: '05' },
-    { id: 'journey', label: '커리어 저니', icon: '06' },
+    { id: 'design-projects', label: '디자인 아카이브', icon: '03' },
+    { id: 'resume', label: '경력·학력', icon: '04' },
+    { id: 'about', label: '소개', icon: '05' },
+    { id: 'achievements', label: '핵심 성과', icon: '06' },
+    { id: 'journey', label: '커리어 저니', icon: '07' },
   ]},
   { group: '페이지 설정', items: [
     { id: 'hero', label: '히어로', icon: '07' },
@@ -81,6 +85,7 @@ const NAV_ITEMS = [
     { id: 'logs', label: '접속 로그', icon: '12' },
   ]},
   { group: '설정', items: [
+    { id: 'taxonomy', label: '분류·선택지', icon: '13' },
     { id: 'history', label: '변경 이력', icon: '13' },
     { id: 'account', label: '관리자 계정', icon: '14' },
   ]},
@@ -219,18 +224,21 @@ function WorkEditor({ item, onChange, onRemove, collapsed, onToggle }) {
 
 function ActivityEditor({ item, onChange, onRemove }) {
   return (
-    <div className="bg-gray-800/50 rounded-lg p-3 space-y-2">
-      <div className="flex justify-between items-start gap-2">
-        <div className="grid grid-cols-2 gap-2 flex-1 sm:grid-cols-3">
-          <Field label="연도" value={item.year} onChange={(v) => onChange({ ...item, year: v })} className="w-24" />
-          <Field label="카테고리" value={item.category} onChange={(v) => onChange({ ...item, category: v })} />
-          <Field label="내용" value={item.summary} onChange={(v) => onChange({ ...item, summary: v })} />
-        </div>
-        <button onClick={onRemove} className="shrink-0 mt-5 px-2 py-1 text-red-400 hover:text-red-300 cursor-pointer">✕</button>
-      </div>
-      <Field label="링크 URL (선택)" value={item.link || ''} onChange={(v) => onChange({ ...item, link: v })} />
+    <div className="admin-activity-row">
+      <YearField value={item.year} onChange={(v) => onChange({ ...item, year: v })} />
+      <Field label="카테고리" value={item.category} onChange={(v) => onChange({ ...item, category: v })} />
+      <Field label="내용" value={item.summary} onChange={(v) => onChange({ ...item, summary: v })} />
+      <Field label="링크 URL" value={item.link || ''} onChange={(v) => onChange({ ...item, link: v })} />
+      <button type="button" onClick={onRemove} aria-label={`${item.summary || '활동'} 삭제`} className="admin-row-delete">삭제</button>
     </div>
   )
+}
+
+function taxonomyOptions(config = loadTaxonomyConfig(), currentValue = '') {
+  const options = (config.categories || []).map((item) => ({ value: item.key, label: item.label }))
+  return currentValue && !options.some((item) => item.value === currentValue)
+    ? [{ value: currentValue, label: `${currentValue} (기존 값)` }, ...options]
+    : options
 }
 
 /* ─── Resume Section ─── */
@@ -286,6 +294,7 @@ function ResumeSection() {
       <ActionBar>
         <SaveButton onClick={handleSave} />
         <ResetButton onClick={handleReset} />
+        <JsonBulkEditor value={config} onApply={(value) => { setConfig(validateResumeImport(value)); flash('JSON 적용 완료 — 저장 버튼을 눌러주세요') }} />
         <div className="flex-1" />
         <ImportExportBar
           onImport={handleImport}
@@ -375,6 +384,8 @@ function HeroSection() {
       <ActionBar>
         <SaveButton onClick={handleSave} />
         <ResetButton onClick={handleReset} />
+        <JsonBulkEditor value={config} onApply={(value) => { setConfig(value); flash('JSON 적용 완료 — 저장 버튼을 눌러주세요') }} />
+        <div className="flex-1" /><ImportExportBar onImport={async (file) => { setConfig(await importJson(file)); flash('가져오기 완료 — 저장 버튼을 눌러주세요') }} onExport={() => downloadJson(config, 'hero.json')} />
       </ActionBar>
       <div className="space-y-4 max-w-4xl">
         <Field label="사이트 타이틀" value={config.siteTitle || ''} onChange={(v) => update('siteTitle', v)} />
@@ -406,6 +417,8 @@ function AuthGateSection() {
       <ActionBar>
         <SaveButton onClick={handleSave} />
         <ResetButton onClick={handleReset} />
+        <JsonBulkEditor value={config} onApply={(value) => { setConfig(value); flash('JSON 적용 완료 — 저장 버튼을 눌러주세요') }} />
+        <div className="flex-1" /><ImportExportBar onImport={async (file) => { setConfig(await importJson(file)); flash('가져오기 완료 — 저장 버튼을 눌러주세요') }} onExport={() => downloadJson(config, 'auth-gate.json')} />
       </ActionBar>
       <div className="space-y-4 max-w-4xl">
         <Field label="태그라인" value={config.tagline} onChange={(v) => update('tagline', v)} />
@@ -481,6 +494,8 @@ function ThemeSection({ onPreviewTheme }) {
       <ActionBar>
         <SaveButton onClick={handleSave} />
         <ResetButton onClick={handleReset} />
+        <JsonBulkEditor value={settings} onApply={(value) => { setSettings(value); flash('JSON 적용 완료 — 저장 버튼을 눌러주세요') }} />
+        <ImportExportBar onImport={async (file) => { setSettings(await importJson(file)); flash('가져오기 완료 — 저장 버튼을 눌러주세요') }} onExport={() => downloadJson(settings, 'theme-settings.json')} />
         {onPreviewTheme && (
           <button
             onClick={() => onPreviewTheme('site', settings.defaultVisitorTheme)}
@@ -527,6 +542,8 @@ function ContactSection() {
       <ActionBar>
         <SaveButton onClick={handleSave} />
         <ResetButton onClick={handleReset} />
+        <JsonBulkEditor value={config} onApply={(value) => { setConfig(value); flash('JSON 적용 완료 — 저장 버튼을 눌러주세요') }} />
+        <div className="flex-1" /><ImportExportBar onImport={async (file) => { setConfig(await importJson(file)); flash('가져오기 완료 — 저장 버튼을 눌러주세요') }} onExport={() => downloadJson(config, 'contact.json')} />
       </ActionBar>
       <div className="space-y-4 max-w-4xl">
         <Field label="제목" value={config.heading} onChange={(v) => update('heading', v)} />
@@ -839,7 +856,9 @@ function TokensSection({ onPreviewTheme }) {
               <>
                 <div className="flex items-center justify-between mb-5">
                   <h3 id="create-token-title" className="text-base font-bold text-white">새 토큰 생성</h3>
-                  <button aria-label="토큰 생성 창 닫기" onClick={closeCreate} className="text-gray-500 hover:text-white cursor-pointer p-1">✕</button>
+                  <button aria-label="토큰 생성 창 닫기" onClick={closeCreate} className="admin-dialog-close">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" /></svg>
+                  </button>
                 </div>
                 <div className="space-y-4">
                   <Field label="라벨 (예: 홍길동)" value={label} onChange={setLabel} />
@@ -1140,10 +1159,12 @@ function AccountSection({ onLogout }) {
 
 /* ─── Projects Section ─── */
 
-function ProjectsSection() {
+function ProjectsSection({ mode = 'standard' }) {
   const [data, setData] = useState(loadProjects)
+  const taxonomy = loadTaxonomyConfig()
   const [toast, setToast] = useState('')
   const [expanded, setExpanded] = useState({})
+  const [designTabs, setDesignTabs] = useState({})
 
   const flash = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2000) }
   const toggleProject = (gi, pi) => {
@@ -1222,25 +1243,41 @@ function ProjectsSection() {
   const handleReset = () => { if (confirm('초기화하시겠습니까?')) { resetProjects(); setData(loadProjects()); flash('초기화 완료') } }
 
   const handleImport = async (file) => {
-    const imported = validateProjectsImport(await importJson(file))
-    setData(imported)
+    const imported = await importJson(file)
+    const merged = mode === 'design'
+      ? { ...data, designArchive: imported.designArchive || {}, designProjects: imported.designProjects || [] }
+      : { ...data, groups: imported.groups || [] }
+    setData(validateProjectsImport(merged))
     flash('가져오기 완료 — 저장 버튼을 눌러주세요')
+  }
+
+  const bulkData = mode === 'design'
+    ? { designArchive: data.designArchive || {}, designProjects: data.designProjects || [] }
+    : { groups: data.groups || [] }
+
+  const applyBulkData = (value) => {
+    const merged = mode === 'design'
+      ? { ...data, designArchive: value.designArchive || {}, designProjects: value.designProjects || [] }
+      : { ...data, groups: value.groups || [] }
+    setData(validateProjectsImport(merged))
+    flash('JSON 적용 완료 — 저장 버튼을 눌러주세요')
   }
 
   return (
     <div>
-      <SectionHeader title="프로젝트" description="PM 프로젝트와 이미지 중심 디자인 케이스 스터디를 함께 관리합니다" />
+      <SectionHeader title={mode === 'design' ? '디자인 아카이브' : '프로젝트'} description={mode === 'design' ? '이미지 중심 디자인 케이스 스터디와 공개 상태를 관리합니다' : 'PM 프로젝트의 그룹과 상세 내용을 관리합니다'} />
       <ActionBar>
         <SaveButton onClick={handleSave} />
         <ResetButton onClick={handleReset} />
+        <JsonBulkEditor value={bulkData} onApply={applyBulkData} />
         <div className="flex-1" />
         <ImportExportBar
           onImport={handleImport}
-          onExport={() => downloadJson(data, 'projects.json')}
-          onSample={() => downloadJson(defaultProjects, 'projects-sample.json')}
+          onExport={() => downloadJson(bulkData, mode === 'design' ? 'design-projects.json' : 'projects.json')}
+          onSample={() => downloadJson(mode === 'design' ? { designArchive: defaultProjects.designArchive || {}, designProjects: defaultProjects.designProjects || [] } : { groups: defaultProjects.groups || [] }, mode === 'design' ? 'design-projects-sample.json' : 'projects-sample.json')}
         />
       </ActionBar>
-      {data.groups?.length > 1 && (
+      {mode === 'standard' && data.groups?.length > 1 && (
         <div className="flex flex-wrap items-center gap-1.5 mb-4">
           {data.groups.map((g, gi) => (
             <button key={gi} onClick={() => jumpToGroup(gi)} className="px-2 py-1 text-[11px] bg-gray-800/60 hover:bg-gray-800 text-gray-400 hover:text-white rounded-md cursor-pointer transition-colors">
@@ -1252,9 +1289,9 @@ function ProjectsSection() {
           <button onClick={() => setExpanded({})} className="text-[11px] text-gray-500 hover:text-white cursor-pointer">모두 접기</button>
         </div>
       )}
-      <div className="space-y-6">
+      {mode === 'standard' && <div className="space-y-6">
         {data.groups?.map((group, gi) => (
-          <div key={gi} id={`proj-group-${gi}`} className="bg-gray-900 rounded-xl p-5 md:p-6 space-y-4 scroll-mt-24">
+          <div key={gi} id={`proj-group-${gi}`} className="admin-editor-sheet bg-gray-900 rounded-xl p-5 md:p-6 space-y-4 scroll-mt-24">
             <div className="flex items-center gap-2">
               <span className="text-accent font-mono text-xs">Group {gi + 1}</span>
               <span className="text-white font-semibold text-sm flex-1 truncate">{group.title}</span>
@@ -1274,10 +1311,10 @@ function ProjectsSection() {
               {group.projects?.map((p, pi) => {
                 const isOpen = expanded[`${gi}-${pi}`]
                 return (
-                  <div key={pi} className="bg-gray-800/50 rounded-lg border border-gray-700/50 overflow-hidden">
+                  <div key={pi} className="admin-project-row bg-gray-800/50 rounded-lg border border-gray-700/50 overflow-hidden">
                     {/* Header — always visible */}
                     <div
-                      className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-800/80 transition-colors"
+                      className="admin-project-row__header flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-800/80 transition-colors"
                       onClick={() => toggleProject(gi, pi)}
                     >
                       <svg className={`w-4 h-4 text-gray-500 shrink-0 transition-transform ${isOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1301,7 +1338,7 @@ function ProjectsSection() {
 
                     {/* Body — collapsible */}
                     {isOpen && (
-                      <div className="px-4 pb-4 pt-1 space-y-4">
+                      <div className="admin-project-row__body px-4 pb-4 pt-3 space-y-5">
                         {/* 기본 정보 */}
                         <div>
                           <p className="text-xs text-gray-500 font-medium mb-2">기본 정보</p>
@@ -1309,7 +1346,7 @@ function ProjectsSection() {
                           <Field label="부제" value={p.subtitle || ''} onChange={(v) => { const g = [...data.groups]; g[gi].projects[pi] = { ...p, subtitle: v }; setData({ ...data, groups: g }) }} className="mb-2" />
                           <div className="grid grid-cols-2 gap-3">
                             <Field label="배지" value={p.badge || ''} onChange={(v) => { const g = [...data.groups]; g[gi].projects[pi] = { ...p, badge: v }; setData({ ...data, groups: g }) }} />
-                            <Field label="배지타입" value={p.badgeType || ''} onChange={(v) => { const g = [...data.groups]; g[gi].projects[pi] = { ...p, badgeType: v }; setData({ ...data, groups: g }) }} />
+                            <SelectField label="배지 유형" value={p.badgeType || 'default'} options={taxonomyOptions(taxonomy, p.badgeType)} onChange={(v) => { const g = [...data.groups]; g[gi].projects[pi] = { ...p, badgeType: v }; setData({ ...data, groups: g }) }} />
                           </div>
                         </div>
 
@@ -1354,9 +1391,9 @@ function ProjectsSection() {
           </div>
         ))}
         <button onClick={() => setData({ ...data, groups: [...(data.groups || []), { title: '', subtitle: '', projects: [] }] })} className="px-4 py-2 border border-accent text-accent hover:bg-accent/10 text-sm rounded-lg transition-colors cursor-pointer">+ 그룹 추가</button>
-      </div>
+      </div>}
 
-      <section id="design-project-admin" className="mt-12 pt-8 border-t border-gray-700 scroll-mt-24">
+      {mode === 'design' && <section id="design-project-admin" className="scroll-mt-24">
         <div className="flex flex-wrap items-end justify-between gap-3 mb-5">
           <div>
             <h3 className="text-lg font-semibold text-white">디자인 프로젝트 아카이브</h3>
@@ -1375,32 +1412,42 @@ function ProjectsSection() {
           {designProjects.map((project, index) => {
             const key = `design-${index}`
             const isOpen = expanded[key]
+            const activeTab = designTabs[key] || 'overview'
+            const tabs = [
+              { id: 'overview', label: '기본 정보' },
+              { id: 'media', label: '대표 이미지' },
+              { id: 'case', label: '케이스 스터디' },
+              { id: 'gallery', label: `갤러리 ${(project.gallery || []).length}` },
+            ]
             return (
-              <article key={project.id || index} className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
-                <button type="button" className="w-full min-h-14 flex items-center gap-3 px-4 text-left hover:bg-gray-800/60" onClick={() => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))}>
+              <article key={project.id || index} className="admin-design-editor bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+                <button type="button" className="admin-design-editor__header w-full min-h-16 flex items-center gap-3 px-4 text-left hover:bg-gray-800/60" onClick={() => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))}>
                   <span className="font-mono text-[10px] text-gray-500">{String(index + 1).padStart(2, '0')}</span>
                   <span className="flex-1 min-w-0"><strong className="block text-sm text-white truncate">{project.title || '새 디자인 프로젝트'}</strong><small className="text-[11px] text-gray-500">{project.category || '분류 없음'} · {project.year || '연도 없음'}</small></span>
+                  <span className={`admin-publish-state ${project.published ? 'is-live' : ''}`}>{project.published ? '공개' : '비공개'}</span>
                   {project.featured && <span className="text-[10px] text-accent">추천</span>}
                   <span className={`text-gray-500 transition-transform ${isOpen ? 'rotate-90' : ''}`}>›</span>
                 </button>
 
                 {isOpen && (
-                  <div className="p-4 md:p-5 border-t border-gray-800 space-y-6">
-                    <div>
-                      <p className="text-xs font-medium text-gray-400 mb-3">공개 설정</p>
-                      <div className="flex flex-wrap gap-5">
-                        <label className="min-h-11 flex items-center gap-2 text-sm text-gray-300"><input type="checkbox" checked={!!project.published} onChange={(e) => updateDesignProject(index, { ...project, published: e.target.checked })} /> 공개</label>
-                        <label className="min-h-11 flex items-center gap-2 text-sm text-gray-300"><input type="checkbox" checked={!!project.featured} onChange={(e) => updateDesignProject(index, { ...project, featured: e.target.checked })} /> 메인 추천</label>
+                  <div className="admin-design-editor__body border-t border-gray-800">
+                    <div className="admin-design-editor__toolbar">
+                      <div className="admin-design-tabs" role="tablist" aria-label="디자인 프로젝트 편집 영역">
+                        {tabs.map((tab) => <button key={tab.id} type="button" role="tab" aria-selected={activeTab === tab.id} onClick={() => setDesignTabs((prev) => ({ ...prev, [key]: tab.id }))}>{tab.label}</button>)}
+                      </div>
+                      <div className="admin-design-visibility">
+                        <label><input type="checkbox" checked={!!project.published} onChange={(e) => updateDesignProject(index, { ...project, published: e.target.checked })} /> 공개</label>
+                        <label><input type="checkbox" checked={!!project.featured} onChange={(e) => updateDesignProject(index, { ...project, featured: e.target.checked })} /> 메인 추천</label>
                       </div>
                     </div>
 
-                    <div>
-                      <p className="text-xs font-medium text-gray-400 mb-3">기본 정보</p>
+                    <div className="admin-design-editor__panel">
+                    {activeTab === 'overview' && <div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                         <Field label="제목" value={project.title || ''} onChange={(v) => updateDesignProject(index, { ...project, title: v })} />
                         <Field label="URL slug" value={project.slug || ''} onChange={(v) => updateDesignProject(index, { ...project, slug: v.toLowerCase().replace(/[^a-z0-9-]/g, '-') })} />
                         <Field label="분류" value={project.category || ''} onChange={(v) => updateDesignProject(index, { ...project, category: v })} />
-                        <Field label="연도" value={project.year || ''} onChange={(v) => updateDesignProject(index, { ...project, year: v })} />
+                        <YearField value={project.year || ''} onChange={(v) => updateDesignProject(index, { ...project, year: v })} />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
                         <Field label="클라이언트" value={project.client || ''} onChange={(v) => updateDesignProject(index, { ...project, client: v })} />
@@ -1408,19 +1455,18 @@ function ProjectsSection() {
                         <Field label="기간" value={project.duration || ''} onChange={(v) => updateDesignProject(index, { ...project, duration: v })} />
                       </div>
                       <Field label="목록 요약" value={project.summary || ''} onChange={(v) => updateDesignProject(index, { ...project, summary: v })} rows={2} className="mt-3" />
-                    </div>
+                    </div>}
 
-                    <div>
-                      <p className="text-xs font-medium text-gray-400 mb-3">대표 이미지</p>
+                    {activeTab === 'media' && <div>
                       <div className="grid grid-cols-1 sm:grid-cols-[1fr_160px] gap-3">
                         <Field label="이미지 URL" value={project.coverImage || ''} onChange={(v) => updateDesignProject(index, { ...project, coverImage: v })} />
                         <Field label="크롭 위치" value={project.coverPosition || '50% 50%'} onChange={(v) => updateDesignProject(index, { ...project, coverPosition: v })} />
                       </div>
+                      <SelectField label="이미지 표시 방식" value={project.coverMode || 'cover'} options={[{ value: 'cover', label: '영역 채우기' }, { value: 'sheet', label: '전체 시트 보기' }]} onChange={(v) => updateDesignProject(index, { ...project, coverMode: v })} className="mt-3 max-w-xs" />
                       <Field label="대체 텍스트" value={project.coverAlt || ''} onChange={(v) => updateDesignProject(index, { ...project, coverAlt: v })} className="mt-3" />
-                    </div>
+                    </div>}
 
-                    <div>
-                      <p className="text-xs font-medium text-gray-400 mb-3">케이스 스터디</p>
+                    {activeTab === 'case' && <div>
                       <div className="space-y-3">
                         <Field label="Brief" value={project.brief || ''} onChange={(v) => updateDesignProject(index, { ...project, brief: v })} rows={3} />
                         <Field label="01 Problem — 문제 정의" value={project.problem || ''} onChange={(v) => updateDesignProject(index, { ...project, problem: v })} rows={3} />
@@ -1429,23 +1475,30 @@ function ProjectsSection() {
                         <Field label="04 Validation — 정량·정성 검증" value={project.validation || ''} onChange={(v) => updateDesignProject(index, { ...project, validation: v })} rows={3} />
                         <Field label="05 Design System" value={project.designSystem || ''} onChange={(v) => updateDesignProject(index, { ...project, designSystem: v })} rows={3} />
                       </div>
-                    </div>
+                    </div>}
 
-                    <div>
+                    {activeTab === 'gallery' && <div>
                       <div className="flex items-center justify-between gap-3 mb-3"><p className="text-xs font-medium text-gray-400">갤러리</p><button type="button" onClick={() => updateDesignProject(index, { ...project, gallery: [...(project.gallery || []), { url: '', alt: '', caption: '' }] })} className="min-h-11 px-3 text-xs text-accent">+ 이미지 추가</button></div>
                       <div className="space-y-3">
                         {(project.gallery || []).map((item, galleryIndex) => (
-                          <div key={galleryIndex} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-2 p-3 bg-gray-800/60 rounded-lg">
+                          <div key={galleryIndex} className="grid grid-cols-1 md:grid-cols-[44px_1fr_1fr_1fr_auto] gap-2 p-3 bg-gray-800/60 rounded-lg">
+                            <div className="flex md:flex-col items-center justify-center gap-1">
+                              <span className="font-mono text-[10px] text-gray-500">{String(galleryIndex + 1).padStart(2, '0')}</span>
+                              <button type="button" aria-label={`이미지 ${galleryIndex + 1} 위로 이동`} disabled={galleryIndex === 0} onClick={() => updateDesignProject(index, { ...project, gallery: swap(project.gallery || [], galleryIndex, galleryIndex - 1) })} className="min-w-11 min-h-11 text-xs text-gray-400 disabled:text-gray-700">↑</button>
+                              <button type="button" aria-label={`이미지 ${galleryIndex + 1} 아래로 이동`} disabled={galleryIndex === (project.gallery || []).length - 1} onClick={() => updateDesignProject(index, { ...project, gallery: swap(project.gallery || [], galleryIndex, galleryIndex + 1) })} className="min-w-11 min-h-11 text-xs text-gray-400 disabled:text-gray-700">↓</button>
+                            </div>
                             <Field label="이미지 URL" value={item.url || ''} onChange={(v) => { const gallery = [...(project.gallery || [])]; gallery[galleryIndex] = { ...item, url: v }; updateDesignProject(index, { ...project, gallery }) }} />
                             <Field label="대체 텍스트" value={item.alt || ''} onChange={(v) => { const gallery = [...(project.gallery || [])]; gallery[galleryIndex] = { ...item, alt: v }; updateDesignProject(index, { ...project, gallery }) }} />
                             <Field label="캡션" value={item.caption || ''} onChange={(v) => { const gallery = [...(project.gallery || [])]; gallery[galleryIndex] = { ...item, caption: v }; updateDesignProject(index, { ...project, gallery }) }} />
                             <button type="button" onClick={() => updateDesignProject(index, { ...project, gallery: (project.gallery || []).filter((_, i) => i !== galleryIndex) })} className="min-h-11 self-end px-3 text-xs text-red-400">삭제</button>
                           </div>
                         ))}
+                        {(project.gallery || []).length === 0 && <p className="py-10 text-center text-xs text-gray-500">등록된 이미지가 없습니다.</p>}
                       </div>
+                    </div>}
                     </div>
 
-                    <div className="flex flex-wrap justify-between gap-3 pt-3 border-t border-gray-800">
+                    <div className="admin-design-editor__footer flex flex-wrap justify-between gap-3 border-t border-gray-800">
                       <div className="flex gap-2"><button type="button" disabled={index === 0} onClick={() => moveDesignProject(index, -1)} className="min-h-11 px-3 text-xs text-gray-400 disabled:text-gray-700">위로</button><button type="button" disabled={index === designProjects.length - 1} onClick={() => moveDesignProject(index, 1)} className="min-h-11 px-3 text-xs text-gray-400 disabled:text-gray-700">아래로</button></div>
                       <button type="button" onClick={() => setData({ ...data, designProjects: designProjects.filter((_, i) => i !== index) })} className="min-h-11 px-3 text-xs text-red-400">프로젝트 삭제</button>
                     </div>
@@ -1456,8 +1509,8 @@ function ProjectsSection() {
           })}
           {designProjects.length === 0 && <div className="py-16 text-center border border-dashed border-gray-800 rounded-xl text-sm text-gray-600">디자인 프로젝트가 없습니다. 새 프로젝트를 추가해 주세요.</div>}
         </div>
-      </section>
-      <FloatingJumpNav items={[...(data.groups || []).map((g, gi) => ({ label: g.title || `그룹 ${gi + 1}`, onClick: () => jumpToGroup(gi) })), { label: '디자인 아카이브', onClick: () => document.getElementById('design-project-admin')?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }]} />
+      </section>}
+      {mode === 'standard' && <FloatingJumpNav items={(data.groups || []).map((g, gi) => ({ label: g.title || `그룹 ${gi + 1}`, onClick: () => jumpToGroup(gi) }))} />}
       <Toast message={toast} />
     </div>
   )
@@ -1465,16 +1518,9 @@ function ProjectsSection() {
 
 /* ─── About Section ─── */
 
-const SKILL_CATS = [
-  { key: 'data', label: 'Data', cls: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20', dot: '#34d399' },
-  { key: 'ux', label: 'UX', cls: 'bg-blue-500/10 text-blue-400 border border-blue-500/20', dot: '#60a5fa' },
-  { key: 'ai', label: 'AI', cls: 'bg-purple-500/10 text-purple-400 border border-purple-500/20', dot: '#a78bfa' },
-  { key: 'ops', label: 'Ops', cls: 'bg-amber-500/10 text-amber-400 border border-amber-500/20', dot: '#fbbf24' },
-  { key: 'default', label: '기본', cls: 'bg-gray-800 text-gray-300 border border-gray-700', dot: '#6b7280' },
-]
-
 function AboutSection() {
   const [config, setConfig] = useState(loadAboutConfig)
+  const taxonomy = loadTaxonomyConfig()
   const [toast, setToast] = useState('')
   const [skillInput, setSkillInput] = useState('')
   const [newCat, setNewCat] = useState('default')
@@ -1492,13 +1538,11 @@ function AboutSection() {
     setSkillInput('')
   }
 
-  const cycleSkillCat = (i) => {
+  const updateSkill = (i, patch) => {
     const skills = (config.skills || []).map((s, idx) => {
       if (idx !== i) return s
       const cur = typeof s === 'string' ? { label: s, category: 'default' } : s
-      const pos = SKILL_CATS.findIndex((c) => c.key === (cur.category || 'default'))
-      const next = SKILL_CATS[(pos + 1) % SKILL_CATS.length].key
-      return { ...cur, category: next }
+      return { ...cur, ...patch }
     })
     setConfig({ ...config, skills })
   }
@@ -1513,55 +1557,58 @@ function AboutSection() {
       <ActionBar>
         <SaveButton onClick={handleSave} />
         <ResetButton onClick={handleReset} />
+        <JsonBulkEditor value={config} onApply={(value) => { setConfig(value); flash('JSON 적용 완료 — 저장 버튼을 눌러주세요') }} />
+        <div className="flex-1" /><ImportExportBar onImport={async (file) => { setConfig(await importJson(file)); flash('가져오기 완료 — 저장 버튼을 눌러주세요') }} onExport={() => downloadJson(config, 'about.json')} />
       </ActionBar>
-      <div className="space-y-4 max-w-4xl">
-        <Field label="섹션 헤딩" value={config.heading || ''} onChange={(v) => update('heading', v)} rows={2} />
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">바이오 (마크다운)</label>
-          <AutoTextarea
-            value={config.bio || ''}
-            onChange={(v) => update('bio', v)}
-            minRows={4}
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-sm text-white font-mono resize-y focus:outline-none focus:border-accent transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-xs text-gray-500 mb-2">스킬 태그 <span className="text-gray-600">— 태그를 클릭하면 색상이 순환 변경됩니다</span></label>
-          <div className="flex flex-wrap gap-2 mb-3">
+      <div className="admin-about-editor">
+        <section className="admin-form-section">
+          <header><h3>소개 문구</h3><p>방문자에게 보이는 헤딩과 본문입니다.</p></header>
+          <div className="space-y-4">
+            <Field label="섹션 헤딩" value={config.heading || ''} onChange={(v) => update('heading', v)} rows={2} />
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">바이오 (마크다운)</label>
+              <AutoTextarea
+                value={config.bio || ''}
+                onChange={(v) => update('bio', v)}
+                minRows={4}
+                className="admin-control w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-sm text-white font-mono resize-y focus:outline-none focus:border-accent transition-colors"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="admin-form-section">
+          <header><h3>스킬</h3><p>표시 이름과 분류를 개별적으로 관리합니다.</p></header>
+          <div className="admin-skill-table" role="list">
+            <div className="admin-skill-table__head" aria-hidden="true"><span>이름</span><span>분류</span><span>관리</span></div>
             {(config.skills || []).map((s, i) => {
               const sk = typeof s === 'string' ? { label: s, category: 'default' } : s
-              const cat = SKILL_CATS.find((c) => c.key === (sk.category || 'default')) || SKILL_CATS[SKILL_CATS.length - 1]
               return (
-                <span
-                  key={i}
-                  onClick={() => cycleSkillCat(i)}
-                  title="클릭하여 색상 변경"
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full cursor-pointer select-none ${cat.cls}`}
-                >
-                  {sk.label}
-                  <button onClick={(e) => { e.stopPropagation(); removeSkill(i) }} className="opacity-50 hover:opacity-100 hover:text-red-400 cursor-pointer">✕</button>
-                </span>
+                <div className="admin-skill-row" role="listitem" key={i}>
+                  <input aria-label={`${sk.label || `스킬 ${i + 1}`} 이름`} value={sk.label || ''} onChange={(e) => updateSkill(i, { label: e.target.value })} className="admin-control bg-gray-800 border border-gray-700 rounded-lg px-3 text-sm text-white focus:outline-none focus:border-accent" />
+                  <select aria-label={`${sk.label || `스킬 ${i + 1}`} 분류`} value={sk.category || 'default'} onChange={(e) => updateSkill(i, { category: e.target.value })} className="admin-control bg-gray-800 border border-gray-700 rounded-lg px-3 text-sm text-white focus:outline-none focus:border-accent">
+                    {taxonomyOptions(taxonomy, sk.category).map((cat) => <option key={cat.value} value={cat.value}>{cat.label}</option>)}
+                  </select>
+                  <button type="button" onClick={() => removeSkill(i)} className="admin-row-delete">삭제</button>
+                </div>
               )
             })}
+            {(config.skills || []).length === 0 && <p className="admin-empty-row">등록된 스킬이 없습니다.</p>}
           </div>
-          <div className="flex flex-wrap items-center gap-1.5 mb-2">
-            <span className="text-[11px] text-gray-500 mr-1">새 태그 색상:</span>
-            {SKILL_CATS.map((c) => (
-              <button
-                key={c.key}
-                onClick={() => setNewCat(c.key)}
-                className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-[11px] cursor-pointer transition-all ${c.cls} ${newCat === c.key ? 'ring-2 ring-accent/70' : 'opacity-50 hover:opacity-100'}`}
-              >
-                <span className="w-2 h-2 rounded-full shrink-0" style={{ background: c.dot }} />
-                {c.label}
-              </button>
-            ))}
+          <div className="admin-skill-add">
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">새 스킬</label>
+              <input value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())} placeholder="예: Product Strategy" className="admin-control w-full bg-gray-800 border border-gray-700 rounded-lg px-3 text-sm text-white focus:outline-none focus:border-accent" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">분류</label>
+              <select value={newCat} onChange={(e) => setNewCat(e.target.value)} className="admin-control w-full bg-gray-800 border border-gray-700 rounded-lg px-3 text-sm text-white focus:outline-none focus:border-accent">
+                {taxonomyOptions(taxonomy).map((cat) => <option key={cat.value} value={cat.value}>{cat.label}</option>)}
+              </select>
+            </div>
+            <button type="button" onClick={addSkill} className="admin-primary-button">스킬 추가</button>
           </div>
-          <div className="flex gap-2">
-            <input value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())} placeholder="스킬 이름 입력 후 Enter" className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent" />
-            <button onClick={addSkill} className="px-3 py-2 bg-accent text-white text-sm rounded-lg cursor-pointer">추가</button>
-          </div>
-        </div>
+        </section>
       </div>
       <Toast message={toast} />
     </div>
@@ -1573,6 +1620,14 @@ function AboutSection() {
 function AchievementsSection() {
   const [config, setConfig] = useState(loadAchievementsConfig)
   const [toast, setToast] = useState('')
+  const projectData = loadProjects()
+  const linkTargets = [
+    { value: 'projects', label: '프로젝트 영역' },
+    { value: 'experience', label: '경력 영역' },
+    ...(projectData.groups || []).flatMap((group) => (group.projects || [])
+      .filter((project) => project.id)
+      .map((project) => ({ value: project.id, label: `프로젝트 · ${project.title || project.id}` }))),
+  ]
 
   const flash = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2000) }
 
@@ -1596,7 +1651,9 @@ function AchievementsSection() {
       <ActionBar>
         <SaveButton onClick={handleSave} />
         <ResetButton onClick={handleReset} />
+        <JsonBulkEditor value={config} onApply={(value) => { setConfig(value); flash('JSON 적용 완료 — 저장 버튼을 눌러주세요') }} />
         <button onClick={addItem} className="px-4 py-2 border border-accent text-accent hover:bg-accent/10 text-sm rounded-lg transition-colors cursor-pointer">+ 성과 추가</button>
+        <div className="flex-1" /><ImportExportBar onImport={async (file) => { setConfig(await importJson(file)); flash('가져오기 완료 — 저장 버튼을 눌러주세요') }} onExport={() => downloadJson(config, 'achievements.json')} />
       </ActionBar>
       <div className="space-y-3">
         {items.map((item, i) => (
@@ -1609,7 +1666,7 @@ function AchievementsSection() {
               <Field label="제목" value={item.title} onChange={(v) => updateItem(i, { ...item, title: v })} />
             </div>
             <Field label="설명" value={item.description} onChange={(v) => updateItem(i, { ...item, description: v })} rows={2} />
-            <Field label="연결 프로젝트 ID (클릭 시 포커스)" value={item.linkTo || ''} onChange={(v) => updateItem(i, { ...item, linkTo: v })} />
+            <SelectField label="클릭 시 이동할 위치" value={item.linkTo || ''} placeholder="연결 없음" options={linkTargets} onChange={(v) => updateItem(i, { ...item, linkTo: v })} />
           </div>
         ))}
         {items.length === 0 && <p className="text-xs text-gray-600 py-4 text-center">항목이 없습니다</p>}
@@ -1658,7 +1715,9 @@ function JourneySection() {
       <ActionBar>
         <SaveButton onClick={handleSave} />
         <ResetButton onClick={handleReset} />
+        <JsonBulkEditor value={config} onApply={(value) => { setConfig(value); flash('JSON 적용 완료 — 저장 버튼을 눌러주세요') }} />
         <button onClick={addItem} className="px-4 py-2 border border-accent text-accent hover:bg-accent/10 text-sm rounded-lg transition-colors cursor-pointer">+ 항목 추가</button>
+        <div className="flex-1" /><ImportExportBar onImport={async (file) => { setConfig(await importJson(file)); flash('가져오기 완료 — 저장 버튼을 눌러주세요') }} onExport={() => downloadJson(config, 'journey.json')} />
       </ActionBar>
       <div className="space-y-3">
         {items.map((item, i) => (
@@ -1676,25 +1735,13 @@ function JourneySection() {
               </div>
             </div>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-              <Field label="연도" value={item.year || ''} onChange={(v) => updateItem(i, { ...item, year: v })} />
+              <YearField value={item.year || ''} onChange={(v) => updateItem(i, { ...item, year: v })} />
               <Field label="회사명" value={item.org || ''} onChange={(v) => updateItem(i, { ...item, org: v })} />
               <Field label="분야" value={item.field || ''} onChange={(v) => updateItem(i, { ...item, field: v })} />
             </div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              <Field label="색상 (hex)" value={item.color || ''} onChange={(v) => updateItem(i, { ...item, color: v })} />
-              <div>
-                <label className="block text-[11px] font-medium text-gray-400 mb-1.5">연결 경력 (클릭 시 해당 경력으로 이동)</label>
-                <select
-                  value={item.companyId || ''}
-                  onChange={(e) => updateItem(i, { ...item, companyId: e.target.value })}
-                  className="w-full bg-gray-800/60 border border-gray-700/70 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent cursor-pointer"
-                >
-                  <option value="">연결 없음</option>
-                  {workList.map((w, wi) => (
-                    <option key={wi} value={`exp-${wi}`}>{w.company || `경력 ${wi + 1}`}</option>
-                  ))}
-                </select>
-              </div>
+              <ColorField label="색상" value={item.color || ''} onChange={(v) => updateItem(i, { ...item, color: v })} />
+              <SelectField label="연결 경력" value={item.companyId || ''} placeholder="연결 없음" options={workList.map((work, index) => ({ value: `exp-${index}`, label: work.company || `경력 ${index + 1}` }))} onChange={(v) => updateItem(i, { ...item, companyId: v })} />
               <label className="flex items-center gap-2 text-xs text-gray-400 mt-5 cursor-pointer">
                 <input type="checkbox" checked={!!item.current} onChange={(e) => updateItem(i, { ...item, current: e.target.checked })} className="accent-accent cursor-pointer" />
                 현재 재직 중 (NOW)
@@ -1711,7 +1758,7 @@ function JourneySection() {
 
 /* ─── Home Dashboard ─── */
 
-function HomeSection({ onNavigate, onExportPDF, onViewPortfolio }) {
+function HomeSection({ onNavigate, onExportPDF, onViewPortfolio: _onViewPortfolio }) {
   const [hoverDay, setHoverDay] = useState(null) // hovered day index on the trend chart
   const [now] = useState(Date.now)
   const tokens = getAccessTokens()
@@ -1767,29 +1814,63 @@ function HomeSection({ onNavigate, onExportPDF, onViewPortfolio }) {
   ]
 
   const shortcuts = [
-    { icon: '01', label: '프로젝트 편집', desc: '카드·그룹 관리', action: () => onNavigate('projects') },
-    { icon: '02', label: '토큰 발급', desc: '접속 권한 관리', action: () => onNavigate('tokens') },
-    { icon: '03', label: 'PDF 출력', desc: '전체 내용 문서화', action: onExportPDF },
-    { icon: '04', label: '포트폴리오 보기', desc: '방문자 화면 확인', action: onViewPortfolio },
+    { icon: '01', label: '프로젝트 편집', desc: `${projectCount}개 항목을 개별 수정`, action: () => onNavigate('projects') },
+    { icon: '02', label: '뷰어 초대', desc: '만료일이 있는 링크 발급', action: () => onNavigate('tokens') },
+    { icon: '03', label: '전체 백업', desc: '변경 이력과 복원 지점 관리', action: () => onNavigate('history') },
+    { icon: '04', label: 'PDF 출력', desc: '수신자별 문서 생성', action: onExportPDF },
   ]
 
   return (
-    <div>
-      <SectionHeader title="홈" description="방문 현황과 콘텐츠 상태를 한눈에 확인합니다" />
+    <div className="admin-home">
+      <div className="flex flex-col gap-5 mb-8 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-[-0.03em] text-white">관리 현황</h2>
+          <p className="text-sm text-gray-500 mt-2 max-w-xl leading-6">{new Date(now).toLocaleDateString('ko-KR')} · 콘텐츠, 백업, 뷰어 권한과 열람 행동을 확인합니다.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button onClick={() => onNavigate('history')} className="admin-secondary-button">백업 · 복원</button>
+          <button onClick={() => onNavigate('tokens')} className="admin-primary-button">+ 뷰어 초대</button>
+        </div>
+      </div>
+
+      <section className="admin-status-strip" aria-label="시스템 상태">
+        <div><span className="admin-status-dot" /><p><b>데이터 정상</b><small>로컬 및 클라우드 저장소 연결</small></p></div>
+        <div><span className="admin-status-dot" /><p><b>접근 보호 중</b><small>소유자 인증 · 만료 토큰 적용</small></p></div>
+        <button onClick={() => onNavigate('logs')}>감사 로그 열기 <span>↗</span></button>
+      </section>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-px mb-6 bg-gray-800/80 border border-gray-800 rounded-2xl overflow-hidden">
         {stats.map((s, i) => (
-          <div key={i} className="bg-gray-900 rounded-xl p-4">
+          <div key={i} className="bg-gray-900 p-4 md:p-5 min-h-28">
             <p className="text-[11px] text-gray-500">{s.label}</p>
-            <p className={`text-2xl font-bold mt-1 ${s.accent ? 'text-accent' : 'text-white'}`}>{s.value}</p>
+            <p className={`text-3xl font-semibold tracking-[-0.04em] mt-3 tabular-nums ${s.accent ? 'text-accent' : 'text-white'}`}>{s.value}</p>
             <p className="text-[10px] text-gray-600 mt-0.5">{s.sub}</p>
           </div>
         ))}
       </div>
 
+      <div className="grid grid-cols-1 xl:grid-cols-[1.35fr_.65fr] gap-4 mb-6">
+        <section className="admin-panel">
+          <div className="admin-panel-heading">
+            <div><h3>데이터 안전 상태</h3></div>
+            <button onClick={() => onNavigate('history')}>복원 지점 보기 →</button>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-px bg-gray-800/70 border border-gray-800 rounded-xl overflow-hidden">
+            <div className="admin-vault-cell"><span>최근 자동 저장</span><b>변경 즉시</b><small>브라우저 로컬 원본 유지</small></div>
+            <div className="admin-vault-cell"><span>클라우드 스냅샷</span><b>{cloudConfigured ? '연결됨' : '설정 필요'}</b><small>{cloudConfigured ? '버전별 복원 가능' : 'Firebase 연결 확인'}</small></div>
+            <div className="admin-vault-cell"><span>전체 덤프</span><b>JSON</b><small>항목별 업로드 · 다운로드</small></div>
+          </div>
+        </section>
+        <section className="admin-panel admin-panel--accent">
+          <div className="admin-panel-heading"><div><h3>지금 열람 중</h3></div><b className="text-2xl text-white tabular-nums">{liveCount}</b></div>
+          <p className="text-xs text-gray-500 leading-5 mt-5">활성 세션은 5분 간격의 신호로 확인합니다. 의심스러운 접근은 토큰 관리에서 즉시 만료할 수 있습니다.</p>
+          <button onClick={() => onNavigate('tokens')} className="mt-5 text-xs text-accent hover:text-accent-light">활성 뷰어 관리 →</button>
+        </section>
+      </div>
+
       {/* 14-day visit chart */}
-      <div className="bg-gray-900 rounded-xl p-5 mb-6">
+      <div className="admin-panel mb-6">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <h3 className="text-sm font-semibold text-accent">방문 추이 <span className="text-gray-600 font-normal">최근 14일</span></h3>
           <div className="flex items-center gap-4">
@@ -1842,7 +1923,7 @@ function HomeSection({ onNavigate, onExportPDF, onViewPortfolio }) {
       </div>
 
       {/* Security alerts */}
-      <div className={`rounded-xl p-5 mb-6 ${alerts7d > 0 ? 'bg-red-500/5 border border-red-500/25' : 'bg-gray-900'}`}>
+      <div className={`rounded-2xl p-5 mb-6 ${alerts7d > 0 ? 'bg-red-500/5 border border-red-500/25' : 'bg-gray-900 border border-gray-800'}`}>
         <div className="flex items-center justify-between mb-3">
           <h3 className={`text-sm font-semibold ${alerts7d > 0 ? 'text-red-400' : 'text-accent'}`}>
             보안 알림
@@ -1873,7 +1954,7 @@ function HomeSection({ onNavigate, onExportPDF, onViewPortfolio }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         {/* Recent authenticated visits */}
-        <div className="bg-gray-900 rounded-xl p-5">
+        <div className="admin-panel">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-accent">
               최근 인증 접속
@@ -1909,16 +1990,15 @@ function HomeSection({ onNavigate, onExportPDF, onViewPortfolio }) {
         </div>
 
         {/* Shortcuts */}
-        <div className="bg-gray-900 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-accent mb-3">바로가기</h3>
+        <div className="admin-panel">
+          <h3 className="text-sm font-semibold text-white mb-3">빠른 작업</h3>
           <div className="grid grid-cols-2 gap-2">
             {shortcuts.map((s, i) => (
               <button
                 key={i}
                 onClick={s.action}
-                className="text-left bg-gray-800/50 hover:bg-gray-800 border border-gray-700/50 hover:border-accent/40 rounded-lg p-3 transition-colors cursor-pointer"
+                className="text-left bg-gray-800/40 hover:bg-gray-800 border border-gray-800 hover:border-accent/40 rounded-xl p-3 transition-all cursor-pointer group"
               >
-                <span className="text-lg">{s.icon}</span>
                 <p className="text-xs font-medium text-white mt-1.5">{s.label}</p>
                 <p className="text-[10px] text-gray-600 mt-0.5">{s.desc}</p>
               </button>
@@ -1928,7 +2008,7 @@ function HomeSection({ onNavigate, onExportPDF, onViewPortfolio }) {
       </div>
 
       {/* Content summary */}
-      <div className="bg-gray-900 rounded-xl p-5">
+      <div className="admin-panel">
         <h3 className="text-sm font-semibold text-accent mb-3">콘텐츠 현황</h3>
         <div className="flex flex-wrap gap-2">
           <button onClick={() => onNavigate('projects')} className="px-3 py-1.5 bg-gray-800/60 hover:bg-gray-800 rounded-lg text-xs text-gray-300 cursor-pointer transition-colors">프로젝트 <b className="text-white">{projectCount}</b></button>
@@ -2183,6 +2263,62 @@ function HistorySection() {
   )
 }
 
+function TaxonomySection() {
+  const [config, setConfig] = useState(loadTaxonomyConfig)
+  const [toast, setToast] = useState('')
+  const categories = config.categories || []
+  const flash = (message) => { setToast(message); setTimeout(() => setToast(''), 2000) }
+  const updateCategory = (index, patch) => setConfig({ ...config, categories: categories.map((item, i) => i === index ? { ...item, ...patch } : item) })
+  const removeCategory = (index) => setConfig({ ...config, categories: categories.filter((_, i) => i !== index) })
+  const addCategory = () => {
+    let number = categories.length + 1
+    let key = `category-${number}`
+    while (categories.some((item) => item.key === key)) { number += 1; key = `category-${number}` }
+    setConfig({ ...config, categories: [...categories, { key, label: '새 분류', color: '#6b7280' }] })
+  }
+  const save = () => {
+    const keys = categories.map((item) => item.key.trim())
+    if (keys.some((key) => !key)) return flash('식별자는 비워둘 수 없습니다')
+    if (new Set(keys).size !== keys.length) return flash('분류 식별자는 중복될 수 없습니다')
+    saveTaxonomyConfig({ ...config, categories: categories.map((item) => ({ ...item, key: item.key.trim() })) })
+    flash('분류·선택지 저장 완료')
+  }
+  const reset = () => {
+    if (!confirm('기본 분류로 초기화하시겠습니까? 기존 콘텐츠의 분류 값은 변경되지 않습니다.')) return
+    setConfig(resetTaxonomyConfig())
+    flash('기본 분류로 초기화했습니다')
+  }
+  return (
+    <div>
+      <SectionHeader title="분류·선택지" description="프로젝트 배지와 소개 스킬에서 공통으로 사용하는 선택지를 관리합니다" />
+      <ActionBar>
+        <SaveButton onClick={save} />
+        <ResetButton onClick={reset} />
+        <JsonBulkEditor value={config} onApply={(value) => { setConfig(value); flash('JSON 적용 완료 — 저장 버튼을 눌러주세요') }} />
+        <div className="flex-1" />
+        <ImportExportBar onImport={async (file) => { setConfig(await importJson(file)); flash('가져오기 완료 — 저장 버튼을 눌러주세요') }} onExport={() => downloadJson(config, 'taxonomy.json')} />
+      </ActionBar>
+      <section className="admin-form-section max-w-5xl">
+        <header><h3>콘텐츠 분류</h3><p>식별자는 저장 데이터에 사용됩니다. 이름과 색상은 언제든 바꿀 수 있습니다.</p></header>
+        <div>
+          <div className="admin-taxonomy-head" aria-hidden="true"><span>표시 이름</span><span>식별자</span><span>색상</span><span>관리</span></div>
+          {categories.map((item, index) => (
+            <div className="admin-taxonomy-row" key={`${item.key}-${index}`}>
+              <Field label="표시 이름" value={item.label || ''} onChange={(value) => updateCategory(index, { label: value })} />
+              <Field label="식별자" value={item.key || ''} onChange={(value) => updateCategory(index, { key: value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })} />
+              <ColorField label="색상" value={item.color || ''} onChange={(value) => updateCategory(index, { color: value })} />
+              <button type="button" className="admin-row-delete" onClick={() => removeCategory(index)}>삭제</button>
+            </div>
+          ))}
+          <button type="button" onClick={addCategory} className="admin-secondary-button mt-4">분류 추가</button>
+          <p className="mt-3 text-[11px] leading-relaxed text-gray-500">분류를 삭제해도 기존 콘텐츠 값은 지워지지 않으며, 해당 편집 화면에서 ‘기존 값’으로 계속 표시됩니다.</p>
+        </div>
+      </section>
+      <Toast message={toast} />
+    </div>
+  )
+}
+
 /* ─── Main Admin ─── */
 
 const SECTION_MAP = {
@@ -2190,6 +2326,7 @@ const SECTION_MAP = {
   logs: LogsSection,
   history: HistorySection,
   projects: ProjectsSection,
+  'design-projects': ProjectsSection,
   resume: ResumeSection,
   about: AboutSection,
   achievements: AchievementsSection,
@@ -2200,18 +2337,25 @@ const SECTION_MAP = {
   contact: ContactSection,
   tokens: TokensSection,
   account: AccountSection,
+  taxonomy: TaxonomySection,
 }
 
 const LAST_SECTION_KEY = 'portfolio_admin_last_section'
+const ADMIN_THEME_KEY = 'portfolio_admin_color_mode'
 
 const ALL_NAV = NAV_ITEMS.flatMap((g) => g.items.map((item) => ({ ...item, group: g.group })))
 
-export default function Admin({ onLogout, onViewPortfolio, onPreviewTheme }) {
+export default function Admin({ onLogout, onViewPortfolio, onPreviewTheme, onOpenDesignSystem }) {
   const [activeSection, setActiveSection] = useState(() => {
     const saved = localStorage.getItem(LAST_SECTION_KEY)
     return SECTION_MAP[saved] ? saved : 'home'
   })
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [adminTheme, setAdminTheme] = useState(() => localStorage.getItem(ADMIN_THEME_KEY) || 'dark')
+  const changeAdminTheme = (theme) => {
+    setAdminTheme(theme)
+    localStorage.setItem(ADMIN_THEME_KEY, theme)
+  }
 
   const handleLogout = () => { clearAdminSession(); onLogout() }
 
@@ -2265,17 +2409,15 @@ export default function Admin({ onLogout, onViewPortfolio, onPreviewTheme }) {
   const sectionProps =
     activeSection === 'account' ? { onLogout: handleLogout }
     : activeSection === 'home' ? { onNavigate: selectSection, onExportPDF: handleExportPDF, onViewPortfolio }
-    : activeSection === 'theme' || activeSection === 'tokens' ? { onPreviewTheme } : {}
+    : activeSection === 'theme' || activeSection === 'tokens' ? { onPreviewTheme }
+    : activeSection === 'design-projects' ? { mode: 'design' } : {}
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex">
+    <div className="admin-shell min-h-screen bg-gray-950 text-gray-100 flex" data-admin-theme={adminTheme}>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col w-60 bg-gray-900/60 border-r border-gray-800/80 sticky top-0 h-screen">
+      <aside className="hidden md:flex flex-col w-64 bg-gray-900/70 border-r border-gray-800/80 sticky top-0 h-screen backdrop-blur-xl">
         <div className="px-5 py-5 border-b border-gray-800/80">
-          <h1 className="text-base font-bold tracking-tight flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-accent inline-block" />
-            Portfolio Admin
-          </h1>
+          <h1 className="text-base font-semibold tracking-[-0.02em]">Private Archive</h1>
           {cloudConfigured && ownerUser ? (
             <p className="text-[11px] text-gray-600 mt-0.5 truncate" title={ownerUser.email}>
               <span className="text-gray-500">{ownerUser.email}</span> 로 인증됨
@@ -2293,13 +2435,9 @@ export default function Admin({ onLogout, onViewPortfolio, onPreviewTheme }) {
                   <button
                     key={item.id}
                     onClick={() => selectSection(item.id)}
-                    className={`w-full text-left px-3 py-2 text-sm flex items-center gap-2.5 rounded-lg transition-colors cursor-pointer ${
-                      activeSection === item.id
-                        ? 'bg-accent/15 text-accent font-medium'
-                        : 'text-gray-400 hover:text-white hover:bg-gray-800/60'
-                    }`}
+                    data-active={activeSection === item.id ? 'true' : 'false'}
+                    className="admin-nav-item w-full text-left px-3 py-2 text-sm flex items-center gap-2.5 rounded-lg transition-colors cursor-pointer"
                   >
-                    <span className="text-base leading-none">{item.icon}</span>
                     {item.label}
                     {activeSection === item.id && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-accent" />}
                   </button>
@@ -2309,6 +2447,11 @@ export default function Admin({ onLogout, onViewPortfolio, onPreviewTheme }) {
           ))}
         </nav>
         <div className="p-3 border-t border-gray-800/80 space-y-1">
+          <div className="admin-theme-switch" aria-label="관리자 화면 색상 모드">
+            <button type="button" aria-pressed={adminTheme === 'light'} onClick={() => changeAdminTheme('light')}>라이트</button>
+            <button type="button" aria-pressed={adminTheme === 'dark'} onClick={() => changeAdminTheme('dark')}>다크</button>
+          </div>
+          <button onClick={onOpenDesignSystem} className="w-full mb-2 px-3 py-2 text-xs text-gray-400 hover:text-white border border-gray-800 hover:border-gray-700 rounded-lg transition-colors cursor-pointer">디자인 시스템 시안</button>
           <button
             onClick={handleExportPDF}
             className="w-full px-3 py-2.5 text-sm font-medium text-white bg-accent/15 hover:bg-accent/25 border border-accent/20 rounded-lg transition-colors cursor-pointer flex items-center gap-2 justify-center"
@@ -2352,6 +2495,7 @@ export default function Admin({ onLogout, onViewPortfolio, onPreviewTheme }) {
             </svg>
           </button>
           <div className="flex items-center gap-3 shrink-0">
+            <button type="button" onClick={() => changeAdminTheme(adminTheme === 'dark' ? 'light' : 'dark')} className="text-xs text-gray-400 hover:text-accent cursor-pointer">{adminTheme === 'dark' ? '라이트' : '다크'}</button>
             {onViewPortfolio && <button onClick={onViewPortfolio} className="text-xs text-accent cursor-pointer">보기</button>}
             <button onClick={handleLogout} className="text-xs text-gray-400 hover:text-red-400 cursor-pointer">로그아웃</button>
           </div>
@@ -2370,11 +2514,9 @@ export default function Admin({ onLogout, onViewPortfolio, onPreviewTheme }) {
                         <button
                           key={item.id}
                           onClick={() => selectSection(item.id)}
-                          className={`text-left px-3 py-2.5 text-sm flex items-center gap-2 rounded-lg cursor-pointer transition-colors ${
-                            activeSection === item.id ? 'bg-accent/15 text-accent font-medium' : 'text-gray-400 bg-gray-800/40 hover:bg-gray-800'
-                          }`}
+                          data-active={activeSection === item.id ? 'true' : 'false'}
+                          className="admin-nav-item text-left px-3 py-2.5 text-sm flex items-center gap-2 rounded-lg cursor-pointer transition-colors"
                         >
-                          <span>{item.icon}</span>
                           <span className="truncate">{item.label}</span>
                         </button>
                       ))}
@@ -2400,8 +2542,8 @@ export default function Admin({ onLogout, onViewPortfolio, onPreviewTheme }) {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 min-w-0 px-4 pb-24 pt-[72px] md:px-8 md:py-8">
-        <div className="max-w-4xl mx-auto">
+      <main className="flex-1 min-w-0 px-4 pb-24 pt-[72px] md:px-8 md:py-8 lg:px-12">
+        <div className="max-w-6xl mx-auto">
           {/* Breadcrumb (desktop) */}
           {current && (
             <p className="hidden md:flex items-center gap-1.5 text-xs text-gray-600 mb-4">
@@ -2409,7 +2551,7 @@ export default function Admin({ onLogout, onViewPortfolio, onPreviewTheme }) {
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
               </svg>
-              <span className="text-gray-400">{current.icon} {current.label}</span>
+              <span className="text-gray-400">{current.label}</span>
             </p>
           )}
           <ActiveComponent {...sectionProps} />

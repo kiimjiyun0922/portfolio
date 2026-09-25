@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import MarkdownRenderer from './ui/MarkdownRenderer'
 import Contact from './Contact'
 import { loadProjects } from '../data/projects'
@@ -13,6 +14,7 @@ const CASE_SECTIONS = [
 ]
 
 export default function ProjectDetailPage({ slug }) {
+  const [galleryState, setGalleryState] = useState({ slug, index: 0 })
   const data = loadProjects()
   const projects = (data.designProjects || []).filter((project) => project.published)
   const projectIndex = projects.findIndex((project) => project.slug === slug)
@@ -31,7 +33,11 @@ export default function ProjectDetailPage({ slug }) {
 
   const previous = projects[(projectIndex - 1 + projects.length) % projects.length]
   const next = projects[(projectIndex + 1) % projects.length]
-  const gallery = project.gallery || []
+  const gallery = (project.gallery || []).filter((item) => item.url)
+  const activeGalleryIndex = galleryState.slug === slug && galleryState.index < gallery.length ? galleryState.index : 0
+  const setActiveGalleryIndex = (index) => setGalleryState({ slug, index })
+  const showPreviousImage = () => setActiveGalleryIndex((activeGalleryIndex - 1 + gallery.length) % gallery.length)
+  const showNextImage = () => setActiveGalleryIndex((activeGalleryIndex + 1) % gallery.length)
   return (
     <>
       <main className="portfolio-subpage project-detail-page">
@@ -41,7 +47,8 @@ export default function ProjectDetailPage({ slug }) {
         aria-label="Close project and return to portfolio"
         onClick={(event) => handleInternalNavigation(event, '/')}
       >
-        <span aria-hidden="true" />
+        <span>Close</span>
+        <i aria-hidden="true" />
       </a>
       <nav className="portfolio-subpage__nav" aria-label="Page navigation">
         <a href="/" onClick={(event) => handleInternalNavigation(event, '/')}>Portfolio</a>
@@ -83,12 +90,28 @@ export default function ProjectDetailPage({ slug }) {
 
       {gallery.length > 0 && (
         <section className="project-detail-gallery" aria-label="Project gallery">
-          {gallery.map((item, index) => (
-            <figure key={`${item.url}-${index}`}>
-              {item.url ? <img src={item.url} alt={item.alt || ''} loading="lazy" /> : <div className="project-detail-gallery__empty">Image pending</div>}
-              {item.caption && <figcaption>{item.caption}</figcaption>}
+          <div className="project-detail-gallery__stage">
+            <figure key={`${gallery[activeGalleryIndex].url}-${activeGalleryIndex}`}>
+              <img src={gallery[activeGalleryIndex].url} alt={gallery[activeGalleryIndex].alt || ''} loading="lazy" />
+              {gallery[activeGalleryIndex].caption && <figcaption>{gallery[activeGalleryIndex].caption}</figcaption>}
             </figure>
-          ))}
+          </div>
+          <div className="project-detail-gallery__controls">
+            <span aria-live="polite">{String(activeGalleryIndex + 1).padStart(2, '0')} / {String(gallery.length).padStart(2, '0')}</span>
+            <div>
+              <button type="button" onClick={showPreviousImage} disabled={gallery.length < 2} aria-label="Previous project image">Previous</button>
+              <button type="button" onClick={showNextImage} disabled={gallery.length < 2} aria-label="Next project image">Next</button>
+            </div>
+          </div>
+          {gallery.length > 1 && (
+            <div className="project-detail-gallery__thumbs" aria-label="Choose project image">
+              {gallery.map((item, index) => (
+                <button key={`${item.url}-${index}`} type="button" aria-current={index === activeGalleryIndex ? 'true' : undefined} aria-label={`Show image ${index + 1}`} onClick={() => setActiveGalleryIndex(index)}>
+                  <img src={item.url} alt="" loading="lazy" />
+                </button>
+              ))}
+            </div>
+          )}
         </section>
       )}
 

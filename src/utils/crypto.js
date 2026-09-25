@@ -7,6 +7,7 @@ const TOKENS_KEY = 'portfolio_access_tokens'
 const ADMIN_SESSION_KEY = 'portfolio_admin_session'
 const ACCESS_LOG_KEY = 'portfolio_access_log'
 const HERO_KEY = 'portfolio_hero_config'
+const TAXONOMY_KEY = 'portfolio_taxonomy_config'
 
 // --- PBKDF2 helpers (Web Crypto API) ---
 
@@ -534,6 +535,38 @@ export function resetThemeSettings() {
   localStorage.removeItem(THEME_SETTINGS_KEY)
   cloudDelete('theme_settings')
   return defaultThemeSettings
+}
+
+// --- Content taxonomy ---
+
+export const defaultTaxonomyConfig = {
+  categories: [
+    { key: 'default', label: '기본', color: '#6b7280' },
+    { key: 'ai', label: 'AI', color: '#34d399' },
+    { key: 'data', label: '데이터', color: '#60a5fa' },
+    { key: 'ux', label: 'UX', color: '#f472b6' },
+    { key: 'ops', label: '운영', color: '#fbbf24' },
+  ],
+}
+
+export function loadTaxonomyConfig() {
+  try {
+    const raw = localStorage.getItem(TAXONOMY_KEY)
+    if (raw) return { ...defaultTaxonomyConfig, ...JSON.parse(raw) }
+  } catch {}
+  return defaultTaxonomyConfig
+}
+
+export function saveTaxonomyConfig(config) {
+  localStorage.setItem(TAXONOMY_KEY, JSON.stringify(config))
+  cloudSet('taxonomy', config)
+  cloudSaveSnapshot('taxonomy', config)
+}
+
+export function resetTaxonomyConfig() {
+  localStorage.removeItem(TAXONOMY_KEY)
+  cloudDelete('taxonomy')
+  return defaultTaxonomyConfig
 }
 
 // --- Resume Config ---

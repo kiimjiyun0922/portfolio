@@ -4,6 +4,7 @@ import { recordHeartbeat, trackAction, setActiveSession, loadThemeSettings, load
 import { applyTheme, THEMES } from './themes'
 
 const Admin = lazy(() => import('./components/Admin'))
+const AdminDesignSystem = lazy(() => import('./components/AdminDesignSystem'))
 const AuthGate = lazy(() => import('./components/AuthGate'))
 const AdminLogin = lazy(() => import('./components/AdminLogin'))
 const Hero = lazy(() => import('./components/Hero'))
@@ -113,8 +114,10 @@ function TokenExpiryBanner({ expiresAt }) {
 
 function App() {
   const adminHash = `#${ADMIN_PATH}`
+  const adminSystemHash = `#${ADMIN_PATH}-system`
   const isLocalPreview = import.meta.env.DEV && new URLSearchParams(window.location.search).has('preview')
-  const [isAdmin, setIsAdmin] = useState(window.location.hash === adminHash)
+  const [adminRoute, setAdminRoute] = useState(window.location.hash)
+  const isAdmin = [adminHash, adminSystemHash].includes(adminRoute)
   // Visitor auth is memory-only: refresh = re-auth required
   const [visitorAuth, setVisitorAuth] = useState(false)
   const [tokenExpiresAt, setTokenExpiresAt] = useState(null)
@@ -304,10 +307,10 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const onHash = () => setIsAdmin(window.location.hash === adminHash)
+    const onHash = () => setAdminRoute(window.location.hash)
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
-  }, [adminHash])
+  }, [adminHash, adminSystemHash])
 
   if (!cloudReady) {
     return <ScreenLoader />
@@ -349,12 +352,16 @@ function App() {
     if (!adminAuth) {
       return <Suspense fallback={<ScreenLoader />}><AdminLogin /></Suspense>
     }
+    if (adminRoute === adminSystemHash) {
+      return <Suspense fallback={<ScreenLoader />}><AdminDesignSystem onBack={() => { window.location.hash = ADMIN_PATH }} /></Suspense>
+    }
     return (
       <Suspense fallback={<ScreenLoader />}>
         <Admin
           onLogout={() => signOutOwner()}
           onViewPortfolio={() => { setVisitorAuth(true); window.location.hash = '' }}
           onPreviewTheme={(view, theme) => setThemePreview({ view, theme })}
+          onOpenDesignSystem={() => { window.location.hash = `${ADMIN_PATH}-system` }}
         />
       </Suspense>
     )

@@ -1,14 +1,6 @@
 import { useState } from 'react'
 import MarkdownRenderer from './ui/MarkdownRenderer'
-import { trackAction } from '../utils/crypto'
-
-const BADGE_STYLES = {
-  ai: 'bg-emerald-500/10 text-emerald-400',
-  data: 'bg-blue-500/10 text-blue-400',
-  ux: 'bg-rose-500/10 text-rose-400',
-  ops: 'bg-amber-500/10 text-amber-400',
-  default: 'bg-gray-800 text-gray-400',
-}
+import { loadTaxonomyConfig, trackAction } from '../utils/crypto'
 
 const TABS = [
   { key: 'problem', label: 'Problem' },
@@ -108,7 +100,8 @@ function StoryTabs({ project }) {
 }
 
 export default function ProjectCard({ project }) {
-  const badgeCls = BADGE_STYLES[project.badgeType] || BADGE_STYLES.default
+  const taxonomy = loadTaxonomyConfig()
+  const badgeColor = (taxonomy.categories || []).find((item) => item.key === project.badgeType)?.color || '#6b7280'
   const hasStory = project.problem || project.solution || project.collaboration || project.result
 
   return (
@@ -118,7 +111,7 @@ export default function ProjectCard({ project }) {
     >
       {/* Header */}
       <div>
-        <span className={`inline-block text-[11px] font-mono font-medium tracking-wider uppercase px-2.5 py-1 rounded mb-3 ${badgeCls}`}>
+        <span className="inline-block text-[11px] font-mono font-medium tracking-wider uppercase px-2.5 py-1 rounded mb-3" style={{ color: badgeColor, backgroundColor: `color-mix(in srgb, ${badgeColor} 10%, transparent)` }}>
           {project.badge}
         </span>
         <h3 className="admin-copy text-lg md:text-xl font-bold text-white mb-2 leading-snug">{project.title}</h3>

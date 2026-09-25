@@ -125,6 +125,7 @@ const SYNC_MAP = {
   achievements: 'portfolio_achievements_config',
   journey: 'portfolio_journey_config',
   theme_settings: 'portfolio_theme_settings',
+  taxonomy: 'portfolio_taxonomy_config',
   projects: 'portfolio_projects',
   case_studies: 'portfolio_case_studies',
   tokens: 'portfolio_access_tokens',
