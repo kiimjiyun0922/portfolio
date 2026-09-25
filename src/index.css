@@ -2231,6 +2231,129 @@ body {
   }
 }
 
+/*
+ * Mist responsive contract
+ * Component rules above describe appearance. This final block is the single
+ * authority for mobile and tablet spacing, widths, and grid collapse.
+ */
+@media (max-width: 767px) {
+  [data-theme="mist"] {
+    --paper-gutter: clamp(20px, 6.2vw, 24px);
+    --section-inset: 40px;
+    --section-head-gap: 22px;
+    --ruled-row-space: 18px;
+  }
+  [data-theme="mist"] .section-wrap { padding-block: var(--section-inset); }
+  [data-theme="mist"] .section-wrap > h2,
+  [data-theme="mist"] .section-wrap > div > div:first-child h2,
+  [data-theme="mist"] #about h2,
+  [data-theme="mist"] #projects > h2 {
+    margin-bottom: var(--section-head-gap);
+    font-size: clamp(36px, 10.4vw, 44px);
+    line-height: 1.02;
+  }
+  [data-theme="mist"] .design-projects { margin-top: 48px; padding-top: 40px; }
+  [data-theme="mist"] .design-projects__header { margin-bottom: 24px; }
+  [data-theme="mist"] #projects .projects-archive { gap: 28px; }
+  [data-theme="mist"] #achievements .t-card,
+  [data-theme="mist"] .experience-entry { padding-block: 18px; }
+  [data-theme="mist"] .resume-sheet > * + * { margin-top: 30px; }
+  [data-theme="mist"] .notebook-footer { gap: 16px; padding-top: 24px; padding-bottom: 24px; }
+  [data-theme="mist"] .notebook-footer__column { gap: 0; }
+  [data-theme="mist"] .portfolio-subpage {
+    width: calc(100% - (var(--paper-gutter) * 2));
+    padding-bottom: 48px;
+  }
+  [data-theme="mist"] .portfolio-subpage__header { padding: 48px 0 32px; }
+  [data-theme="mist"] .project-detail-hero { padding: 44px 0 28px; }
+  [data-theme="mist"] .project-detail-brief { padding: 34px 0; }
+  [data-theme="mist"] .project-detail-story section { padding: 38px 0; }
+  [data-theme="mist"] .project-detail-gallery { padding: 44px 0; }
+  [data-theme="mist"] .project-detail-footer { margin-top: 44px; }
+}
+
+@media (min-width: 768px) and (max-width: 1179px) {
+  [data-theme="mist"] {
+    --paper-gutter: clamp(32px, 5vw, 52px);
+    --section-inset: clamp(56px, 7vw, 68px);
+    --section-head-gap: 30px;
+    --ruled-row-space: 19px;
+  }
+  [data-theme="mist"] .section-wrap { padding-block: var(--section-inset); }
+  [data-theme="mist"] .section-wrap > h2,
+  [data-theme="mist"] .section-wrap > div > div:first-child h2,
+  [data-theme="mist"] #about h2,
+  [data-theme="mist"] #projects > h2 {
+    margin-bottom: var(--section-head-gap);
+    font-size: clamp(2.5rem, 5.2vw, 3.35rem);
+    line-height: 1;
+  }
+  [data-theme="mist"] .journey-index__row {
+    grid-template-columns: 32px 92px minmax(0, 1fr) minmax(124px, .7fr);
+    gap: 14px;
+  }
+  [data-theme="mist"] .journey-index__number { grid-column: 1; grid-row: 1 / span 2; }
+  [data-theme="mist"] .journey-index__year { grid-column: 2; grid-row: 1; }
+  [data-theme="mist"] .journey-index__company { grid-column: 3; grid-row: 1 / span 2; }
+  [data-theme="mist"] .journey-index__field { grid-column: 4; grid-row: 1 / span 2; }
+  [data-theme="mist"] .journey-index__status { grid-column: 2; grid-row: 2; }
+  [data-theme="mist"] .experience-entry {
+    grid-template-columns: 34px minmax(0, 1fr);
+    column-gap: 18px;
+    row-gap: 18px;
+    padding-block: 24px;
+  }
+  [data-theme="mist"] .experience-entry__index { grid-column: 1; grid-row: 1 / span 2; }
+  [data-theme="mist"] .experience-entry__identity { grid-column: 2; grid-row: 1; }
+  [data-theme="mist"] .experience-entry__body { grid-column: 2; grid-row: 2; }
+  [data-theme="mist"] .experience-entry__projects { margin-top: 0; }
+  [data-theme="mist"] .portfolio-subpage {
+    width: calc(100% - (var(--paper-gutter) * 2));
+    padding-bottom: 64px;
+  }
+  [data-theme="mist"] .portfolio-subpage__header { padding: 64px 0 44px; }
+  [data-theme="mist"] .portfolio-subpage__header h1,
+  [data-theme="mist"] .project-detail-hero__copy h1 { font-size: clamp(52px, 8vw, 78px); }
+  [data-theme="mist"] .project-detail-hero { padding: 64px 0 36px; }
+  [data-theme="mist"] .project-detail-hero .design-project-visual,
+  [data-theme="mist"] .project-archive-card .design-project-visual { min-height: 0; aspect-ratio: 3 / 2; }
+  [data-theme="mist"] .project-detail-brief { padding: 44px 0; }
+  [data-theme="mist"] .project-detail-story section {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 12px 24px;
+    padding: 48px 0;
+  }
+  [data-theme="mist"] .project-detail-story section > div { grid-column: 1 / -1; }
+  [data-theme="mist"] .project-detail-gallery { padding: 56px 0; }
+  [data-theme="mist"] .project-detail-next { grid-template-columns: 1fr 1fr; gap: 0; }
+  [data-theme="mist"] .project-detail-next a:first-child { padding-right: 20px; }
+  [data-theme="mist"] .project-detail-next a:last-child { padding-left: 20px; border-left: 1px solid #cfccc3; }
+  [data-theme="mist"] .project-detail-next a:nth-child(2) {
+    grid-column: 1 / -1;
+    order: 3;
+    min-height: 68px;
+    align-items: flex-start;
+    padding: 0;
+    border: 0;
+    border-top: 1px solid #cfccc3;
+  }
+  [data-theme="mist"] .project-detail-footer { margin-top: 56px; }
+}
+
+@media (min-width: 768px) and (max-width: 899px) {
+  [data-theme="mist"] .project-archive-grid { grid-template-columns: 1fr; gap: 48px; }
+  [data-theme="mist"] .project-archive-card,
+  [data-theme="mist"] .project-archive-card:nth-child(3n + 2),
+  [data-theme="mist"] .project-archive-card:nth-child(3n) { grid-column: 1; padding-top: 0; }
+}
+
+@media (min-width: 900px) and (max-width: 1179px) {
+  [data-theme="mist"] .project-archive-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 52px 28px; }
+  [data-theme="mist"] .project-archive-card,
+  [data-theme="mist"] .project-archive-card:nth-child(3n + 2),
+  [data-theme="mist"] .project-archive-card:nth-child(3n) { grid-column: auto; padding-top: 0; }
+}
+
 /* ════════════════════════════════════════════════════════════════
    THEMES — visitor-selectable visual worlds.
    Each theme remaps the token variables that Tailwind utilities
