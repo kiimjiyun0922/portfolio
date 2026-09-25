@@ -60,6 +60,39 @@ test('career journey keeps its text position on hover', async ({ page }) => {
   expect(after.y).toBeCloseTo(before.y, 1)
 })
 
+test('project group link moves to its configured work experience', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.goto('/?preview')
+  const link = page.getByRole('button', { name: 'AI Product 관련 업무 경험으로 이동' })
+  await link.scrollIntoViewIfNeeded()
+  await link.click()
+  const target = page.locator('#exp-0')
+  await expect(target).toHaveClass(/experience-entry--linked/)
+  await expect(target).toBeInViewport()
+})
+
+test('yellow project surface uses one warm semantic rule palette', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.goto('/?preview')
+  const colors = await page.locator('#projects').evaluate((section) => {
+    const sectionStyle = getComputedStyle(section)
+    const indexRow = section.querySelector('.design-projects__index-row')
+    const heading = section.querySelector('.projects-archive-heading')
+    return {
+      ink: sectionStyle.getPropertyValue('--project-ink').trim(),
+      meta: sectionStyle.getPropertyValue('--project-meta').trim(),
+      rule: sectionStyle.getPropertyValue('--project-rule').trim(),
+      indexBorder: getComputedStyle(indexRow).borderBottomColor,
+      headingBorder: getComputedStyle(heading).borderBottomColor,
+    }
+  })
+  expect(colors.ink).toBe('#2f2d24')
+  expect(colors.meta).toBe('#686147')
+  expect(colors.rule).toContain('49, 44, 31')
+  expect(colors.indexBorder).not.toBe('rgb(207, 204, 195)')
+  expect(colors.headingBorder).not.toBe('rgb(207, 204, 195)')
+})
+
 for (const width of [390, 1024, 1280]) {
   test(`project detail brief has a distinct responsive layout at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 })

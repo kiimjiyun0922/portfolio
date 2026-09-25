@@ -28,8 +28,8 @@ function scrollToExperience(id) {
   const el = document.getElementById(id)
   if (el) {
     el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    el.classList.add('ring-1', 'ring-accent/40', 'rounded-xl')
-    setTimeout(() => el.classList.remove('ring-1', 'ring-accent/40', 'rounded-xl'), 2000)
+    el.classList.add('experience-entry--linked')
+    setTimeout(() => el.classList.remove('experience-entry--linked'), 1800)
   }
 }
 
@@ -49,20 +49,24 @@ export default function Projects() {
 
       <div className="projects-archive space-y-16">
         {data.groups.map((group, gi) => {
-          const expId = group.linkToExperience || findExperienceId(group.title, work)
+          const explicitExperienceId = typeof group.linkToExperience === 'string' ? group.linkToExperience : null
+          const legacyExperienceId = group.linkToExperience === true ? `exp-${gi}` : null
+          const expId = explicitExperienceId || legacyExperienceId || findExperienceId(group.title, work)
           return (
           <div key={gi} className="projects-archive-group">
             {/* Group Header */}
             <div className="projects-archive-heading mb-6">
               {expId ? (
-                <h3
-                  className="admin-copy text-lg md:text-xl font-bold text-white inline-flex items-center gap-2 cursor-pointer hover:text-accent transition-colors group"
-                  onClick={() => scrollToExperience(expId)}
-                >
-                  {group.title}
-                  <svg className="w-4 h-4 text-gray-600 group-hover:text-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
-                  </svg>
+                <h3>
+                  <button
+                    type="button"
+                    className="projects-archive-heading__link admin-copy"
+                    onClick={() => scrollToExperience(expId)}
+                    aria-label={`${group.title} 관련 업무 경험으로 이동`}
+                  >
+                    {group.title}
+                    <span aria-hidden="true">↘</span>
+                  </button>
                 </h3>
               ) : (
                 <h3 className="admin-copy text-lg md:text-xl font-bold text-white">{group.title}</h3>

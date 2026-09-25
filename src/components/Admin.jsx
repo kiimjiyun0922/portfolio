@@ -1162,6 +1162,7 @@ function AccountSection({ onLogout }) {
 function ProjectsSection({ mode = 'standard' }) {
   const [data, setData] = useState(loadProjects)
   const taxonomy = loadTaxonomyConfig()
+  const resume = loadResumeConfig()
   const [toast, setToast] = useState('')
   const [expanded, setExpanded] = useState({})
   const [designTabs, setDesignTabs] = useState({})
@@ -1301,9 +1302,15 @@ function ProjectsSection({ mode = 'standard' }) {
               </div>
               <button onClick={() => setData({ ...data, groups: data.groups.filter((_, i) => i !== gi) })} className="text-xs text-red-400 hover:text-red-300 cursor-pointer">삭제</button>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <Field label="그룹 제목" value={group.title} onChange={(v) => { const g = [...data.groups]; g[gi] = { ...group, title: v }; setData({ ...data, groups: g }) }} />
               <Field label="그룹 부제" value={group.subtitle} onChange={(v) => { const g = [...data.groups]; g[gi] = { ...group, subtitle: v }; setData({ ...data, groups: g }) }} />
+              <SelectField
+                label="연결할 업무 경험"
+                value={typeof group.linkToExperience === 'string' ? group.linkToExperience : group.linkToExperience === true ? `exp-${gi}` : ''}
+                options={[{ value: '', label: '연결 안 함' }, ...(resume.work || []).filter((item) => item.company).map((item, index) => ({ value: `exp-${index}`, label: item.company }))]}
+                onChange={(v) => { const g = [...data.groups]; g[gi] = { ...group, linkToExperience: v }; setData({ ...data, groups: g }) }}
+              />
             </div>
 
             <div className="space-y-3">
