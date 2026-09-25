@@ -162,6 +162,10 @@ body {
   --color-accent: #75684d;
   --color-accent-light: #8d7d5c;
   --color-accent-dark: #5f543e;
+  --ink-title: #242522;
+  --ink-body: #3b3c39;
+  --ink-meta: #716d61;
+  --ink-action: #75684d;
   --font-sans: 'Newsreader', 'Gowun Batang', 'Batang', serif;
   --font-display: 'Gowun Batang', 'Batang', serif;
   --radius-md: 0px;
@@ -799,17 +803,38 @@ body {
 }
 
 [data-theme="mist"] .section-wrap > p:first-child {
-  color: #777872;
+  color: var(--ink-meta);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   letter-spacing: .08em;
 }
 [data-theme="mist"] .section-wrap > h2,
 [data-theme="mist"] .section-wrap > div > div:first-child h2 {
   font-family: var(--font-display);
-  color: #242522;
+  color: var(--ink-title);
   font-weight: 400;
   letter-spacing: -.025em;
 }
+
+/* Editorial color hierarchy: titles stay neutral; taupe is reserved for labels and actions. */
+[data-theme="mist"] #about h2,
+[data-theme="mist"] #journey > h2,
+[data-theme="mist"] #achievements > h2,
+[data-theme="mist"] #experience > h2,
+[data-theme="mist"] #resume > h2,
+[data-theme="mist"] .design-projects__header h2,
+[data-theme="mist"] .portfolio-subpage__header h1,
+[data-theme="mist"] .project-detail-hero__copy h1 { color: var(--ink-title); }
+[data-theme="mist"] .journey-index__company,
+[data-theme="mist"] #achievements .t-card h4,
+[data-theme="mist"] .experience-entry__identity h3,
+[data-theme="mist"] .resume-block__heading,
+[data-theme="mist"] .resume-education__copy > p:first-child,
+[data-theme="mist"] .design-projects__feature-copy h3,
+[data-theme="mist"] .project-archive-card__copy h2,
+[data-theme="mist"] .project-detail-brief h2,
+[data-theme="mist"] .project-detail-story h2 { color: var(--ink-title); }
+[data-theme="mist"] .experience-entry__identity > p.text-accent,
+[data-theme="mist"] .resume-activity__category { color: var(--ink-meta); }
 
 [data-theme="mist"] .t-card {
   background: rgba(250, 246, 238, .68);
