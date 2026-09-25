@@ -32,8 +32,8 @@ export default function Journey() {
           <motion.button
             key={`${item.year}-${item.org}`}
             type="button"
-            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={reduceMotion ? false : { opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, amount: 0.35 }}
             transition={{ duration: 0.38, delay: reduceMotion ? 0 : i * 0.06, ease: [0.16, 1, 0.3, 1] }}
             data-no-global-track

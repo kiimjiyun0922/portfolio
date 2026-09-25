@@ -30,6 +30,21 @@ for (const viewport of viewports) {
   }
 }
 
+test('career journey keeps its text position on hover', async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 768 })
+  await page.goto('/?preview')
+  const firstRow = page.locator('.journey-index__row').first()
+  const company = firstRow.locator('.journey-index__company')
+  await firstRow.scrollIntoViewIfNeeded()
+  const before = await company.boundingBox()
+  await firstRow.hover()
+  await page.waitForTimeout(250)
+  const after = await company.boundingBox()
+
+  expect(after.x).toBeCloseTo(before.x, 1)
+  expect(after.y).toBeCloseTo(before.y, 1)
+})
+
 for (const viewport of viewports) {
   test(`portfolio spacing follows the responsive contract at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport)
