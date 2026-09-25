@@ -13,7 +13,7 @@ const browser = await chromium.launch({ headless: true })
 try {
   for (const width of widths) {
     const page = await browser.newPage({ viewport: { width, height: width < 768 ? 844 : 900 }, deviceScaleFactor: 1 })
-    await page.goto(`${baseUrl}/?preview`, { waitUntil: 'networkidle' })
+    await page.goto(`${baseUrl}/?preview`, { waitUntil: 'domcontentloaded' })
     await page.locator('#home').waitFor({ state: 'visible' })
     await page.evaluate(() => document.fonts.ready)
     await page.waitForTimeout(500)
@@ -41,6 +41,29 @@ try {
           .filter((value) => Number.isFinite(value)),
         bodySize: size('#about .prose-dark p'),
         journeyYearSize: size('.journey-index__year'),
+        heroTitleSize: size('.mist-hero-title span'),
+        heroStatOverlap: [...document.querySelectorAll('.mist-hero-stats button')].some((button) => {
+          const label = button.querySelector('.mist-hero-stat-label')?.getBoundingClientRect()
+          const pseudo = getComputedStyle(button, '::before')
+          const buttonBox = button.getBoundingClientRect()
+          const pseudoWidth = Number.parseFloat(pseudo.width) || 0
+          return label ? buttonBox.left + pseudoWidth > label.left + 1 : false
+        }),
+        ornamentOverlap: (() => {
+          const overlaps = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top
+          const ornaments = [...document.querySelectorAll('#projects .notebook-mark, #resume .notebook-mark')]
+            .filter((element) => getComputedStyle(element).display !== 'none')
+            .map((element) => element.getBoundingClientRect())
+          const protectedText = [...document.querySelectorAll('#projects > p, #projects > h2, #projects h3, #projects .projects-archive-heading p, #projects .t-card span, #projects .t-card p, #projects .design-projects__header p, #resume > p, #resume > h2, #resume h3, #resume .resume-list p, #resume .resume-list span')]
+            .map((element) => element.getBoundingClientRect())
+          return ornaments.some((ornament) => protectedText.some((content) => overlaps(ornament, content)))
+        })(),
+        selectedIndexInset: (() => {
+          const row = document.querySelector('.design-projects__index-row[aria-pressed="true"]')
+          const index = row?.querySelector('span')
+          if (!row || !index) return null
+          return index.getBoundingClientRect().left - row.getBoundingClientRect().left
+        })(),
         mobileStatus: getComputedStyle(document.querySelector('.portfolio-mobile-status')).display,
         hiddenContent: [...document.querySelectorAll('#about > div > div, .journey-index__row, .experience-entry, .resume-block')]
           .filter((element) => Number.parseFloat(getComputedStyle(element).opacity) < .99).length,
@@ -53,6 +76,10 @@ try {
     check(metrics.h2Sizes.every((size) => size >= (width < 768 ? 38 : 40)), `${width}px: a section title is below the Mist title token`)
     check(metrics.bodySize === null || metrics.bodySize >= 15, `${width}px: body text is below 15px`)
     check(metrics.journeyYearSize === null || metrics.journeyYearSize <= 12.5, `${width}px: journey year is incorrectly promoted above metadata size`)
+    check(metrics.heroTitleSize === null || metrics.heroTitleSize <= 120.5, `${width}px: hero title exceeds the 120px cap`)
+    check(!metrics.heroStatOverlap, `${width}px: hero stat index overlaps its label`)
+    check(!metrics.ornamentOverlap, `${width}px: a decorative mark overlaps protected content`)
+    check(metrics.selectedIndexInset === null || metrics.selectedIndexInset >= 19, `${width}px: selected design index content is too close to its state marker`)
     check(metrics.mobileStatus === 'none', `${width}px: undocumented mobile status control is visible`)
     check(metrics.hiddenContent === 0, `${width}px: ${metrics.hiddenContent} content blocks remain hidden before scrolling`)
 
@@ -60,8 +87,30 @@ try {
     await page.close()
   }
 
+  const interactions = await browser.newPage({ viewport: { width: 1440, height: 900 } })
+  await interactions.goto(`${baseUrl}/?preview`, { waitUntil: 'domcontentloaded' })
+  await interactions.locator('#projects').waitFor({ state: 'attached' })
+  await interactions.locator('#projects').scrollIntoViewIfNeeded()
+  const tab = interactions.locator('#projects .project-story__nav button').first()
+  if (await tab.count()) {
+    await tab.click()
+    const tabFocus = await tab.evaluate((element) => {
+      const style = getComputedStyle(element)
+      return { outline: style.outlineStyle, shadow: style.boxShadow }
+    })
+    check(tabFocus.outline === 'none', 'project tab: mouse click leaves a focus outline')
+    check(tabFocus.shadow === 'none', 'project tab: active state retains a second selection shadow')
+  }
+  const backToTop = interactions.locator('.notebook-footer__link')
+  if (await backToTop.count()) {
+    await backToTop.click()
+    const footerFocus = await backToTop.evaluate((element) => getComputedStyle(element).outlineStyle)
+    check(footerFocus === 'none', 'footer: mouse click leaves a focus outline')
+  }
+  await interactions.close()
+
   const detail = await browser.newPage({ viewport: { width: 390, height: 844 } })
-  await detail.goto(`${baseUrl}/projects/sample-noma-launch?preview`, { waitUntil: 'networkidle' })
+  await detail.goto(`${baseUrl}/projects/sample-noma-launch?preview`, { waitUntil: 'domcontentloaded' })
   await detail.locator('.project-detail-close').waitFor({ state: 'visible' })
   const detailState = await detail.evaluate(() => ({
     overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -83,20 +132,32 @@ try {
   await detail.screenshot({ path: '/tmp/mist-detail-390.png', fullPage: true })
   await detail.close()
 
-  const gate = await browser.newPage({ viewport: { width: 390, height: 844 } })
-  await gate.goto(baseUrl, { waitUntil: 'networkidle' })
-  await gate.locator('.t-gate').waitFor({ state: 'visible' })
-  const gateState = await gate.evaluate(() => ({
-    overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    titleSize: Number.parseFloat(getComputedStyle(document.querySelector('.gate-title')).fontSize),
-    inputHeight: document.querySelector('.gate-form input')?.getBoundingClientRect().height,
-    buttonHeight: document.querySelector('.gate-form button')?.getBoundingClientRect().height,
-  }))
-  check(gateState.overflow <= 1, `gate mobile: horizontal overflow ${gateState.overflow}px`)
-  check(gateState.titleSize >= 36, 'gate mobile: title hierarchy is too small')
-  check(gateState.inputHeight >= 44 && gateState.buttonHeight >= 44, 'gate mobile: a touch target is below 44px')
-  await gate.screenshot({ path: '/tmp/mist-gate-390.png', fullPage: true })
-  await gate.close()
+  for (const width of [390, 768, 1440]) {
+    const gate = await browser.newPage({ viewport: { width, height: width < 768 ? 844 : 900 } })
+    await gate.goto(baseUrl, { waitUntil: 'domcontentloaded' })
+    await gate.locator('.t-gate').waitFor({ state: 'visible' })
+    await gate.waitForTimeout(1000)
+    const gateState = await gate.evaluate(() => {
+      const intro = document.querySelector('.gate-intro')?.getBoundingClientRect()
+      const panel = document.querySelector('.gate-panel')?.getBoundingClientRect()
+      return {
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        titleSize: Number.parseFloat(getComputedStyle(document.querySelector('.gate-title')).fontSize),
+        inputHeight: document.querySelector('.gate-form input')?.getBoundingClientRect().height,
+        buttonHeight: document.querySelector('.gate-form button')?.getBoundingClientRect().height,
+        introTop: intro?.top,
+        introBottom: intro?.bottom,
+        panelTop: panel?.top,
+      }
+    })
+    check(gateState.overflow <= 1, `gate ${width}px: horizontal overflow ${gateState.overflow}px`)
+    check(gateState.titleSize >= (width < 768 ? 36 : 44), `gate ${width}px: title hierarchy is too small`)
+    check(gateState.inputHeight >= 44 && gateState.buttonHeight >= 44, `gate ${width}px: a touch target is below 44px`)
+    if (width >= 1024) check(Math.abs(gateState.introTop - gateState.panelTop) <= 2, `gate ${width}px: intro and form do not share a top line`)
+    if (width < 1024) check(gateState.panelTop >= gateState.introBottom, `gate ${width}px: stacked form overlaps the intro`)
+    await gate.screenshot({ path: `/tmp/mist-gate-${width}.png`, fullPage: true })
+    await gate.close()
+  }
 } finally {
   await browser.close()
 }

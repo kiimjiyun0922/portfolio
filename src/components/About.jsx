@@ -7,6 +7,7 @@ import { loadAboutConfig } from '../utils/crypto'
 
 export default function About() {
   const [config] = useState(loadAboutConfig)
+  const [profileAvailable, setProfileAvailable] = useState(true)
   const headingLines = (config.heading || 'Designing the balance\nbetween users and business').split('\n')
 
   if (!config.bio && (!config.skills || config.skills.length === 0)) return null
@@ -35,14 +36,16 @@ export default function About() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="flex flex-col sm:flex-row gap-5 sm:gap-8 items-stretch mb-8"
+          className={`about-profile ${profileAvailable ? 'about-profile--with-image' : 'about-profile--copy-only'} flex flex-col sm:flex-row gap-5 sm:gap-8 items-stretch mb-8`}
         >
-          <img
-            src="/profile.jpg"
-            alt="Profile"
-            className="w-32 sm:w-44 md:w-48 rounded-2xl object-cover shrink-0 border border-gray-800 self-start sm:self-stretch"
-            onError={(e) => { e.target.style.display = 'none' }}
-          />
+          {profileAvailable && (
+            <img
+              src="/profile.jpg"
+              alt="Profile"
+              className="w-32 sm:w-44 md:w-48 rounded-2xl object-cover shrink-0 border border-gray-800 self-start sm:self-stretch"
+              onError={() => setProfileAvailable(false)}
+            />
+          )}
           {config.bio && (
             <div className="prose-dark flex-1 flex items-center">
               <MarkdownRenderer content={config.bio} />

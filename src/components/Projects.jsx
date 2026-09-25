@@ -65,7 +65,7 @@ export default function Projects() {
                     aria-label={`${group.title} 관련 업무 경험으로 이동`}
                   >
                     {group.title}
-                    <span aria-hidden="true">↘</span>
+                    <span aria-hidden="true">↖</span>
                   </button>
                 </h3>
               ) : (

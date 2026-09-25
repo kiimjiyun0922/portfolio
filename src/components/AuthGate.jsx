@@ -124,41 +124,43 @@ export default function AuthGate({ onSuccess }) {
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/3 rounded-full blur-3xl" />
       </div>
 
-      {/* Tagline */}
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="admin-copy gate-eyebrow relative text-accent text-sm md:text-base font-medium tracking-wider uppercase mb-6"
-      >
-        {config.tagline}
-      </motion.p>
+      <div className="gate-intro">
+        {/* Tagline */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="admin-copy gate-eyebrow relative text-accent text-sm md:text-base font-medium tracking-wider uppercase mb-6"
+        >
+          {config.tagline}
+        </motion.p>
 
-      {/* Headline */}
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.15 }}
-        className="gate-title relative text-2xl md:text-4xl lg:text-5xl font-bold leading-tight max-w-4xl"
-      >
-        {headlineParts.length > 1 ? (
-          <>
-            <span className="gate-title__line">{headlineParts[0]}</span>
-            <span className="gate-title__line gate-title__line--accent">{headlineParts.slice(1).join('\n')}</span>
-          </>
-        ) : (
-          config.headline
-        )}
-      </motion.h1>
+        {/* Headline */}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.15 }}
+          className="gate-title relative text-2xl md:text-4xl lg:text-5xl font-bold leading-tight max-w-4xl"
+        >
+          {headlineParts.length > 1 ? (
+            <>
+              <span className="gate-title__line">{headlineParts[0]}</span>
+              <span className="gate-title__line gate-title__line--accent">{headlineParts.slice(1).join('\n')}</span>
+            </>
+          ) : (
+            config.headline
+          )}
+        </motion.h1>
 
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        className="admin-copy gate-deck relative mt-4 text-gray-400 text-sm md:text-base max-w-2xl"
-      >
-        {config.subtitle}
-      </motion.p>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="admin-copy gate-deck relative mt-4 text-gray-400 text-sm md:text-base max-w-2xl"
+        >
+          {config.subtitle}
+        </motion.p>
+      </div>
 
       {/* Auth Card - input only */}
       <motion.div
