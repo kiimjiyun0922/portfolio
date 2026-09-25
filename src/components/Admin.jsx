@@ -85,6 +85,7 @@ const NAV_ITEMS = [
     { id: 'logs', label: '접속 로그', icon: '12' },
   ]},
   { group: '설정', items: [
+    { id: 'design-system', label: '디자인 시스템', icon: '13' },
     { id: 'taxonomy', label: '분류·선택지', icon: '13' },
     { id: 'history', label: '변경 이력', icon: '13' },
     { id: 'account', label: '관리자 계정', icon: '14' },
@@ -2386,6 +2387,7 @@ export default function Admin({ onLogout, onViewPortfolio, onPreviewTheme, onOpe
   }, [])
 
   const selectSection = (id) => {
+    if (id === 'design-system') { setMobileMenuOpen(false); onOpenDesignSystem(); return }
     setActiveSection(id)
     setMobileMenuOpen(false)
     localStorage.setItem(LAST_SECTION_KEY, id)
@@ -2458,7 +2460,6 @@ export default function Admin({ onLogout, onViewPortfolio, onPreviewTheme, onOpe
             <button type="button" aria-pressed={adminTheme === 'light'} onClick={() => changeAdminTheme('light')}>라이트</button>
             <button type="button" aria-pressed={adminTheme === 'dark'} onClick={() => changeAdminTheme('dark')}>다크</button>
           </div>
-          <button onClick={onOpenDesignSystem} className="w-full mb-2 px-3 py-2 text-xs text-gray-400 hover:text-white border border-gray-800 hover:border-gray-700 rounded-lg transition-colors cursor-pointer">디자인 시스템 시안</button>
           <button
             onClick={handleExportPDF}
             className="w-full px-3 py-2.5 text-sm font-medium text-white bg-accent/15 hover:bg-accent/25 border border-accent/20 rounded-lg transition-colors cursor-pointer flex items-center gap-2 justify-center"

@@ -1,5 +1,24 @@
 # Portfolio Design System
 
+> 이 문서는 구현의 단일 기준입니다. 어드민의 `디자인 시스템` 페이지는 이 문서의 시각화이며, 규칙을 변경할 때 문서·페이지·구현을 같은 변경 단위로 갱신합니다.
+
+## 정보 구조
+
+- Public: Access gate → Hero → About → Featured projects → Work experience → Career journey → Achievements → Background → Contact/Footer
+- Projects: Selected design work → All projects archive → Project detail → Image gallery → Previous/All/Next
+- Admin: Dashboard → Portfolio content → Project archive → Access & logs → Settings → Design system
+- 모든 상세 화면은 메인으로 돌아가는 명시적 경로를 제공하고, 아카이브와 상세에는 공통 푸터를 유지합니다.
+- 화살표나 링크처럼 보이는 요소는 실제 목적지가 있을 때만 표시합니다.
+
+## UX 전역 규칙
+
+- 정렬: 모든 섹션은 공통 콘텐츠 시작선과 번호 열을 사용합니다.
+- 줄바꿈: 저장된 명시적 줄바꿈을 우선하고, 화면이 좁을 때만 자연 줄바꿈을 허용합니다.
+- 간격: 8px 배수 토큰을 사용하며 경계선과 내용 사이 상하 패딩을 동일하게 둡니다.
+- 상태: hover, focus, pressed는 색과 선으로 표현하고 요소의 위치·크기를 바꾸지 않습니다.
+- 콘텐츠: 원본 데이터와 순서를 보존하며 값이 없을 때만 항목을 숨깁니다.
+- 반응형 변경은 모바일 360/390, 태블릿 768/1024, 데스크톱 1280/1440에서 검증합니다.
+
 ## 방향
 
 현재 기본 방문자 화면은 `Mist` 테마입니다. 목표는 장식적인 웹 카드 모음이 아니라 흰 종이에 정리된 포트폴리오 인쇄물에 가까운 화면입니다. 콘텐츠의 위계는 그림자나 과한 색보다 타이포그래피, 규칙선, 여백과 작은 기하학 표식으로 만듭니다.
