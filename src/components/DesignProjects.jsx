@@ -40,12 +40,11 @@ export default function DesignProjects() {
       </header>
 
       <div className="design-projects__editorial">
-        <div className="design-projects__index" role="list" aria-label="Selected design projects">
+        <div className="design-projects__index" aria-label="Selected design projects">
           {selectedProjects.map((project, index) => (
             <button
               key={project.id || project.slug}
               type="button"
-              role="listitem"
               aria-pressed={selected.id === project.id}
               onClick={() => setSelectedId(project.id)}
               className="design-projects__index-row"

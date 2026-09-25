@@ -116,7 +116,7 @@ export default function Hero() {
           <p className="admin-copy text-gray-500 max-w-[42ch]">{hero.subtitle}</p>
         </motion.div>
 
-        <motion.dl
+        <motion.ul
           initial={reduceMotion ? false : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.7 }}
@@ -124,12 +124,14 @@ export default function Hero() {
           aria-label="Portfolio highlights"
         >
           {statItems.map((stat) => (
-            <button key={`${stat.label}-${stat.num}`} type="button" onClick={() => scrollTo(stat.link || 'projects')}>
-              <dd>{stat.num}</dd>
-              <dt>{stat.label}</dt>
-            </button>
+            <li key={`${stat.label}-${stat.num}`}>
+              <button type="button" onClick={() => scrollTo(stat.link || 'projects')}>
+                <span className="mist-hero-stat-value">{stat.num}</span>
+                <span className="mist-hero-stat-label">{stat.label}</span>
+              </button>
+            </li>
           ))}
-        </motion.dl>
+        </motion.ul>
       </div>
 
     </section>

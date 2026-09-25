@@ -35,3 +35,21 @@ test('client error endpoint rejects reports without a message', async () => {
   assert.equal(res.statusCode, 400)
   assert.deepEqual(res.body, { error: 'invalid-request' })
 })
+
+test('health endpoint reports degraded when server credentials are absent', async () => {
+  const oldAccount = process.env.FIREBASE_SERVICE_ACCOUNT
+  delete process.env.FIREBASE_SERVICE_ACCOUNT
+  const res = response()
+
+  try {
+    await healthHandler({ method: 'GET', headers: {} }, res)
+    assert.equal(res.statusCode, 503)
+    assert.equal(res.headers['Cache-Control'], 'no-store')
+    assert.equal(res.body.status, 'degraded')
+    assert.deepEqual(res.body.checks, { firebase: false, rateLimitStore: false })
+    assert.equal(typeof res.body.latencyMs, 'number')
+  } finally {
+    if (oldAccount === undefined) delete process.env.FIREBASE_SERVICE_ACCOUNT
+    else process.env.FIREBASE_SERVICE_ACCOUNT = oldAccount
+  }
+})

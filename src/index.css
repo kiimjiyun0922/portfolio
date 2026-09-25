@@ -255,7 +255,7 @@ body {
 }
 [data-theme="mist"] .t-gate .gate-contact > p:last-child {
   grid-column: 1 / -1;
-  color: #777870;
+  color: #686963;
 }
 [data-theme="mist"] .t-gate input:focus,
 [data-theme="mist"] .t-gate input:focus-visible {
@@ -488,7 +488,8 @@ body {
   color: #60615c;
   text-align: left;
 }
-[data-theme="mist"] .mist-hero-stats > * {
+[data-theme="mist"] .mist-hero-stats > li { list-style: none; }
+[data-theme="mist"] .mist-hero-stats > li > button {
   position: relative;
   display: grid;
   grid-template-columns: 24px minmax(0, 1fr) 28px;
@@ -502,7 +503,7 @@ body {
   text-align: inherit;
   cursor: pointer;
 }
-[data-theme="mist"] .mist-hero-stats > *::before {
+[data-theme="mist"] .mist-hero-stats > li > button::before {
   position: static;
   grid-column: 1;
   grid-row: 1;
@@ -513,10 +514,10 @@ body {
   line-height: 1;
   letter-spacing: .08em;
 }
-[data-theme="mist"] .mist-hero-stats > :nth-child(1)::before { content: '01'; }
-[data-theme="mist"] .mist-hero-stats > :nth-child(2)::before { content: '02'; }
-[data-theme="mist"] .mist-hero-stats > :nth-child(3)::before { content: '03'; }
-[data-theme="mist"] .mist-hero-stats dd {
+[data-theme="mist"] .mist-hero-stats > :nth-child(1) > button::before { content: '01'; }
+[data-theme="mist"] .mist-hero-stats > :nth-child(2) > button::before { content: '02'; }
+[data-theme="mist"] .mist-hero-stats > :nth-child(3) > button::before { content: '03'; }
+[data-theme="mist"] .mist-hero-stat-value {
   grid-column: 3;
   grid-row: 1;
   justify-self: end;
@@ -528,7 +529,7 @@ body {
   font-weight: 600;
   letter-spacing: 0;
 }
-[data-theme="mist"] .mist-hero-stats dt {
+[data-theme="mist"] .mist-hero-stat-label {
   grid-column: 2;
   grid-row: 1;
   display: flex;
@@ -541,7 +542,7 @@ body {
   text-transform: uppercase;
   white-space: nowrap;
 }
-[data-theme="mist"] .mist-hero-stats dt::after {
+[data-theme="mist"] .mist-hero-stat-label::after {
   content: '';
   flex: 1;
   min-width: 18px;
@@ -563,9 +564,9 @@ body {
     width: min(300px, calc(100% - 40px));
     margin-left: auto;
   }
-  [data-theme="mist"] .mist-hero-stats > * { min-height: 0; padding: 6px 0 5px; }
-  [data-theme="mist"] .mist-hero-stats dd { font-size: 12px; }
-  [data-theme="mist"] .mist-hero-stats dt { font-size: 12px; }
+  [data-theme="mist"] .mist-hero-stats > li > button { min-height: 0; padding: 6px 0 5px; }
+  [data-theme="mist"] .mist-hero-stat-value { font-size: 12px; }
+  [data-theme="mist"] .mist-hero-stat-label { font-size: 12px; }
 }
 
 @media (min-width: 768px) and (max-width: 1179px) {

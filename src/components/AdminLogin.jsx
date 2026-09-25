@@ -71,7 +71,7 @@ export default function AdminLogin() {
         </div>
 
         <div className="text-center mt-4">
-          <a href="#" className="text-gray-500 hover:text-gray-300 text-xs">
+          <a href="#" className="text-gray-400 hover:text-gray-200 text-xs">
             ← 포트폴리오로 돌아가기
           </a>
         </div>
