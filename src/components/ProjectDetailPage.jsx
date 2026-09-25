@@ -58,7 +58,6 @@ export default function ProjectDetailPage({ slug }) {
 
       {project.brief && (
         <section className="project-detail-brief">
-          <span>00</span>
           <h2>Brief</h2>
           <MarkdownRenderer content={project.brief} />
         </section>
