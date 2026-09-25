@@ -31,6 +31,7 @@ export default function ProjectDetailPage({ slug }) {
   const previous = projects[(projectIndex - 1 + projects.length) % projects.length]
   const next = projects[(projectIndex + 1) % projects.length]
   const gallery = project.gallery || []
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
   return (
     <main className="portfolio-subpage project-detail-page">
@@ -55,7 +56,13 @@ export default function ProjectDetailPage({ slug }) {
         {project.duration && <div><dt>Duration</dt><dd>{project.duration}</dd></div>}
       </dl>
 
-      {project.brief && <section className="project-detail-brief"><h2>Brief</h2><MarkdownRenderer content={project.brief} /></section>}
+      {project.brief && (
+        <section className="project-detail-brief">
+          <span>00</span>
+          <h2>Brief</h2>
+          <MarkdownRenderer content={project.brief} />
+        </section>
+      )}
 
       <div className="project-detail-story">
         {CASE_SECTIONS.map(([number, label, key]) => project[key] ? (
@@ -83,7 +90,15 @@ export default function ProjectDetailPage({ slug }) {
         <a href="/projects" onClick={(event) => handleInternalNavigation(event, '/projects')}><span>All projects</span></a>
         {projects.length > 1 && <a href={`/projects/${next.slug}`} onClick={(event) => handleInternalNavigation(event, `/projects/${next.slug}`)}><span>Next</span><strong>{next.title}</strong></a>}
       </nav>
+
+      <footer className="project-detail-footer">
+        <a href="/" onClick={(event) => handleInternalNavigation(event, '/')}>
+          <span>Return</span>
+          <strong>Back to portfolio</strong>
+        </a>
+        <a href="/projects" onClick={(event) => handleInternalNavigation(event, '/projects')}>Design archive</a>
+        <button type="button" onClick={scrollToTop}>Back to top <span aria-hidden="true">↑</span></button>
+      </footer>
     </main>
   )
 }
-
