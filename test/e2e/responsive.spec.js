@@ -86,6 +86,20 @@ for (const width of [768, 1024, 1280]) {
   })
 }
 
+for (const width of [390, 1024]) {
+  test(`project detail inherits navigation and footer at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 })
+    await page.goto('/projects/sample-noma-launch?preview')
+    const close = page.getByRole('link', { name: 'Close project and return to portfolio' })
+    await expect(close).toBeVisible()
+    await expect(close).toHaveAttribute('href', '/')
+    await expect(page.locator('.notebook-footer')).toBeAttached()
+    const box = await close.boundingBox()
+    expect(box.width).toBeGreaterThanOrEqual(44)
+    expect(box.height).toBeGreaterThanOrEqual(44)
+  })
+}
+
 for (const viewport of viewports) {
   test(`portfolio spacing follows the responsive contract at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport)

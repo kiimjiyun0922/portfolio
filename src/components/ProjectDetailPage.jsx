@@ -1,4 +1,5 @@
 import MarkdownRenderer from './ui/MarkdownRenderer'
+import Contact from './Contact'
 import { loadProjects } from '../data/projects'
 import { handleInternalNavigation } from '../utils/navigation'
 import { ProjectVisual } from './DesignProjects'
@@ -31,10 +32,17 @@ export default function ProjectDetailPage({ slug }) {
   const previous = projects[(projectIndex - 1 + projects.length) % projects.length]
   const next = projects[(projectIndex + 1) % projects.length]
   const gallery = project.gallery || []
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
-
   return (
-    <main className="portfolio-subpage project-detail-page">
+    <>
+      <main className="portfolio-subpage project-detail-page">
+      <a
+        className="project-detail-close"
+        href="/"
+        aria-label="Close project and return to portfolio"
+        onClick={(event) => handleInternalNavigation(event, '/')}
+      >
+        <span aria-hidden="true" />
+      </a>
       <nav className="portfolio-subpage__nav" aria-label="Page navigation">
         <a href="/" onClick={(event) => handleInternalNavigation(event, '/')}>Portfolio</a>
         <a href="/projects" onClick={(event) => handleInternalNavigation(event, '/projects')}>Design archive</a>
@@ -90,14 +98,8 @@ export default function ProjectDetailPage({ slug }) {
         {projects.length > 1 && <a href={`/projects/${next.slug}`} onClick={(event) => handleInternalNavigation(event, `/projects/${next.slug}`)}><span>Next</span><strong>{next.title}</strong></a>}
       </nav>
 
-      <footer className="project-detail-footer">
-        <a href="/" onClick={(event) => handleInternalNavigation(event, '/')}>
-          <span>Return</span>
-          <strong>Back to portfolio</strong>
-        </a>
-        <a href="/projects" onClick={(event) => handleInternalNavigation(event, '/projects')}>Design archive</a>
-        <button type="button" onClick={scrollToTop}>Back to top <span aria-hidden="true">↑</span></button>
-      </footer>
-    </main>
+      </main>
+      <Contact />
+    </>
   )
 }
