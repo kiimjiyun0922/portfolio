@@ -44,6 +44,9 @@ for (const viewport of viewports) {
       const stats = document.querySelector('.mist-hero-stats')
       const statButtons = [...stats.querySelectorAll('button')]
       const valueRights = statButtons.map((button) => button.querySelector('.mist-hero-stat-value').getBoundingClientRect().right)
+      const heroTitle = document.querySelector('.mist-hero-title span')
+      const heroHeadline = document.querySelector('.mist-hero-intro h1')
+      const heroRole = document.querySelector('.mist-hero-role')
 
       return {
         sectionPadding: Number.parseFloat(sectionStyle.paddingTop),
@@ -52,6 +55,9 @@ for (const viewport of viewports) {
         statButtonWidths: statButtons.map((button) => button.getBoundingClientRect().width),
         valueRights,
         cursorDisplay: getComputedStyle(document.querySelector('.notebook-cursor')).display,
+        heroTitleSize: Number.parseFloat(getComputedStyle(heroTitle).fontSize),
+        heroHeadlineSize: Number.parseFloat(getComputedStyle(heroHeadline).fontSize),
+        heroRoleDisplay: getComputedStyle(heroRole).display,
       }
     })
 
@@ -61,6 +67,8 @@ for (const viewport of viewports) {
     expect(metrics.titleSize).toBeGreaterThanOrEqual(isMobile ? 36 : 40)
     expect(Math.min(...metrics.statButtonWidths)).toBeGreaterThanOrEqual(metrics.statsWidth - 1)
     expect(Math.max(...metrics.valueRights) - Math.min(...metrics.valueRights)).toBeLessThanOrEqual(1)
+    expect(metrics.heroTitleSize).toBeGreaterThan(metrics.heroHeadlineSize * 1.6)
+    expect(metrics.heroRoleDisplay).toBe('none')
     if (isMobile) expect(metrics.cursorDisplay).toBe('none')
   })
 }
