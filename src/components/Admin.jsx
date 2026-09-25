@@ -85,7 +85,6 @@ const NAV_ITEMS = [
     { id: 'logs', label: '접속 로그', icon: '12' },
   ]},
   { group: '설정', items: [
-    { id: 'design-system', label: '디자인 시스템', icon: '13' },
     { id: 'taxonomy', label: '분류·선택지', icon: '13' },
     { id: 'history', label: '변경 이력', icon: '13' },
     { id: 'account', label: '관리자 계정', icon: '14' },
@@ -2387,7 +2386,6 @@ export default function Admin({ onLogout, onViewPortfolio, onPreviewTheme, onOpe
   }, [])
 
   const selectSection = (id) => {
-    if (id === 'design-system') { setMobileMenuOpen(false); onOpenDesignSystem(); return }
     setActiveSection(id)
     setMobileMenuOpen(false)
     localStorage.setItem(LAST_SECTION_KEY, id)

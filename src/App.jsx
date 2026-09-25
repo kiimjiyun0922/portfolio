@@ -4,7 +4,7 @@ import { recordHeartbeat, trackAction, setActiveSession, loadThemeSettings, load
 import { applyTheme, THEMES } from './themes'
 
 const Admin = lazy(() => import('./components/Admin'))
-const AdminDesignSystem = lazy(() => import('./components/AdminDesignSystem'))
+const FrontDesignSystem = lazy(() => import('./components/FrontDesignSystem'))
 const AuthGate = lazy(() => import('./components/AuthGate'))
 const AdminLogin = lazy(() => import('./components/AdminLogin'))
 const Hero = lazy(() => import('./components/Hero'))
@@ -353,7 +353,7 @@ function App() {
       return <Suspense fallback={<ScreenLoader />}><AdminLogin /></Suspense>
     }
     if (adminRoute === adminSystemHash) {
-      return <Suspense fallback={<ScreenLoader />}><AdminDesignSystem onBack={() => { window.location.hash = ADMIN_PATH }} /></Suspense>
+      return <Suspense fallback={<ScreenLoader />}><FrontDesignSystem onBack={() => { window.location.hash = ADMIN_PATH }} /></Suspense>
     }
     return (
       <Suspense fallback={<ScreenLoader />}>
