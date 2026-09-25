@@ -542,6 +542,7 @@ body {
 [data-theme="mist"] .mist-hero-stats > li > button {
   position: relative;
   display: grid;
+  width: 100%;
   grid-template-columns: 24px minmax(0, 1fr) 28px;
   gap: 9px;
   align-items: baseline;
@@ -601,6 +602,8 @@ body {
 }
 
 @media (max-width: 767px) {
+  [data-theme="mist"] .notebook-cursor { display: none; }
+  [data-theme="mist"] [data-note-cursor] { cursor: auto; }
   [data-theme="mist"] .mist-hero-footer {
     right: 20px;
     bottom: 72px;
@@ -2243,6 +2246,8 @@ body {
     --section-head-gap: 22px;
     --ruled-row-space: 18px;
   }
+  [data-theme="mist"] .notebook-cursor { display: none; }
+  [data-theme="mist"] [data-note-cursor] { cursor: auto; }
   [data-theme="mist"] .section-wrap { padding-block: var(--section-inset); }
   [data-theme="mist"] .section-wrap > h2,
   [data-theme="mist"] .section-wrap > div > div:first-child h2,

@@ -41,10 +41,17 @@ for (const viewport of viewports) {
       const title = document.querySelector('#projects > h2')
       const sectionStyle = getComputedStyle(section)
       const titleStyle = getComputedStyle(title)
+      const stats = document.querySelector('.mist-hero-stats')
+      const statButtons = [...stats.querySelectorAll('button')]
+      const valueRights = statButtons.map((button) => button.querySelector('.mist-hero-stat-value').getBoundingClientRect().right)
 
       return {
         sectionPadding: Number.parseFloat(sectionStyle.paddingTop),
         titleSize: Number.parseFloat(titleStyle.fontSize),
+        statsWidth: stats.getBoundingClientRect().width,
+        statButtonWidths: statButtons.map((button) => button.getBoundingClientRect().width),
+        valueRights,
+        cursorDisplay: getComputedStyle(document.querySelector('.notebook-cursor')).display,
       }
     })
 
@@ -52,5 +59,8 @@ for (const viewport of viewports) {
     expect(metrics.sectionPadding).toBeGreaterThanOrEqual(isMobile ? 40 : 56)
     expect(metrics.sectionPadding).toBeLessThanOrEqual(isMobile ? 40 : 68)
     expect(metrics.titleSize).toBeGreaterThanOrEqual(isMobile ? 36 : 40)
+    expect(Math.min(...metrics.statButtonWidths)).toBeGreaterThanOrEqual(metrics.statsWidth - 1)
+    expect(Math.max(...metrics.valueRights) - Math.min(...metrics.valueRights)).toBeLessThanOrEqual(1)
+    if (isMobile) expect(metrics.cursorDisplay).toBe('none')
   })
 }
