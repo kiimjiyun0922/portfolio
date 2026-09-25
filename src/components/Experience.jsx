@@ -9,14 +9,14 @@ function ProjectDetail({ project }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="group">
+    <div className="experience-project group">
       <button
         onClick={() => {
           if (!open) trackAction('detail', project.title) // track expansions only — that's the interest signal
           setOpen(!open)
         }}
         data-no-global-track
-        className="w-full flex items-start gap-2.5 text-left py-2 cursor-pointer"
+        className="experience-project__toggle w-full flex items-start gap-2.5 text-left py-2 cursor-pointer"
       >
         <svg
           className={`w-3 h-3 text-gray-600 group-hover:text-accent shrink-0 mt-[3px] transition-all ${open ? 'rotate-90 text-accent' : ''}`}
@@ -37,12 +37,12 @@ function ProjectDetail({ project }) {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2, ease: 'easeInOut' }}
-            className="overflow-hidden"
+            className="experience-project__panel overflow-hidden"
           >
-            <div className="pl-4 sm:pl-[22px] pb-4 space-y-3">
+            <div className="experience-project__details pl-4 sm:pl-[22px] pb-4 space-y-3">
               {/* Summary — structured with labels */}
               {project.summary && (
-                <div className="space-y-2">
+                <div className="experience-project__summary space-y-2">
                   <div className="text-xs leading-relaxed text-gray-400">
                     <MarkdownRenderer content={project.summary} />
                   </div>
@@ -51,7 +51,7 @@ function ProjectDetail({ project }) {
 
               {/* Result — box */}
               {project.result && (
-                <div className="bg-accent/8 border border-accent/20 rounded-lg px-3 py-2.5">
+                <div className="experience-project__result bg-accent/8 border border-accent/20 rounded-lg px-3 py-2.5">
                   <p className="text-[10px] font-mono text-accent/70 uppercase tracking-wider mb-1.5">Result</p>
                   <div className="text-xs leading-relaxed text-gray-200">
                     <MarkdownRenderer content={project.result} />

@@ -11,6 +11,15 @@ export default function ProjectArchivePage() {
   return (
     <>
       <main className="portfolio-subpage project-archive-page">
+        <a
+          className="project-detail-close"
+          href="/"
+          aria-label="Close design archive and return to portfolio"
+          onClick={(event) => handleInternalNavigation(event, '/')}
+        >
+          <span>Close</span>
+          <i aria-hidden="true" />
+        </a>
         <nav className="portfolio-subpage__nav" aria-label="Page navigation">
           <a href="/" onClick={(event) => handleInternalNavigation(event, '/')}>Portfolio</a>
           <span>Design archive</span>

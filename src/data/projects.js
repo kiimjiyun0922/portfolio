@@ -13,9 +13,34 @@ const LEGACY_DESIGN_SAMPLE_IMAGE = '/assets/design-project-samples.webp'
 // 설치 직후 데모용 샘플 (sampleContent.js). 어드민 저장 후엔 Firestore가 우선.
 export const defaultProjects = sampleProjects
 
+const SAMPLE_DESIGN_PROJECTS_BY_KEY = new Map(
+  defaultProjects.designProjects.flatMap((project) => [
+    [project.id, project],
+    [project.slug, project],
+  ]),
+)
+
 function isLegacyDesignSample(project) {
   return LEGACY_DESIGN_SAMPLE_IDS.has(project?.id)
     || project?.coverImage === LEGACY_DESIGN_SAMPLE_IMAGE
+}
+
+function hydrateSampleDesignProject(project) {
+  const sample = SAMPLE_DESIGN_PROJECTS_BY_KEY.get(project?.id)
+    || SAMPLE_DESIGN_PROJECTS_BY_KEY.get(project?.slug)
+  if (!sample) return project
+
+  return {
+    ...sample,
+    ...project,
+    coverImage: project.coverImage?.trim() || sample.coverImage,
+    coverAlt: project.coverAlt?.trim() || sample.coverAlt,
+    coverPosition: project.coverPosition || sample.coverPosition,
+    coverMode: project.coverMode || sample.coverMode,
+    gallery: Array.isArray(project.gallery) && project.gallery.length > 0
+      ? project.gallery
+      : sample.gallery,
+  }
 }
 
 export function migrateDesignProjects(savedDesignProjects) {
@@ -23,10 +48,12 @@ export function migrateDesignProjects(savedDesignProjects) {
     return defaultProjects.designProjects
   }
 
-  const customProjects = savedDesignProjects.filter((project) => !isLegacyDesignSample(project))
-  const hadLegacySamples = customProjects.length !== savedDesignProjects.length
+  const retainedProjects = savedDesignProjects.filter((project) => !isLegacyDesignSample(project))
+  const customProjects = retainedProjects.map(hydrateSampleDesignProject)
+  const hadLegacySamples = retainedProjects.length !== savedDesignProjects.length
+  const hydratedSampleData = customProjects.some((project, index) => project !== retainedProjects[index])
 
-  if (!hadLegacySamples) return savedDesignProjects
+  if (!hadLegacySamples) return hydratedSampleData ? customProjects : savedDesignProjects
 
   const customIds = new Set(customProjects.flatMap((project) => [project.id, project.slug]).filter(Boolean))
   const freshSamples = defaultProjects.designProjects.filter(

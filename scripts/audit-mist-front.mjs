@@ -42,6 +42,21 @@ try {
         bodySize: size('#about .prose-dark p'),
         journeyYearSize: size('.journey-index__year'),
         heroTitleSize: size('.mist-hero-title span'),
+        fogContract: (() => {
+          const title = document.querySelector('.mist-hero-title')
+          const fog = document.querySelector('.mist-fog-layer')
+          if (!title || !fog) return null
+          const titleStyle = getComputedStyle(title)
+          const fogStyle = getComputedStyle(fog)
+          return {
+            titleZ: Number.parseInt(titleStyle.zIndex, 10) || 0,
+            fogZ: Number.parseInt(fogStyle.zIndex, 10) || 0,
+            maskLayers: (fogStyle.maskImage.match(/radial-gradient/g) || []).length,
+            filter: fogStyle.backdropFilter || fogStyle.webkitBackdropFilter || '',
+            edgeFilter: fogStyle.filter,
+            background: fogStyle.backgroundColor,
+          }
+        })(),
         heroStatOverlap: [...document.querySelectorAll('.mist-hero-stats button')].some((button) => {
           const label = button.querySelector('.mist-hero-stat-label')?.getBoundingClientRect()
           const pseudo = getComputedStyle(button, '::before')
@@ -64,6 +79,17 @@ try {
           if (!row || !index) return null
           return index.getBoundingClientRect().left - row.getBoundingClientRect().left
         })(),
+        sampleCoverLoaded: (() => {
+          const image = document.querySelector('.design-projects__feature .design-project-visual img')
+          return image ? image.complete && image.naturalWidth > 0 : false
+        })(),
+        resumeBoundary: (() => {
+          const blocks = [...document.querySelectorAll('.resume-block')]
+          if (blocks.length < 2) return null
+          const previousRow = blocks[0].querySelector('.resume-list > :last-child')?.getBoundingClientRect()
+          const nextHeading = blocks[1].querySelector('.resume-block__heading')?.getBoundingClientRect()
+          return previousRow && nextHeading ? nextHeading.top - previousRow.bottom : null
+        })(),
         mobileStatus: getComputedStyle(document.querySelector('.portfolio-mobile-status')).display,
         hiddenContent: [...document.querySelectorAll('#about > div > div, .journey-index__row, .experience-entry, .resume-block')]
           .filter((element) => Number.parseFloat(getComputedStyle(element).opacity) < .99).length,
@@ -77,12 +103,19 @@ try {
     check(metrics.bodySize === null || metrics.bodySize >= 15, `${width}px: body text is below 15px`)
     check(metrics.journeyYearSize === null || metrics.journeyYearSize <= 12.5, `${width}px: journey year is incorrectly promoted above metadata size`)
     check(metrics.heroTitleSize === null || metrics.heroTitleSize <= 120.5, `${width}px: hero title exceeds the 120px cap`)
+    check(metrics.fogContract && metrics.fogContract.fogZ > metrics.fogContract.titleZ, `${width}px: Mist fog is not layered above the hero title`)
+    check(metrics.fogContract && metrics.fogContract.maskLayers >= 3, `${width}px: Mist fog is missing its cloud mask`)
+    check(metrics.fogContract && metrics.fogContract.filter.includes('blur('), `${width}px: Mist fog has no backdrop blur`)
+    check(metrics.fogContract && metrics.fogContract.edgeFilter.includes('blur('), `${width}px: Mist fog edge is not feathered`)
     check(!metrics.heroStatOverlap, `${width}px: hero stat index overlaps its label`)
     check(!metrics.ornamentOverlap, `${width}px: a decorative mark overlaps protected content`)
     check(metrics.selectedIndexInset === null || metrics.selectedIndexInset >= 19, `${width}px: selected design index content is too close to its state marker`)
+    check(metrics.sampleCoverLoaded, `${width}px: selected sample cover is missing`)
+    check(metrics.resumeBoundary === null || Math.abs(metrics.resumeBoundary) <= 1, `${width}px: resume blocks have an arbitrary ${metrics.resumeBoundary}px gap`)
     check(metrics.mobileStatus === 'none', `${width}px: undocumented mobile status control is visible`)
     check(metrics.hiddenContent === 0, `${width}px: ${metrics.hiddenContent} content blocks remain hidden before scrolling`)
 
+    await page.screenshot({ path: `/tmp/mist-hero-${width}.png`, fullPage: false })
     await page.screenshot({ path: `/tmp/mist-front-${width}.png`, fullPage: true })
     await page.close()
   }
@@ -107,6 +140,25 @@ try {
     const footerFocus = await backToTop.evaluate((element) => getComputedStyle(element).outlineStyle)
     check(footerFocus === 'none', 'footer: mouse click leaves a focus outline')
   }
+  const experienceToggle = interactions.locator('.experience-project__toggle').first()
+  if (await experienceToggle.count()) {
+    await experienceToggle.click()
+    await interactions.locator('.experience-project__details').first().waitFor({ state: 'visible' })
+    const projectRhythm = await interactions.evaluate(() => {
+      const toggle = document.querySelector('.experience-project__toggle')?.getBoundingClientRect()
+      const summary = document.querySelector('.experience-project__summary')?.getBoundingClientRect()
+      const result = document.querySelector('.experience-project__result')?.getBoundingClientRect()
+      const toggleStyle = document.querySelector('.experience-project__toggle') ? getComputedStyle(document.querySelector('.experience-project__toggle')) : null
+      return {
+        summaryGap: toggle && summary ? summary.top - toggle.bottom : null,
+        resultGap: summary && result ? result.top - summary.bottom : null,
+        toggleBorder: toggleStyle?.borderBottomWidth,
+      }
+    })
+    check(projectRhythm.toggleBorder === '0px', 'experience project: divider incorrectly separates title from its summary')
+    check(projectRhythm.summaryGap !== null && projectRhythm.summaryGap >= 7 && projectRhythm.summaryGap <= 10, `experience project: title-summary gap is ${projectRhythm.summaryGap}px`)
+    check(projectRhythm.resultGap !== null && projectRhythm.resultGap >= 15 && projectRhythm.resultGap <= 18, `experience project: summary-result gap is ${projectRhythm.resultGap}px`)
+  }
   await interactions.close()
 
   const detail = await browser.newPage({ viewport: { width: 390, height: 844 } })
@@ -116,6 +168,7 @@ try {
     overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
     closeHeight: document.querySelector('.project-detail-close')?.getBoundingClientRect().height,
     footer: Boolean(document.querySelector('.notebook-footer')),
+    briefSize: Number.parseFloat(getComputedStyle(document.querySelector('.project-detail-brief > div')).fontSize),
     firstStoryColumns: getComputedStyle(document.querySelector('.project-detail-story section')).gridTemplateColumns.split(' ').length,
     galleryRatio: (() => {
       const element = document.querySelector('.project-detail-gallery__stage, .project-detail-gallery img')
@@ -127,10 +180,50 @@ try {
   check(detailState.overflow <= 1, `detail mobile: horizontal overflow ${detailState.overflow}px`)
   check(detailState.closeHeight >= 44, 'detail mobile: close target is below 44px')
   check(detailState.footer, 'detail mobile: common footer is missing')
+  check(detailState.briefSize <= 17, `detail mobile: brief is oversized at ${detailState.briefSize}px`)
   check(detailState.firstStoryColumns === 1, 'detail mobile: story row did not collapse to one readable column')
   check(detailState.galleryRatio === null || Math.abs(detailState.galleryRatio - 1.5) < .08, 'detail mobile: gallery is not locked to 3:2')
   await detail.screenshot({ path: '/tmp/mist-detail-390.png', fullPage: true })
   await detail.close()
+
+  const detailDesktop = await browser.newPage({ viewport: { width: 1440, height: 900 } })
+  await detailDesktop.goto(`${baseUrl}/projects/sample-noma-launch?preview`, { waitUntil: 'domcontentloaded' })
+  await detailDesktop.locator('.project-detail-brief').waitFor({ state: 'visible' })
+  const detailDesktopState = await detailDesktop.evaluate(() => {
+    const brief = document.querySelector('.project-detail-brief > div')
+    const story = document.querySelector('.project-detail-story section > div')
+    const line = document.querySelector('.project-detail-story section')
+    return {
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      briefSize: Number.parseFloat(getComputedStyle(brief).fontSize),
+      briefWidth: brief.getBoundingClientRect().width,
+      storyWidth: story.getBoundingClientRect().width,
+      lineWidth: Number.parseFloat(getComputedStyle(line).borderBottomWidth),
+    }
+  })
+  check(detailDesktopState.overflow <= 1, `detail desktop: horizontal overflow ${detailDesktopState.overflow}px`)
+  check(detailDesktopState.briefSize <= 17, `detail desktop: brief is oversized at ${detailDesktopState.briefSize}px`)
+  check(detailDesktopState.briefWidth <= 760, `detail desktop: brief reading width is ${detailDesktopState.briefWidth}px`)
+  check(detailDesktopState.storyWidth <= 760, `detail desktop: story reading width is ${detailDesktopState.storyWidth}px`)
+  check(detailDesktopState.lineWidth === 1, `detail desktop: story divider is ${detailDesktopState.lineWidth}px`)
+  await detailDesktop.screenshot({ path: '/tmp/mist-detail-1440.png', fullPage: true })
+  await detailDesktop.close()
+
+  const archive = await browser.newPage({ viewport: { width: 1440, height: 900 } })
+  await archive.goto(`${baseUrl}/projects?preview`, { waitUntil: 'domcontentloaded' })
+  await archive.locator('.project-archive-page').waitFor({ state: 'visible' })
+  await archive.locator('.project-archive-card img').first().waitFor({ state: 'visible' })
+  const archiveState = await archive.evaluate(() => ({
+    closeHeight: document.querySelector('.project-detail-close')?.getBoundingClientRect().height || 0,
+    loadedImages: [...document.querySelectorAll('.project-archive-card img')].every((image) => image.complete && image.naturalWidth > 0),
+  }))
+  check(archiveState.closeHeight >= 44, 'archive: close target is missing or below 44px')
+  check(archiveState.loadedImages, 'archive: one or more sample covers are missing')
+  await archive.evaluate(() => window.scrollTo(0, 1000))
+  await archive.waitForTimeout(300)
+  check(await archive.locator('.notebook-top-button').isVisible(), 'archive: floating Top is missing after scrolling')
+  await archive.screenshot({ path: '/tmp/mist-archive-1440.png', fullPage: true })
+  await archive.close()
 
   for (const width of [390, 768, 1440]) {
     const gate = await browser.newPage({ viewport: { width, height: width < 768 ? 844 : 900 } })

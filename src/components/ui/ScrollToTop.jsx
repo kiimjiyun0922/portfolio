@@ -4,11 +4,20 @@ import { motion, AnimatePresence } from 'framer-motion'
 export default function ScrollToTop() {
   const [homeVisible, setHomeVisible] = useState(true)
   const [footerVisible, setFooterVisible] = useState(false)
+  const [hasHome, setHasHome] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
     const home = document.getElementById('home')
     const footer = document.getElementById('contact')
-    if (!home || !footer) return undefined
+
+    const updateScrolled = () => setScrolled(window.scrollY > Math.max(240, window.innerHeight * .6))
+    const initialFrame = window.requestAnimationFrame(() => {
+      setHasHome(Boolean(home))
+      setHomeVisible(Boolean(home))
+      updateScrolled()
+    })
+    window.addEventListener('scroll', updateScrolled, { passive: true })
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -17,12 +26,16 @@ export default function ScrollToTop() {
       })
     }, { threshold: 0.05 })
 
-    observer.observe(home)
-    observer.observe(footer)
-    return () => observer.disconnect()
+    if (home) observer.observe(home)
+    if (footer) observer.observe(footer)
+    return () => {
+      window.cancelAnimationFrame(initialFrame)
+      observer.disconnect()
+      window.removeEventListener('scroll', updateScrolled)
+    }
   }, [])
 
-  const show = !homeVisible && !footerVisible
+  const show = (hasHome ? !homeVisible : scrolled) && !footerVisible
 
   return (
     <AnimatePresence>

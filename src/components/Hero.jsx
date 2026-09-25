@@ -10,7 +10,11 @@ export default function Hero() {
   const reduceMotion = useReducedMotion()
   const focusX = useMotionValue(50)
   const focusY = useMotionValue(48)
-  const fogMask = useMotionTemplate`radial-gradient(circle clamp(96px, 24vw, 220px) at ${focusX}% ${focusY}%, transparent 0%, rgba(0,0,0,.05) 20%, rgba(0,0,0,.18) 42%, rgba(0,0,0,.48) 68%, rgba(0,0,0,.82) 88%, black 100%)`
+  const fogMask = useMotionTemplate`
+    radial-gradient(ellipse clamp(82px, 12vw, 160px) clamp(66px, 9vw, 120px) at calc(${focusX}% - 7%) calc(${focusY}% + 2%), transparent 0 20%, rgba(0,0,0,.02) 38%, rgba(0,0,0,.1) 58%, rgba(0,0,0,.32) 78%, rgba(0,0,0,.7) 94%, black 100%),
+    radial-gradient(ellipse clamp(94px, 14vw, 184px) clamp(74px, 10vw, 132px) at ${focusX}% calc(${focusY}% - 2%), transparent 0 22%, rgba(0,0,0,.02) 40%, rgba(0,0,0,.1) 60%, rgba(0,0,0,.32) 80%, rgba(0,0,0,.7) 94%, black 100%),
+    radial-gradient(ellipse clamp(78px, 11vw, 150px) clamp(70px, 9vw, 116px) at calc(${focusX}% + 8%) calc(${focusY}% + 3%), transparent 0 18%, rgba(0,0,0,.02) 36%, rgba(0,0,0,.1) 58%, rgba(0,0,0,.32) 78%, rgba(0,0,0,.7) 94%, black 100%)
+  `
 
   const workYears = (() => {
     const work = resume.work?.filter((item) => item.company && item.period) || []
@@ -103,7 +107,12 @@ export default function Hero() {
       <motion.div
         aria-hidden="true"
         className="mist-fog-layer absolute inset-0 pointer-events-none"
-        style={{ maskImage: fogMask, WebkitMaskImage: fogMask }}
+        style={{
+          maskImage: fogMask,
+          maskComposite: 'intersect',
+          WebkitMaskImage: fogMask,
+          WebkitMaskComposite: 'source-in',
+        }}
       />
 
       <div className="mist-hero-footer">

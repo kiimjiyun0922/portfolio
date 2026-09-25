@@ -144,10 +144,10 @@ function App() {
   const renderPortfolio = () => {
     const detailMatch = routePath.match(/^\/projects\/([^/]+)\/?$/)
     if (detailMatch) {
-      return <ProjectDetailPage slug={decodeURIComponent(detailMatch[1])} />
+      return <><ProjectDetailPage slug={decodeURIComponent(detailMatch[1])} /><ScrollToTop /></>
     }
     if (routePath === '/projects' || routePath === '/projects/') {
-      return <ProjectArchivePage />
+      return <><ProjectArchivePage /><ScrollToTop /></>
     }
     return (
       <>

@@ -2,21 +2,33 @@ import { useMemo, useState } from 'react'
 import { loadProjects } from '../data/projects'
 import { handleInternalNavigation } from '../utils/navigation'
 
+function projectKey(project) {
+  return project?.id || project?.slug || project?.title
+}
+
 function ProjectVisual({ project, className = '' }) {
-  if (!project.coverImage) {
+  const [failedUrl, setFailedUrl] = useState('')
+  const imageUrl = project?.coverImage?.trim() || ''
+
+  if (!imageUrl || failedUrl === imageUrl) {
     return <div className={`design-project-visual design-project-visual--empty ${className}`}><span>Image pending</span></div>
   }
   return (
-    <div
+    <figure
       className={`design-project-visual ${className}`}
-      role="img"
-      aria-label={project.coverAlt || `${project.title} cover`}
-      style={{
-        backgroundImage: `url(${project.coverImage})`,
-        backgroundPosition: project.coverPosition || '50% 50%',
-        backgroundSize: project.coverMode === 'sheet' ? '200% 200%' : 'cover',
-      }}
-    />
+    >
+      <img
+        src={imageUrl}
+        alt={project.coverAlt?.trim() || `${project.title || 'Project'} cover`}
+        loading="eager"
+        decoding="async"
+        onError={() => setFailedUrl(imageUrl)}
+        style={{
+          objectPosition: project.coverPosition || '50% 50%',
+          objectFit: project.coverMode === 'sheet' ? 'contain' : 'cover',
+        }}
+      />
+    </figure>
   )
 }
 
@@ -25,8 +37,8 @@ export default function DesignProjects() {
   const projects = useMemo(() => (data.designProjects || []).filter((project) => project.published), [data])
   const featured = projects.filter((project) => project.featured)
   const selectedProjects = featured.length ? featured : projects.slice(0, 3)
-  const [selectedId, setSelectedId] = useState(selectedProjects[0]?.id)
-  const selected = selectedProjects.find((project) => project.id === selectedId) || selectedProjects[0]
+  const [selectedId, setSelectedId] = useState(projectKey(selectedProjects[0]))
+  const selected = selectedProjects.find((project) => projectKey(project) === selectedId) || selectedProjects[0]
   const archive = data.designArchive || {}
   const showArchive = projects.length >= Math.max(1, Number(archive.archiveThreshold) || 4)
 
@@ -45,8 +57,9 @@ export default function DesignProjects() {
             <button
               key={project.id || project.slug}
               type="button"
-              aria-pressed={selected.id === project.id}
-              onClick={() => setSelectedId(project.id)}
+              aria-pressed={projectKey(selected) === projectKey(project)}
+              aria-current={projectKey(selected) === projectKey(project) ? 'true' : undefined}
+              onClick={() => setSelectedId(projectKey(project))}
               className="design-projects__index-row"
             >
               <span>{String(index + 1).padStart(2, '0')}</span>
