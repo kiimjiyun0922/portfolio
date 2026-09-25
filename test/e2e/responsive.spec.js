@@ -65,6 +65,27 @@ for (const width of [390, 1024, 1280]) {
   })
 }
 
+for (const width of [768, 1024, 1280]) {
+  test(`project title stays intentional at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 })
+    await page.goto('/projects/sample-pulse-festival?preview')
+    const title = page.locator('.project-detail-hero__copy h1')
+    await expect(title).toBeVisible()
+    const metrics = await title.evaluate((element) => {
+      const style = getComputedStyle(element)
+      return {
+        height: element.getBoundingClientRect().height,
+        lineHeight: Number.parseFloat(style.lineHeight),
+        documentWidth: document.documentElement.scrollWidth,
+        viewportWidth: document.documentElement.clientWidth,
+      }
+    })
+
+    expect(metrics.height).toBeLessThanOrEqual(metrics.lineHeight * 1.15)
+    expect(metrics.documentWidth).toBeLessThanOrEqual(metrics.viewportWidth)
+  })
+}
+
 for (const viewport of viewports) {
   test(`portfolio spacing follows the responsive contract at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport)
