@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+  <rect width="1440" height="900" fill="#f7f6f1"/>
+  <g fill="#292824" font-family="Arial, sans-serif">
+    <text x="56" y="54" font-size="13" letter-spacing="4">OPTION C / DUAL ARCHIVE</text>
+    <text x="56" y="105" font-family="Georgia, serif" font-size="44">One portfolio, two practices</text>
+    <text x="56" y="134" font-size="13" fill="#69675f">A clear switch preserves the current PM cases and opens a visual design archive</text>
+  </g>
+  <line x1="56" y1="165" x2="1384" y2="165" stroke="#aaa79e"/>
+  <g font-family="Arial, sans-serif">
+    <rect x="56" y="194" width="218" height="48" fill="#292824"/>
+    <text x="83" y="224" fill="#f7f6f1" font-size="12" letter-spacing="2">PRODUCT STRATEGY</text>
+    <rect x="274" y="194" width="218" height="48" fill="none" stroke="#aaa79e"/>
+    <text x="318" y="224" fill="#292824" font-size="12" letter-spacing="2">VISUAL DESIGN</text>
+  </g>
+  <g font-family="Arial, sans-serif" fill="#292824">
+    <text x="56" y="302" font-size="11" letter-spacing="2">CURRENT FORMAT / KEPT INTACT</text>
+    <text x="56" y="352" font-family="Georgia, serif" font-size="30">LLM customer assistant</text>
+    <text x="56" y="385" font-size="14">Problem → Solution → Collaboration → Result</text>
+    <line x1="56" y1="420" x2="686" y2="420" stroke="#bcb9b0"/>
+    <text x="56" y="463" font-size="24">−42%</text><text x="178" y="463" font-size="24">4.6</text><text x="270" y="463" font-size="24">9 weeks</text>
+    <text x="56" y="496" font-size="12" fill="#69675f">Current data-rich PM case remains exactly where users expect it.</text>
+  </g>
+  <line x1="720" y1="278" x2="720" y2="706" stroke="#aaa79e"/>
+  <g font-family="Arial, sans-serif" fill="#292824">
+    <text x="758" y="302" font-size="11" letter-spacing="2">VISUAL DESIGN PREVIEW</text>
+  </g>
+  <rect x="758" y="328" width="290" height="205" fill="#b9c6c9"/>
+  <rect x="1068" y="328" width="316" height="205" fill="#d2c2b4"/>
+  <rect x="758" y="553" width="626" height="153" fill="#d9d6cc"/>
+  <g fill="#292824" font-family="Arial, sans-serif">
+    <text x="778" y="581" font-size="11" letter-spacing="2">01 / IDENTITY</text>
+    <text x="778" y="621" font-family="Georgia, serif" font-size="26">Atlas brand system</text>
+    <text x="778" y="653" font-size="13">Image, short description and role. Open a dedicated case page.</text>
+    <text x="1245" y="675" font-size="12">VIEW ↗</text>
+  </g>
+  <rect x="56" y="760" width="1328" height="100" fill="#eee4aa"/>
+  <text x="76" y="802" font-family="Arial, sans-serif" font-size="12" letter-spacing="2" fill="#292824">SHARED DETAIL TEMPLATE</text>
+  <text x="76" y="833" font-family="Georgia, serif" font-size="20" fill="#292824">Each practice keeps its own index, while every project uses a consistent subpage shell.</text>
+</svg>
