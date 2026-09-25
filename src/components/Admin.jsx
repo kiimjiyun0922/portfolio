@@ -1391,7 +1391,6 @@ function ProjectsSection() {
                       <div className="flex flex-wrap gap-5">
                         <label className="min-h-11 flex items-center gap-2 text-sm text-gray-300"><input type="checkbox" checked={!!project.published} onChange={(e) => updateDesignProject(index, { ...project, published: e.target.checked })} /> 공개</label>
                         <label className="min-h-11 flex items-center gap-2 text-sm text-gray-300"><input type="checkbox" checked={!!project.featured} onChange={(e) => updateDesignProject(index, { ...project, featured: e.target.checked })} /> 메인 추천</label>
-                        <label className="min-h-11 flex items-center gap-2 text-sm text-gray-300"><input type="checkbox" checked={project.coverMode === 'sheet'} onChange={(e) => updateDesignProject(index, { ...project, coverMode: e.target.checked ? 'sheet' : 'cover' })} /> 2×2 샘플 시트 크롭</label>
                       </div>
                     </div>
 

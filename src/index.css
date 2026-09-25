@@ -1176,14 +1176,38 @@ body {
 [data-theme="mist"] .project-detail-next strong { margin-top: 8px; font-family: var(--font-display); font-size: 20px; font-weight: 400; }
 
 @media (max-width: 767px) {
+  /* Mobile reads content immediately; desktop scroll reveals are intentionally disabled. */
+  [data-theme="mist"] #about .max-w-3xl > div,
+  [data-theme="mist"] .journey-index__item,
+  [data-theme="mist"] .experience-entry,
+  [data-theme="mist"] .resume-block {
+    opacity: 1 !important;
+    transform: none !important;
+  }
   [data-theme="mist"] .design-projects { margin-top: 72px; padding-top: 48px; }
   [data-theme="mist"] .design-projects__header { grid-template-columns: 1fr; gap: 16px; margin-bottom: 32px; }
   [data-theme="mist"] .design-projects__header h2 { font-size: clamp(40px, 12vw, 54px); }
   [data-theme="mist"] .design-projects__header p { font-size: 16px; }
   [data-theme="mist"] .design-projects__editorial { grid-template-columns: 1fr; gap: 28px; }
-  [data-theme="mist"] .design-projects__index { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; border-top: 0; border-bottom: 1px solid #aaa79e; }
-  [data-theme="mist"] .design-projects__index-row { min-width: 76%; min-height: 72px; scroll-snap-align: start; border-top: 1px solid #aaa79e; border-bottom: 0; }
-  [data-theme="mist"] .design-project-visual { min-height: min(92vw, 460px); }
+  [data-theme="mist"] .design-projects__index {
+    display: grid;
+    overflow: visible;
+    border-top: 1px solid #8d8a80;
+    border-bottom: 0;
+  }
+  [data-theme="mist"] .design-projects__index-row {
+    width: 100%;
+    min-width: 0;
+    min-height: 64px;
+    padding-block: 10px;
+    border-top: 0;
+    border-bottom: 1px solid #aaa79e;
+  }
+  [data-theme="mist"] .design-projects__index-row strong { font-size: 16px; }
+  [data-theme="mist"] .design-project-visual {
+    min-height: 0;
+    aspect-ratio: 3 / 2;
+  }
   [data-theme="mist"] .design-projects__feature-copy { grid-template-columns: 1fr; gap: 12px; }
   [data-theme="mist"] .design-projects__feature-copy h3 { font-size: 31px; }
   [data-theme="mist"] .design-projects__feature-copy h3 + p { font-size: 16px; }
@@ -1199,11 +1223,17 @@ body {
   [data-theme="mist"] .project-archive-card,
   [data-theme="mist"] .project-archive-card:nth-child(3n + 2),
   [data-theme="mist"] .project-archive-card:nth-child(3n) { grid-column: 1; padding-top: 0; }
-  [data-theme="mist"] .project-archive-card .design-project-visual { min-height: min(92vw, 460px); }
+  [data-theme="mist"] .project-archive-card .design-project-visual { min-height: 0; aspect-ratio: 3 / 2; }
+  [data-theme="mist"] .project-archive-card__copy > span,
+  [data-theme="mist"] .project-archive-card__copy p,
+  [data-theme="mist"] .project-detail-hero__copy > p:first-child,
+  [data-theme="mist"] .project-detail-meta dt,
+  [data-theme="mist"] .project-detail-story section > span,
+  [data-theme="mist"] .project-detail-next span { font-size: 12px; }
   [data-theme="mist"] .project-detail-hero { padding: 56px 0 32px; }
   [data-theme="mist"] .project-detail-hero__copy { margin-bottom: 32px; }
   [data-theme="mist"] .project-detail-hero__copy > p:last-child { font-size: 16px; }
-  [data-theme="mist"] .project-detail-hero .design-project-visual { min-height: 82vw; }
+  [data-theme="mist"] .project-detail-hero .design-project-visual { min-height: 0; aspect-ratio: 3 / 2; }
   [data-theme="mist"] .project-detail-meta { grid-template-columns: 1fr; }
   [data-theme="mist"] .project-detail-meta > div { min-height: auto; padding: 18px 0; border-right: 0; border-bottom: 1px solid #cfccc3; }
   [data-theme="mist"] .project-detail-meta > div:last-child { border-bottom: 0; }
@@ -1211,7 +1241,7 @@ body {
   [data-theme="mist"] .project-detail-brief > div { font-size: 17px; }
   [data-theme="mist"] .project-detail-story section { grid-template-columns: 42px 1fr; gap: 10px 20px; padding: 48px 0; }
   [data-theme="mist"] .project-detail-story h2 { font-size: 25px; }
-  [data-theme="mist"] .project-detail-story section > div { grid-column: 2; font-size: 16px; }
+  [data-theme="mist"] .project-detail-story section > div { grid-column: 1 / -1; font-size: 16px; }
   [data-theme="mist"] .project-detail-gallery { grid-template-columns: 1fr; gap: 44px; padding: 56px 0; }
   [data-theme="mist"] .project-detail-gallery figure:nth-child(3n) { grid-column: 1; }
   [data-theme="mist"] .project-detail-next { grid-template-columns: 1fr; }
