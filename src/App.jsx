@@ -17,6 +17,8 @@ const Contact = lazy(() => import('./components/Contact'))
 const ScrollToTop = lazy(() => import('./components/ui/ScrollToTop'))
 const PortfolioRail = lazy(() => import('./components/PortfolioRail'))
 const NotebookCursor = lazy(() => import('./components/NotebookCursor'))
+const ProjectArchivePage = lazy(() => import('./components/ProjectArchivePage'))
+const ProjectDetailPage = lazy(() => import('./components/ProjectDetailPage'))
 
 function ScreenLoader() {
   return (
@@ -128,6 +130,37 @@ function App() {
   // Admin theme preview: { view: 'site' | 'gate', theme } — renders the real
   // visitor screens under the chosen theme without leaving the admin session
   const [themePreview, setThemePreview] = useState(null)
+  const [routePath, setRoutePath] = useState(window.location.pathname)
+
+  useEffect(() => {
+    const onRouteChange = () => setRoutePath(window.location.pathname)
+    window.addEventListener('popstate', onRouteChange)
+    return () => window.removeEventListener('popstate', onRouteChange)
+  }, [])
+
+  const renderPortfolio = () => {
+    const detailMatch = routePath.match(/^\/projects\/([^/]+)\/?$/)
+    if (detailMatch) {
+      return <ProjectDetailPage slug={decodeURIComponent(detailMatch[1])} />
+    }
+    if (routePath === '/projects' || routePath === '/projects/') {
+      return <ProjectArchivePage />
+    }
+    return (
+      <>
+        <Hero />
+        <About />
+        <Journey />
+        <Achievements />
+        <Projects />
+        <Experience />
+        <Resume />
+        <Contact />
+        <PortfolioRail />
+        <ScrollToTop />
+      </>
+    )
+  }
 
   useEffect(() => {
     const updateSiteTitle = () => {
@@ -284,16 +317,7 @@ function App() {
     return (
       <div className="t-page min-h-screen bg-gray-950 text-gray-100 font-sans">
         <Suspense fallback={<ScreenLoader />}>
-          <Hero />
-          <About />
-          <Journey />
-          <Achievements />
-          <Projects />
-          <Experience />
-          <Resume />
-          <Contact />
-          <PortfolioRail />
-          <ScrollToTop />
+          {renderPortfolio()}
           <NotebookCursor />
         </Suspense>
       </div>
@@ -308,16 +332,7 @@ function App() {
           <AuthGate onSuccess={() => {}} />
         ) : (
           <div className="t-page min-h-screen bg-gray-950 text-gray-100 font-sans">
-            <Hero />
-            <About />
-            <Journey />
-            <Achievements />
-            <Projects />
-            <Experience />
-            <Resume />
-            <Contact />
-            <PortfolioRail />
-            <ScrollToTop />
+            {renderPortfolio()}
             <NotebookCursor />
           </div>
         )}
@@ -365,16 +380,7 @@ function App() {
     <div className="t-page min-h-screen bg-gray-950 text-gray-100 font-sans">
       <TokenExpiryBanner expiresAt={tokenExpiresAt} />
       <Suspense fallback={<ScreenLoader />}>
-        <Hero />
-        <About />
-        <Journey />
-        <Achievements />
-        <Projects />
-        <Experience />
-        <Resume />
-        <Contact />
-        <PortfolioRail />
-        <ScrollToTop />
+        {renderPortfolio()}
         <NotebookCursor />
       </Suspense>
     </div>

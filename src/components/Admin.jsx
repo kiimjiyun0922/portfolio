@@ -1160,8 +1160,65 @@ function ProjectsSection() {
   const jumpToGroup = (gi) => document.getElementById(`proj-group-${gi}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   const moveGroup = (gi, dir) => { const j = gi + dir; if (j < 0 || j >= data.groups.length) return; setData({ ...data, groups: swap(data.groups, gi, j) }) }
   const moveProject = (gi, pi, dir) => { const group = data.groups[gi]; const j = pi + dir; if (j < 0 || j >= group.projects.length) return; const g = [...data.groups]; g[gi] = { ...group, projects: swap(group.projects, pi, j) }; setData({ ...data, groups: g }) }
+  const designProjects = data.designProjects || []
+  const updateDesignProject = (index, project) => {
+    const items = [...designProjects]
+    items[index] = project
+    setData({ ...data, designProjects: items })
+  }
+  const moveDesignProject = (index, dir) => {
+    const next = index + dir
+    if (next < 0 || next >= designProjects.length) return
+    setData({ ...data, designProjects: swap(designProjects, index, next) })
+  }
+  const addDesignProject = () => {
+    const id = `design-${Date.now()}`
+    setData({
+      ...data,
+      designProjects: [...designProjects, {
+        id,
+        slug: id,
+        title: '',
+        category: '',
+        year: '',
+        summary: '',
+        role: '',
+        client: '',
+        duration: '',
+        featured: false,
+        published: false,
+        coverImage: '',
+        coverPosition: '50% 50%',
+        coverAlt: '',
+        brief: '',
+        problem: '',
+        userFlow: '',
+        solution: '',
+        validation: '',
+        designSystem: '',
+        gallery: [],
+      }],
+    })
+  }
 
-  const handleSave = () => { saveProjects(data); flash('프로젝트 저장 완료') }
+  const handleSave = () => {
+    const publishedDesign = (data.designProjects || []).filter((project) => project.published)
+    const slugs = publishedDesign.map((project) => project.slug?.trim()).filter(Boolean)
+    if (publishedDesign.some((project) => !project.title?.trim() || !project.slug?.trim())) {
+      flash('공개 프로젝트에는 제목과 URL slug가 필요합니다')
+      return
+    }
+    if (new Set(slugs).size !== slugs.length) {
+      flash('디자인 프로젝트의 URL slug는 중복될 수 없습니다')
+      return
+    }
+    if (publishedDesign.some((project) => project.coverImage && !project.coverAlt?.trim())) {
+      flash('대표 이미지가 있는 공개 프로젝트에는 대체 텍스트가 필요합니다')
+      return
+    }
+    saveProjects(data)
+    flash('프로젝트 저장 완료')
+  }
   const handleReset = () => { if (confirm('초기화하시겠습니까?')) { resetProjects(); setData(loadProjects()); flash('초기화 완료') } }
 
   const handleImport = async (file) => {
@@ -1172,7 +1229,7 @@ function ProjectsSection() {
 
   return (
     <div>
-      <SectionHeader title="프로젝트" description="Featured Projects 섹션에 표시될 프로젝트를 관리합니다" />
+      <SectionHeader title="프로젝트" description="PM 프로젝트와 이미지 중심 디자인 케이스 스터디를 함께 관리합니다" />
       <ActionBar>
         <SaveButton onClick={handleSave} />
         <ResetButton onClick={handleReset} />
@@ -1298,7 +1355,110 @@ function ProjectsSection() {
         ))}
         <button onClick={() => setData({ ...data, groups: [...(data.groups || []), { title: '', subtitle: '', projects: [] }] })} className="px-4 py-2 border border-accent text-accent hover:bg-accent/10 text-sm rounded-lg transition-colors cursor-pointer">+ 그룹 추가</button>
       </div>
-      <FloatingJumpNav items={(data.groups || []).map((g, gi) => ({ label: g.title || `그룹 ${gi + 1}`, onClick: () => jumpToGroup(gi) }))} />
+
+      <section id="design-project-admin" className="mt-12 pt-8 border-t border-gray-700 scroll-mt-24">
+        <div className="flex flex-wrap items-end justify-between gap-3 mb-5">
+          <div>
+            <h3 className="text-lg font-semibold text-white">디자인 프로젝트 아카이브</h3>
+            <p className="text-xs text-gray-500 mt-1">메인에는 추천 작업이 표시되고, 공개 프로젝트 수가 기준 이상이면 전체 아카이브 링크가 나타납니다.</p>
+          </div>
+          <button onClick={addDesignProject} className="min-h-11 px-4 border border-accent text-accent hover:bg-accent/10 text-sm rounded-lg transition-colors cursor-pointer">+ 디자인 프로젝트 추가</button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_180px] gap-3 bg-gray-900 rounded-xl p-5 mb-5">
+          <Field label="섹션 제목" value={data.designArchive?.title || ''} onChange={(v) => setData({ ...data, designArchive: { ...(data.designArchive || {}), title: v } })} />
+          <Field label="섹션 소개" value={data.designArchive?.intro || ''} onChange={(v) => setData({ ...data, designArchive: { ...(data.designArchive || {}), intro: v } })} />
+          <Field label="아카이브 노출 기준" value={String(data.designArchive?.archiveThreshold ?? 4)} onChange={(v) => setData({ ...data, designArchive: { ...(data.designArchive || {}), archiveThreshold: Math.max(1, Number(v) || 1) } })} />
+        </div>
+
+        <div className="space-y-3">
+          {designProjects.map((project, index) => {
+            const key = `design-${index}`
+            const isOpen = expanded[key]
+            return (
+              <article key={project.id || index} className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+                <button type="button" className="w-full min-h-14 flex items-center gap-3 px-4 text-left hover:bg-gray-800/60" onClick={() => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))}>
+                  <span className="font-mono text-[10px] text-gray-500">{String(index + 1).padStart(2, '0')}</span>
+                  <span className="flex-1 min-w-0"><strong className="block text-sm text-white truncate">{project.title || '새 디자인 프로젝트'}</strong><small className="text-[11px] text-gray-500">{project.category || '분류 없음'} · {project.year || '연도 없음'}</small></span>
+                  {project.featured && <span className="text-[10px] text-accent">추천</span>}
+                  <span className={`text-gray-500 transition-transform ${isOpen ? 'rotate-90' : ''}`}>›</span>
+                </button>
+
+                {isOpen && (
+                  <div className="p-4 md:p-5 border-t border-gray-800 space-y-6">
+                    <div>
+                      <p className="text-xs font-medium text-gray-400 mb-3">공개 설정</p>
+                      <div className="flex flex-wrap gap-5">
+                        <label className="min-h-11 flex items-center gap-2 text-sm text-gray-300"><input type="checkbox" checked={!!project.published} onChange={(e) => updateDesignProject(index, { ...project, published: e.target.checked })} /> 공개</label>
+                        <label className="min-h-11 flex items-center gap-2 text-sm text-gray-300"><input type="checkbox" checked={!!project.featured} onChange={(e) => updateDesignProject(index, { ...project, featured: e.target.checked })} /> 메인 추천</label>
+                        <label className="min-h-11 flex items-center gap-2 text-sm text-gray-300"><input type="checkbox" checked={project.coverMode === 'sheet'} onChange={(e) => updateDesignProject(index, { ...project, coverMode: e.target.checked ? 'sheet' : 'cover' })} /> 2×2 샘플 시트 크롭</label>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-medium text-gray-400 mb-3">기본 정보</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <Field label="제목" value={project.title || ''} onChange={(v) => updateDesignProject(index, { ...project, title: v })} />
+                        <Field label="URL slug" value={project.slug || ''} onChange={(v) => updateDesignProject(index, { ...project, slug: v.toLowerCase().replace(/[^a-z0-9-]/g, '-') })} />
+                        <Field label="분류" value={project.category || ''} onChange={(v) => updateDesignProject(index, { ...project, category: v })} />
+                        <Field label="연도" value={project.year || ''} onChange={(v) => updateDesignProject(index, { ...project, year: v })} />
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+                        <Field label="클라이언트" value={project.client || ''} onChange={(v) => updateDesignProject(index, { ...project, client: v })} />
+                        <Field label="역할" value={project.role || ''} onChange={(v) => updateDesignProject(index, { ...project, role: v })} />
+                        <Field label="기간" value={project.duration || ''} onChange={(v) => updateDesignProject(index, { ...project, duration: v })} />
+                      </div>
+                      <Field label="목록 요약" value={project.summary || ''} onChange={(v) => updateDesignProject(index, { ...project, summary: v })} rows={2} className="mt-3" />
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-medium text-gray-400 mb-3">대표 이미지</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-[1fr_160px] gap-3">
+                        <Field label="이미지 URL" value={project.coverImage || ''} onChange={(v) => updateDesignProject(index, { ...project, coverImage: v })} />
+                        <Field label="크롭 위치" value={project.coverPosition || '50% 50%'} onChange={(v) => updateDesignProject(index, { ...project, coverPosition: v })} />
+                      </div>
+                      <Field label="대체 텍스트" value={project.coverAlt || ''} onChange={(v) => updateDesignProject(index, { ...project, coverAlt: v })} className="mt-3" />
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-medium text-gray-400 mb-3">케이스 스터디</p>
+                      <div className="space-y-3">
+                        <Field label="Brief" value={project.brief || ''} onChange={(v) => updateDesignProject(index, { ...project, brief: v })} rows={3} />
+                        <Field label="01 Problem — 문제 정의" value={project.problem || ''} onChange={(v) => updateDesignProject(index, { ...project, problem: v })} rows={3} />
+                        <Field label="02 IA / User Flow" value={project.userFlow || ''} onChange={(v) => updateDesignProject(index, { ...project, userFlow: v })} rows={3} />
+                        <Field label="03 Design Solution & Rationale" value={project.solution || ''} onChange={(v) => updateDesignProject(index, { ...project, solution: v })} rows={3} />
+                        <Field label="04 Validation — 정량·정성 검증" value={project.validation || ''} onChange={(v) => updateDesignProject(index, { ...project, validation: v })} rows={3} />
+                        <Field label="05 Design System" value={project.designSystem || ''} onChange={(v) => updateDesignProject(index, { ...project, designSystem: v })} rows={3} />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between gap-3 mb-3"><p className="text-xs font-medium text-gray-400">갤러리</p><button type="button" onClick={() => updateDesignProject(index, { ...project, gallery: [...(project.gallery || []), { url: '', alt: '', caption: '' }] })} className="min-h-11 px-3 text-xs text-accent">+ 이미지 추가</button></div>
+                      <div className="space-y-3">
+                        {(project.gallery || []).map((item, galleryIndex) => (
+                          <div key={galleryIndex} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-2 p-3 bg-gray-800/60 rounded-lg">
+                            <Field label="이미지 URL" value={item.url || ''} onChange={(v) => { const gallery = [...(project.gallery || [])]; gallery[galleryIndex] = { ...item, url: v }; updateDesignProject(index, { ...project, gallery }) }} />
+                            <Field label="대체 텍스트" value={item.alt || ''} onChange={(v) => { const gallery = [...(project.gallery || [])]; gallery[galleryIndex] = { ...item, alt: v }; updateDesignProject(index, { ...project, gallery }) }} />
+                            <Field label="캡션" value={item.caption || ''} onChange={(v) => { const gallery = [...(project.gallery || [])]; gallery[galleryIndex] = { ...item, caption: v }; updateDesignProject(index, { ...project, gallery }) }} />
+                            <button type="button" onClick={() => updateDesignProject(index, { ...project, gallery: (project.gallery || []).filter((_, i) => i !== galleryIndex) })} className="min-h-11 self-end px-3 text-xs text-red-400">삭제</button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap justify-between gap-3 pt-3 border-t border-gray-800">
+                      <div className="flex gap-2"><button type="button" disabled={index === 0} onClick={() => moveDesignProject(index, -1)} className="min-h-11 px-3 text-xs text-gray-400 disabled:text-gray-700">위로</button><button type="button" disabled={index === designProjects.length - 1} onClick={() => moveDesignProject(index, 1)} className="min-h-11 px-3 text-xs text-gray-400 disabled:text-gray-700">아래로</button></div>
+                      <button type="button" onClick={() => setData({ ...data, designProjects: designProjects.filter((_, i) => i !== index) })} className="min-h-11 px-3 text-xs text-red-400">프로젝트 삭제</button>
+                    </div>
+                  </div>
+                )}
+              </article>
+            )
+          })}
+          {designProjects.length === 0 && <div className="py-16 text-center border border-dashed border-gray-800 rounded-xl text-sm text-gray-600">디자인 프로젝트가 없습니다. 새 프로젝트를 추가해 주세요.</div>}
+        </div>
+      </section>
+      <FloatingJumpNav items={[...(data.groups || []).map((g, gi) => ({ label: g.title || `그룹 ${gi + 1}`, onClick: () => jumpToGroup(gi) })), { label: '디자인 아카이브', onClick: () => document.getElementById('design-project-admin')?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }]} />
       <Toast message={toast} />
     </div>
   )

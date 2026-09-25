@@ -4,6 +4,7 @@ import ProjectCard from './ProjectCard'
 import { loadProjects } from '../data/projects'
 import { loadResumeConfig } from '../utils/crypto'
 import NotebookOrnaments from './ui/NotebookOrnaments'
+import DesignProjects from './DesignProjects'
 
 // Map group title to experience company index
 function findExperienceId(groupTitle, work) {
@@ -36,7 +37,7 @@ export default function Projects() {
   const [data] = useState(loadProjects)
   const resume = loadResumeConfig()
   const work = resume.work || []
-  const hasContent = data.groups?.some((g) => g.projects?.some((p) => p.title))
+  const hasContent = data.groups?.some((g) => g.projects?.some((p) => p.title)) || data.designProjects?.some((p) => p.title && p.published)
 
   if (!hasContent) return null
 
@@ -83,6 +84,7 @@ export default function Projects() {
           </div>
         )})}
       </div>
+      <DesignProjects />
     </SectionWrapper>
   )
 }

@@ -21,5 +21,14 @@ export function validateProjectsImport(value) {
       }
     })
   })
+  if (value.designProjects !== undefined && !Array.isArray(value.designProjects)) throw new Error('designProjects 항목은 배열이어야 합니다')
+  ;(value.designProjects || []).forEach((project, projectIndex) => {
+    if (!object(project) || typeof project.title !== 'string' || typeof project.slug !== 'string') {
+      throw new Error(`${projectIndex + 1}번째 디자인 프로젝트에 title과 slug 문자열이 필요합니다`)
+    }
+    if (project.gallery !== undefined && !Array.isArray(project.gallery)) {
+      throw new Error(`${projectIndex + 1}번째 디자인 프로젝트의 gallery는 배열이어야 합니다`)
+    }
+  })
   return value
 }

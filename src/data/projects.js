@@ -13,7 +13,14 @@ export function loadProjects() {
       const parsed = JSON.parse(saved)
       // Validate structure: must have groups array with at least one project
       if (parsed?.groups?.length > 0 && parsed.groups.some((g) => g.projects?.some((p) => p.title))) {
-        return parsed
+        return {
+          ...defaultProjects,
+          ...parsed,
+          designArchive: { ...defaultProjects.designArchive, ...(parsed.designArchive || {}) },
+          // Existing PM data remains authoritative. The design sample is only
+          // seeded when this new collection has never been saved before.
+          designProjects: Array.isArray(parsed.designProjects) ? parsed.designProjects : defaultProjects.designProjects,
+        }
       }
     }
   } catch {
