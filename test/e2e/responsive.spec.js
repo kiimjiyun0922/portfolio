@@ -160,6 +160,12 @@ for (const width of [390, 1024]) {
 
 test('gate keeps the request hint attached to the email channel', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
+  await page.addInitScript(() => {
+    localStorage.setItem('portfolio_authgate_config', JSON.stringify({
+      contactEmail: 'portfolio@example.com',
+      contactHint: 'Request one via the email above',
+    }))
+  })
   await page.goto('/')
   const email = page.locator('.gate-contact__channel a')
   const hint = page.locator('.gate-contact__channel p')
