@@ -11,8 +11,9 @@
     "test:e2e": "playwright test",
     "audit:mist": "node scripts/audit-mist-front.mjs",
     "audit:theme-guides": "node scripts/audit-theme-guides.mjs",
+    "audit:bundle": "node scripts/audit-bundle.mjs",
     "sync:mist-guide": "node scripts/sync-mist-system-doc.mjs",
-    "check": "npm run lint && npm test && npm run build",
+    "check": "npm run lint && npm test && npm run build && npm run audit:bundle",
     "preview": "vite preview"
   },
   "dependencies": {

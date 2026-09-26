@@ -9,6 +9,7 @@
 - 디자인 규칙: [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)
 - 공개 프론트 공통 계약: [docs/FRONT_THEME_CONTRACT.md](docs/FRONT_THEME_CONTRACT.md)
 - 변경 기록: [docs/CHANGELOG.md](docs/CHANGELOG.md)
+- 운영·복구 절차: [docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md)
 
 ## 주요 기능
 
@@ -40,6 +41,7 @@ Firebase, 어드민 인증, 환경변수, 개인값 교체와 Vercel 배포 절�
 ```bash
 npm run dev       # 로컬 개발 서버
 npm run check     # 린트, 테스트, 프로덕션 빌드
+npm run audit:bundle # 초기 로딩과 대형 자산 번들 예산 검사
 npm run audit:theme-guides # 7개 테마 가이드의 8개 반응형 폭 자동 검수
 npm run build     # 프로덕션 빌드
 npm run preview   # 빌드 결과 미리보기

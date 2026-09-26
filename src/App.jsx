@@ -2,6 +2,7 @@ import { lazy, Suspense, useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { recordHeartbeat, trackAction, setActiveSession, loadThemeSettings, loadHeroConfig, ADMIN_PATH } from './utils/crypto'
 import { applyTheme, THEMES } from './themes'
+import { ADMIN_ACTIVITY_KEY, ADMIN_LOGOUT_KEY, getAdminIdleState, readAdminActivity, writeAdminActivity } from './utils/adminSession'
 
 const Admin = lazy(() => import('./components/Admin'))
 const AdminDesignSystem = lazy(() => import('./components/AdminDesignSystem'))
@@ -25,6 +26,18 @@ function ScreenLoader() {
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center">
       <div className="text-gray-500 text-sm animate-pulse">Loading...</div>
+    </div>
+  )
+}
+
+function AdminIdleBanner({ remainingMs, onContinue, onLogout }) {
+  const minutes = Math.max(1, Math.ceil(remainingMs / 60_000))
+  return (
+    <div className="fixed inset-x-0 top-0 z-[140] flex min-h-14 items-center justify-center gap-3 border-b border-amber-400/30 bg-gray-950/95 px-4 py-2 text-sm text-gray-200 backdrop-blur" role="alert">
+      <strong className="whitespace-nowrap text-amber-300">관리자 세션 만료 {minutes}분 전</strong>
+      <span className="hidden sm:inline">편집을 계속하려면 세션을 연장하세요.</span>
+      <button type="button" onClick={onContinue} className="min-h-11 rounded-lg bg-amber-300 px-4 font-semibold text-gray-950">계속 사용</button>
+      <button type="button" onClick={onLogout} className="min-h-11 rounded-lg border border-gray-600 px-4">로그아웃</button>
     </div>
   )
 }
@@ -180,6 +193,7 @@ function App() {
   // Admin auth = the owner's Google account (undefined while Firebase restores the session)
   const [adminUser, setAdminUser] = useState(undefined)
   const adminAuth = !!adminUser && adminUser.email === OWNER_EMAIL
+  const [adminIdle, setAdminIdle] = useState({ warning: false, remainingMs: 0 })
   const [cloudReady, setCloudReady] = useState(!isCloudEnabled)
   // Theme carried by the visitor's token ('' = use the admin-set default)
   const [visitorTheme, setVisitorTheme] = useState('')
@@ -251,6 +265,59 @@ function App() {
   }, [isAdmin, visitorAuth, visitorTheme, cloudReady, themePreview, adminAuth, isAdminPreviewFrame, adminPreviewTheme])
 
   useEffect(() => watchOwnerAuth((u) => setAdminUser(u ?? null)), [])
+
+  const logoutAdminSession = useCallback(() => {
+    localStorage.setItem(ADMIN_LOGOUT_KEY, String(Date.now()))
+    setAdminIdle({ warning: false, remainingMs: 0 })
+    signOutOwner()
+  }, [])
+
+  const continueAdminSession = useCallback(() => {
+    const at = writeAdminActivity()
+    setAdminIdle({ warning: false, remainingMs: getAdminIdleState(at).remainingMs })
+  }, [])
+
+  // Admin sessions are revoked after 30 minutes without an explicit user
+  // action. Activity and logout signals use storage so every open tab agrees.
+  useEffect(() => {
+    if (!adminAuth) return undefined
+    if (!readAdminActivity()) writeAdminActivity()
+    let lastWrite = 0
+    const markActivity = () => {
+      const now = Date.now()
+      if (now - lastWrite < 15_000) return
+      lastWrite = now
+      writeAdminActivity(now)
+      setAdminIdle({ warning: false, remainingMs: getAdminIdleState(now, now).remainingMs })
+    }
+    const enforce = () => {
+      const state = getAdminIdleState(readAdminActivity())
+      if (state.expired) logoutAdminSession()
+      else setAdminIdle({ warning: state.warning, remainingMs: state.remainingMs })
+    }
+    const onStorage = (event) => {
+      if (event.key === ADMIN_LOGOUT_KEY) signOutOwner()
+      if (event.key === ADMIN_ACTIVITY_KEY) enforce()
+    }
+    const events = ['pointerdown', 'keydown', 'touchstart']
+    events.forEach((name) => window.addEventListener(name, markActivity, { passive: true }))
+    window.addEventListener('storage', onStorage)
+    window.addEventListener('focus', enforce)
+    document.addEventListener('visibilitychange', enforce)
+    const interval = window.setInterval(enforce, 15_000)
+    enforce()
+    return () => {
+      events.forEach((name) => window.removeEventListener(name, markActivity))
+      window.removeEventListener('storage', onStorage)
+      window.removeEventListener('focus', enforce)
+      document.removeEventListener('visibilitychange', enforce)
+      window.clearInterval(interval)
+    }
+  }, [adminAuth, logoutAdminSession])
+
+  const adminIdleBanner = adminIdle.warning
+    ? <AdminIdleBanner remainingMs={adminIdle.remainingMs} onContinue={continueAdminSession} onLogout={logoutAdminSession} />
+    : null
 
   // Enforce token expiry on open tabs: local check every minute,
   // live revocation check (force-expire / revoke / extend) + heartbeat every 5 minutes
@@ -399,6 +466,7 @@ function App() {
     const previewSrc = `${window.location.pathname}?admin-preview=1&theme=${encodeURIComponent(themePreview.theme)}&view=${themePreview.view}`
     return (
       <>
+        {adminIdleBanner}
         <div className={`theme-preview-stage theme-preview-stage--${themePreview.width || 'desktop'}`}>
           <iframe key={previewSrc} title="방문자 테마 실제 화면" src={previewSrc} />
         </div>
@@ -416,17 +484,17 @@ function App() {
       return <Suspense fallback={<ScreenLoader />}><AdminLogin /></Suspense>
     }
     if (adminRoute === adminSystemHash) {
-      return <Suspense fallback={<ScreenLoader />}><AdminDesignSystem onBack={() => { window.location.hash = ADMIN_PATH }} /></Suspense>
+      return <>{adminIdleBanner}<Suspense fallback={<ScreenLoader />}><AdminDesignSystem onBack={() => { window.location.hash = ADMIN_PATH }} /></Suspense></>
     }
     return (
-      <Suspense fallback={<ScreenLoader />}>
+      <>{adminIdleBanner}<Suspense fallback={<ScreenLoader />}>
         <Admin
-          onLogout={() => signOutOwner()}
+          onLogout={logoutAdminSession}
           onViewPortfolio={() => { setVisitorAuth(true); window.location.hash = '' }}
           onPreviewTheme={(view, theme, width = 'desktop') => setThemePreview({ view, theme, width })}
           onOpenDesignSystem={() => { window.location.hash = `${ADMIN_PATH}-system` }}
         />
-      </Suspense>
+      </Suspense></>
     )
   }
 
