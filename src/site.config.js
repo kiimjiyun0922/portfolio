@@ -11,20 +11,21 @@
 // ════════════════════════════════════════════════════════════════
 
 const env = import.meta.env
+const runtimeOrigin = typeof window !== 'undefined' ? window.location.origin : ''
 
 export const SITE = {
   // 배포 도메인 (토큰 접속 링크·QR·PDF 각주에 사용)
-  url: env.VITE_SITE_URL || 'https://your-domain.com',
+  url: env.VITE_SITE_URL || runtimeOrigin,
 
   // 소유자 표시 이름 (PDF 헤더·파일명에 사용)
-  ownerName: env.VITE_OWNER_NAME || 'Minseo Han',
+  ownerName: env.VITE_OWNER_NAME || 'Portfolio Owner',
 
   // 어드민 콘솔에만 로그인할 수 있는 소유자 Google 계정.
   // firestore.rules의 isOwner() 이메일과 반드시 일치해야 합니다.
-  ownerEmail: env.VITE_OWNER_EMAIL || 'your-google-account@gmail.com',
+  ownerEmail: env.VITE_OWNER_EMAIL || '',
 
   // 접속 화면(AuthGate)의 토큰 요청 연락처 기본값 — 어드민에서 수정 가능
-  contactEmail: env.VITE_CONTACT_EMAIL || 'contact@your-domain.com',
+  contactEmail: env.VITE_CONTACT_EMAIL || '',
 
   // 보안 알림 이메일 (EmailJS). service를 비우면 이메일 알림이 꺼집니다.
   emailjs: {

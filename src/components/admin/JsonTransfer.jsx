@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { adminAlert } from './adminDialogService'
 
 export function ImportExportBar({ onImport, onExport, onSample, importLabel = 'JSON 가져오기', sampleLabel = '샘플 다운로드' }) {
   const fileRef = useRef(null)
@@ -7,7 +8,7 @@ export function ImportExportBar({ onImport, onExport, onSample, importLabel = 'J
       <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={async (event) => {
         const file = event.target.files?.[0]
         if (file) {
-          try { await onImport(file) } catch (error) { alert(error.message) }
+          try { await onImport(file) } catch (error) { await adminAlert(error.message, { title: 'JSON 가져오기 실패', danger: true }) }
         }
         event.target.value = ''
       }} />

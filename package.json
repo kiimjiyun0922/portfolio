@@ -9,6 +9,9 @@
     "lint": "eslint .",
     "test": "node --test test/*.test.js && vitest run test/components",
     "test:e2e": "playwright test",
+    "audit:mist": "node scripts/audit-mist-front.mjs",
+    "audit:theme-guides": "node scripts/audit-theme-guides.mjs",
+    "sync:mist-guide": "node scripts/sync-mist-system-doc.mjs",
     "check": "npm run lint && npm test && npm run build",
     "preview": "vite preview"
   },

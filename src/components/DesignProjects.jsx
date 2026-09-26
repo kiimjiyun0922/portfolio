@@ -47,12 +47,12 @@ export default function DesignProjects() {
   return (
     <section className="design-projects" aria-labelledby="design-projects-title">
       <header className="design-projects__header">
-        <h2 id="design-projects-title">{archive.title || 'Selected Design Work'}</h2>
+        <h2 id="design-projects-title">{archive.title || 'Selected Work'}</h2>
         {archive.intro && <p>{archive.intro}</p>}
       </header>
 
       <div className="design-projects__editorial">
-        <div className="design-projects__index" aria-label="Selected design projects">
+        <div className="design-projects__index" aria-label="Selected projects">
           {selectedProjects.map((project, index) => (
             <button
               key={project.id || project.slug}
@@ -87,7 +87,7 @@ export default function DesignProjects() {
 
       {showArchive && (
         <div className="design-projects__archive-link">
-          <a href="/projects" onClick={(event) => handleInternalNavigation(event, '/projects')}>View all design projects <span aria-hidden="true">↗</span></a>
+          <a href="/projects" onClick={(event) => handleInternalNavigation(event, '/projects')}>View all projects <span aria-hidden="true">↗</span></a>
           <span>{String(projects.length).padStart(2, '0')} projects</span>
         </div>
       )}

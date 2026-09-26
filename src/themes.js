@@ -6,14 +6,14 @@ export const THEMES = [
   {
     id: 'mist',
     name: 'Mist',
-    desc: '소프트 포커스 - 페일 그레이, 코럴 컬러 필드, 에디토리얼 타이포',
+    desc: '종이와 무채색 포그, 타우프 잉크의 에디토리얼 테마',
     dark: false,
-    swatch: ['#f2f2f0', '#222321', '#c84f45'],
+    swatch: ['#fbfbf8', '#292824', '#786f58'],
   },
   {
     id: 'default',
-    name: '기본',
-    desc: '다크 네이비 + Toss 블루 (현재 디자인)',
+    name: 'Midnight',
+    desc: '다크 네이비 + 클리어 블루의 제품 중심 테마',
     dark: true,
     swatch: ['#030712', '#111827', '#0064FF'],
   },

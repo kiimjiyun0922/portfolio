@@ -15,8 +15,9 @@
   --mist-taupe: #786f58;
   --mist-project: #eee1a4;
   --mist-selection: #ded7c4;
-  --mist-line: rgba(41, 40, 36, .22);
-  --mist-line-strong: rgba(41, 40, 36, .48);
+  --mist-line: rgba(41, 40, 36, .16);
+  --mist-line-strong: rgba(41, 40, 36, .34);
+  --mist-line-background: rgba(41, 40, 36, .14);
   --mist-gutter: clamp(20px, 5.55vw, 80px);
   --mist-rail: 1280px;
   --mist-section-y: clamp(72px, 8vw, 112px);
@@ -184,16 +185,16 @@
 [data-theme="mist"] .mist-fog-layer {
   inset: -20px;
   z-index: 2;
-  background: rgba(251, 251, 248, .018);
-  filter: blur(28px);
-  -webkit-backdrop-filter: blur(3px) saturate(0) contrast(.99);
-  backdrop-filter: blur(3px) saturate(0) contrast(.99);
+  background: rgba(251, 251, 248, .012);
+  filter: none;
+  -webkit-backdrop-filter: blur(3.2px) saturate(.92) contrast(.995);
+  backdrop-filter: blur(3.2px) saturate(.92) contrast(.995);
 }
 
 [data-theme="mist"] .mist-fog-layer::before,
 [data-theme="mist"] .mist-fog-layer::after {
-  background-color: transparent;
-  filter: blur(38px) grayscale(1);
+  display: none;
+  content: none;
 }
 
 [data-theme="mist"] .mist-hero-footer {
@@ -304,7 +305,8 @@
 }
 
 [data-theme="mist"] #about .about-profile--copy-only .prose-dark {
-  max-width: 62ch;
+  width: min(100%, 760px);
+  max-width: none;
 }
 
 [data-theme="mist"] #about img {
@@ -317,11 +319,31 @@
 
 [data-theme="mist"] #about .prose-dark,
 [data-theme="mist"] #about .prose-dark p {
-  max-width: 62ch;
+  max-width: 760px;
   margin: 0;
   color: var(--mist-body);
   font-size: 16px;
   line-height: 1.7;
+  word-break: keep-all;
+  text-wrap: pretty;
+}
+
+/* Floating Top is available on every public page after 35vh. React removes it
+   while the footer is visible; CSS never moves or suppresses it by viewport. */
+[data-theme="mist"] .notebook-top-button,
+[data-theme="mist"] .notebook-top-button:hover,
+[data-theme="mist"] .notebook-top-button:active {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: center;
+  min-height: 44px;
+  padding-inline: 12px;
+  transform: none !important;
+  translate: none !important;
+}
+
+[data-theme="mist"] .notebook-top-button__index {
+  display: none;
 }
 
 [data-theme="mist"] .about-skill {
@@ -384,6 +406,10 @@
 }
 
 [data-theme="mist"] .journey-index__company {
+  display: inline-flex;
+  gap: 10px;
+  align-items: baseline;
+  min-width: 0;
   color: var(--mist-ink);
   font: 700 17px/20px var(--mist-display);
 }
@@ -583,15 +609,15 @@
   margin-block-end: 0 !important;
 }
 
-[data-theme="mist"] .resume-block__heading {
+[data-theme="mist"] #resume .resume-block__heading {
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr);
   gap: 24px;
   align-items: first baseline;
   margin: 0 !important;
   padding: 20px 0;
-  border-top: 1px solid var(--mist-line);
-  border-bottom: 1px solid var(--mist-line);
+  border-top: 1px solid var(--mist-line-background);
+  border-bottom: 1px solid var(--mist-line-background);
   color: var(--mist-ink);
   font: 700 18px/24px var(--mist-display);
 }
@@ -602,23 +628,37 @@
   font: 400 12px/20px var(--mist-mono);
 }
 
-[data-theme="mist"] .resume-list {
+[data-theme="mist"] #resume .resume-list {
   gap: 0 !important;
   border-top: 0;
 }
 
-[data-theme="mist"] .resume-block + .resume-block .resume-block__heading {
+[data-theme="mist"] #resume .resume-block + .resume-block .resume-block__heading {
   border-top: 0;
 }
 
-[data-theme="mist"] :where(.resume-education__row, .resume-activity__row) {
+[data-theme="mist"] #resume :where(.resume-education__row, .resume-activity__row) {
   min-height: 0;
   margin: 0;
   padding: 20px 0;
   border: 0;
-  border-bottom: 1px solid var(--mist-line);
+  border-bottom: 1px solid var(--mist-line-background);
   border-radius: 0;
   background: transparent;
+}
+
+/* Background owns one quiet boundary system. This higher-specificity rule
+   prevents legacy final-row rules from darkening only some dividers. */
+[data-theme="mist"] #resume .resume-list > :last-child {
+  border-bottom: 1px solid var(--mist-line-background);
+}
+
+[data-theme="mist"] #resume .resume-list > :where(.resume-education__row, .resume-activity__row) {
+  padding: 20px 0;
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 1px solid var(--mist-line-background);
+  border-left: 0;
 }
 
 [data-theme="mist"] .resume-education__row {
@@ -708,6 +748,10 @@
   border-top: 1px solid var(--mist-line-strong);
 }
 
+[data-theme="mist"] #projects .project-card__sequence {
+  display: none;
+}
+
 [data-theme="mist"] #projects .projects-archive-heading {
   display: grid;
   grid-template-columns: minmax(150px, .55fr) minmax(240px, 1fr) minmax(260px, 1.1fr);
@@ -747,6 +791,58 @@
   line-height: 24px;
 }
 
+/* Project narratives are reading content, not micro metadata. */
+[data-theme="mist"] #projects .t-card > div:first-child p {
+  color: var(--mist-body);
+  font-size: 15px;
+  line-height: 24px;
+}
+
+[data-theme="mist"] #projects .project-story__nav button {
+  color: var(--mist-body);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+[data-theme="mist"] #projects .project-story__nav span {
+  color: var(--mist-body);
+  font-size: 12px;
+}
+
+[data-theme="mist"] #projects .project-story__value {
+  color: var(--mist-ink);
+  font-size: 22px;
+  line-height: 28px;
+}
+
+[data-theme="mist"] #projects .project-story__label {
+  color: var(--mist-body);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+[data-theme="mist"] #projects .project-story__copy,
+[data-theme="mist"] #projects .project-story__copy p,
+[data-theme="mist"] #projects .project-story__insight .text-\[13px\],
+[data-theme="mist"] #projects .project-story__insight p {
+  color: var(--mist-ink);
+  font-size: 16px;
+  line-height: 26px;
+}
+
+[data-theme="mist"] #projects .project-story__inner {
+  grid-column: 1 / -1;
+}
+
+[data-theme="mist"] #projects .project-story__copy,
+[data-theme="mist"] #projects .project-story__copy p {
+  width: 100%;
+  max-width: none;
+  overflow-wrap: normal;
+  word-break: keep-all;
+  text-wrap: pretty;
+}
+
 [data-theme="mist"] #projects :where(.t-card, button, a) {
   transform: none !important;
 }
@@ -758,10 +854,7 @@
 }
 
 [data-theme="mist"] .design-projects__header {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(260px, .85fr);
-  gap: 48px;
-  align-items: end;
+  display: block;
   margin-bottom: 40px;
 }
 
@@ -770,10 +863,12 @@
 }
 
 [data-theme="mist"] .design-projects__header p {
-  margin: 0 0 6px;
+  max-width: 68ch;
+  margin: 12px 0 0;
   color: var(--mist-body);
   font-size: 15px;
   line-height: 24px;
+  word-break: keep-all;
 }
 
 [data-theme="mist"] .design-projects__index-row,
@@ -830,6 +925,7 @@
   gap: 8px;
   min-height: 80px;
   padding: 16px 20px;
+  border-left: 3px solid transparent;
   background: transparent;
   box-shadow: none;
 }
@@ -840,8 +936,16 @@
 }
 
 [data-theme="mist"] .design-projects__index-row[aria-pressed="true"] {
-  box-shadow: inset 3px 0 0 var(--mist-taupe);
+  border-left-color: var(--mist-taupe);
+  box-shadow: none;
   background: rgba(41, 40, 36, .045);
+}
+
+/* Selected metadata remains visually secondary without falling below the
+   normal-text contrast floor on the active paper surface. */
+[data-theme="mist"] .design-projects__index-row[aria-pressed="true"] > span:first-child,
+[data-theme="mist"] .design-projects__index-row[aria-pressed="true"] small {
+  color: var(--mist-body);
 }
 
 [data-theme="mist"] .design-projects__index-row:focus:not(:focus-visible) {
@@ -855,7 +959,35 @@
 }
 
 [data-theme="mist"] .design-projects__index-row[aria-pressed="true"]:focus-visible {
-  box-shadow: inset 3px 0 0 var(--mist-taupe);
+  outline: 0 !important;
+  border-left-color: var(--mist-ink);
+  box-shadow: none;
+}
+
+[data-theme="mist"] .design-projects__feature-copy {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+[data-theme="mist"] .design-projects__feature-copy > div {
+  width: 100%;
+  max-width: 78ch;
+}
+
+[data-theme="mist"] .design-projects__feature-copy h3 + p {
+  max-width: 78ch;
+  color: var(--mist-ink);
+  font-size: 16px;
+  line-height: 26px;
+  overflow-wrap: normal;
+  word-break: keep-all;
+  text-wrap: balance;
+}
+
+[data-theme="mist"] .design-projects__case-link {
+  justify-self: start;
+  margin-top: 0;
 }
 
 /* Rail and ornaments are Mist-only and never cover readable content. */
@@ -885,6 +1017,10 @@
   left: 10px;
 }
 
+[data-theme="mist"] .notebook-cursor.has-label .notebook-cursor__mark {
+  display: none;
+}
+
 /* Decorative marks are restricted to section-edge safe zones. */
 [data-theme="mist"] .notebook-ornaments--projects .notebook-mark--star {
   top: 12px;
@@ -911,33 +1047,39 @@
 }
 
 [data-theme="mist"] .portfolio-rail-card {
+  width: min(420px, calc(100vw - 96px));
   border: 1px solid var(--mist-line);
   color: var(--mist-ink);
   background: rgba(251, 251, 248, .94);
   box-shadow: none;
 }
 
-/* Session state belongs to document flow and must never cover content. */
+/* A pre-expiry notice floats above the page. An expired session is not shown
+   here: App unmounts the portfolio and returns the full-screen AuthGate. */
 [data-theme="mist"] .visitor-session-banner {
-  position: relative !important;
-  inset: auto !important;
-  z-index: 70;
+  position: fixed !important;
+  top: 16px !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: 50% !important;
+  z-index: 120;
   display: grid;
-  grid-template-columns: 20px max-content minmax(0, 1fr) 44px;
-  justify-content: stretch;
-  gap: 16px;
+  grid-template-columns: 20px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 12px;
+  width: min(720px, calc(100vw - 32px));
   min-height: 64px;
-  padding: 10px var(--mist-gutter);
-  border: 0;
-  border-bottom: 1px solid var(--mist-line-strong);
+  padding: 9px 10px 9px 16px;
+  border: 1px solid var(--mist-line-strong);
   color: var(--mist-ink);
-  background: var(--mist-paper-raised);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
+  background: rgba(251, 251, 248, .98);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  transform: translateX(-50%);
 }
 
 /* Backward-compatible hook for the existing live banner markup. */
-[data-theme="mist"] .t-page > div[class~="fixed"][class~="top-0"][class~="left-0"][class~="right-0"]:not(.theme-preview-toolbar) {
+[data-theme="mist"] .t-page > div[class~="fixed"][class~="top-0"][class~="left-0"][class~="right-0"]:not(.theme-preview-toolbar):not(.visitor-session-banner) {
   position: relative !important;
   inset: auto !important;
   z-index: 70;
@@ -951,7 +1093,7 @@
   backdrop-filter: none;
 }
 
-[data-theme="mist"] .t-page > div[class~="fixed"][class~="top-0"][class~="left-0"][class~="right-0"]:not(.theme-preview-toolbar) > button {
+[data-theme="mist"] .t-page > div[class~="fixed"][class~="top-0"][class~="left-0"][class~="right-0"]:not(.theme-preview-toolbar):not(.visitor-session-banner) > button {
   display: grid;
   place-items: center;
   width: 44px;
@@ -967,7 +1109,10 @@
 }
 
 [data-theme="mist"] .visitor-session-banner__copy {
-  display: contents;
+  display: grid;
+  grid-template-columns: max-content max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
   color: var(--mist-body);
   font-size: 13px;
   line-height: 20px;
@@ -989,6 +1134,7 @@
 [data-theme="mist"] .visitor-session-banner__remaining {
   margin: 0;
   color: var(--mist-taupe);
+  font: 600 12px/20px var(--mist-mono);
 }
 
 [data-theme="mist"] .visitor-session-banner__close {
@@ -1085,6 +1231,27 @@
   padding: clamp(48px, 6vw, 80px) 0 48px;
 }
 
+/* Archive cards use one stable editorial grid. Staggered spans caused clipping
+   and made missing media look like intentional empty columns. */
+[data-theme="mist"] .project-archive-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 64px 32px;
+}
+
+[data-theme="mist"] .project-archive-card,
+[data-theme="mist"] .project-archive-card:nth-child(3n + 2),
+[data-theme="mist"] .project-archive-card:nth-child(3n) {
+  grid-column: auto;
+  min-width: 0;
+  padding-top: 0;
+}
+
+[data-theme="mist"] .project-archive-card .design-project-visual {
+  min-height: 0;
+  aspect-ratio: 3 / 2;
+}
+
 [data-theme="mist"] .project-detail-close {
   min-width: 96px;
   height: 44px;
@@ -1100,9 +1267,18 @@
   grid-template-columns: 160px minmax(0, 1fr);
   gap: 40px;
   padding: 32px 0;
-  border-top: 1px solid var(--mist-line);
-  border-bottom: 1px solid var(--mist-line);
-  background: var(--mist-paper-raised);
+  border-top: 1px solid rgba(41, 40, 36, .14);
+  border-bottom: 1px solid rgba(41, 40, 36, .14);
+  background: transparent;
+}
+
+/* The brief owns one quiet shared boundary; the meta ledger never doubles it. */
+[data-theme="mist"] .project-detail-meta:has(+ .project-detail-brief) {
+  border-bottom: 0;
+}
+
+[data-theme="mist"] .project-detail-meta + .project-detail-brief {
+  border-top: 1px solid rgba(41, 40, 36, .14);
 }
 
 [data-theme="mist"] .project-detail-brief > * {
@@ -1211,7 +1387,7 @@
   display: grid;
   grid-template-columns: minmax(180px, .7fr) minmax(320px, 1.3fr) auto;
   gap: clamp(32px, 6vw, 96px);
-  align-items: end;
+  align-items: start;
   padding: 32px var(--mist-gutter);
   border-top: 1px solid var(--mist-line-strong);
   color: var(--mist-body);
@@ -1233,6 +1409,20 @@
   gap: 4px 16px;
   align-items: baseline;
   flex-wrap: wrap;
+}
+
+[data-theme="mist"] .notebook-footer__column,
+[data-theme="mist"] .notebook-footer__column p,
+[data-theme="mist"] .notebook-footer__contacts,
+[data-theme="mist"] .notebook-footer__link,
+[data-theme="mist"] .notebook-footer__strong {
+  margin: 0;
+  padding-block: 0;
+  line-height: 20px;
+}
+
+[data-theme="mist"] .notebook-footer__column {
+  align-self: start;
 }
 
 [data-theme="mist"] .notebook-footer__link,
@@ -1355,6 +1545,11 @@
     left: var(--mist-gutter);
     grid-template-columns: 1fr;
     gap: 20px;
+  }
+  [data-theme="mist"] .notebook-top-button {
+    right: 20px;
+    bottom: max(20px, env(safe-area-inset-bottom));
+    display: grid !important;
   }
 
   [data-theme="mist"] .mist-hero-meta {
@@ -1626,10 +1821,10 @@
 
   [data-theme="mist"] .mist-fog-layer {
     inset: -32px;
-    background: rgba(251, 251, 248, .015);
-    filter: blur(32px);
-    -webkit-backdrop-filter: blur(2px) saturate(0) contrast(.99);
-    backdrop-filter: blur(2px) saturate(0) contrast(.99);
+    background: rgba(251, 251, 248, .01);
+    filter: none;
+    -webkit-backdrop-filter: blur(2.6px) saturate(.94) contrast(.995);
+    backdrop-filter: blur(2.6px) saturate(.94) contrast(.995);
   }
 
   [data-theme="mist"] .section-wrap { padding-block: var(--mist-section-y); }
@@ -1751,14 +1946,12 @@
   }
   [data-theme="mist"] .mist-fog-layer {
     inset: -32px;
-    opacity: .68;
-    background: rgba(251, 251, 248, .012);
-    filter: blur(34px);
-    -webkit-backdrop-filter: blur(2px) saturate(0) contrast(.99);
-    backdrop-filter: blur(2px) saturate(0) contrast(.99);
+    opacity: .82;
+    background: rgba(251, 251, 248, .008);
+    filter: none;
+    -webkit-backdrop-filter: blur(2.4px) saturate(.95) contrast(.997);
+    backdrop-filter: blur(2.4px) saturate(.95) contrast(.997);
   }
-  [data-theme="mist"] .mist-fog-layer::before,
-  [data-theme="mist"] .mist-fog-layer::after { filter: blur(46px) grayscale(1); }
   [data-theme="mist"] .mist-hero-footer {
     right: var(--mist-gutter);
     bottom: max(20px, env(safe-area-inset-bottom));
@@ -1926,6 +2119,7 @@
   [data-theme="mist"] .project-detail-meta > div:last-child { border-bottom: 0; }
   [data-theme="mist"] .project-detail-meta dt { margin-bottom: 4px; }
   [data-theme="mist"] .project-detail-brief {
+    grid-template-columns: minmax(0, 1fr);
     gap: 12px;
     padding-block: 24px;
   }
@@ -1994,3 +2188,266 @@
     letter-spacing: 0;
   }
 }
+
+/* Final access and rail contracts. Keep these last so older responsive rules
+   cannot turn the warning back into document flow or re-narrow the tooltip. */
+@media (min-width: 1180px) {
+  [data-theme="mist"] .portfolio-rail-card {
+    width: min(420px, calc(100vw - 96px));
+  }
+
+  [data-theme="mist"] .portfolio-rail-detail {
+    max-width: 38ch;
+    overflow-wrap: normal;
+    word-break: keep-all;
+    text-wrap: pretty;
+  }
+}
+
+@media (max-width: 720px) {
+  [data-theme="mist"] .visitor-session-banner {
+    top: 8px !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: 50% !important;
+    grid-template-columns: minmax(0, 1fr) 44px;
+    width: calc(100vw - 16px);
+    padding: 9px 8px 9px 12px;
+    transform: translateX(-50%);
+  }
+
+  [data-theme="mist"] .visitor-session-banner > svg { display: none; }
+  [data-theme="mist"] .visitor-session-banner__copy {
+    grid-template-columns: max-content 1fr;
+    gap: 2px 8px;
+  }
+  [data-theme="mist"] .visitor-session-banner__copy > span:last-child { grid-column: 1 / -1; }
+}
+
+/* Reviewed layout lock — guide v1.6.
+   Keep this block last: it owns the three recurring regressions that must not
+   be reintroduced by shared or responsive theme rules. */
+@media (min-width: 768px) {
+  [data-theme="mist"] #about .about-profile--copy-only .prose-dark,
+  [data-theme="mist"] #about .about-profile--copy-only .prose-dark > div,
+  [data-theme="mist"] #about .about-profile--copy-only .prose-dark p {
+    width: min(100%, 78ch);
+    max-width: 78ch;
+  }
+
+  /* The project narrative starts on the title column, as in the reviewed
+     editorial composition. It must not collapse into the left meta column. */
+  [data-theme="mist"] #projects .project-story__inner {
+    grid-column: 2 / -1;
+    width: 100%;
+    min-width: 0;
+  }
+
+  [data-theme="mist"] #projects .project-story__copy,
+  [data-theme="mist"] #projects .project-story__copy p {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+/* Background uses one visible but quiet boundary. Every adjacency has one
+   owner, so increasing contrast never creates a double or heavy rule. */
+[data-theme="mist"] #resume .resume-block__heading,
+[data-theme="mist"] #resume .resume-list > :where(.resume-education__row, .resume-activity__row),
+[data-theme="mist"] #resume .resume-list > :last-child {
+  border-color: var(--mist-line-background);
+}
+
+/* Mobile is a dedicated reading composition, not a scaled desktop grid. */
+@media (max-width: 767px) {
+  [data-theme="mist"] .notebook-cursor {
+    display: none !important;
+  }
+
+  /* Give the access form a visibly separate start and keep smaller devices
+     scrollable instead of squeezing the introduction into the input. */
+  [data-theme="mist"] .t-gate {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  [data-theme="mist"] .t-gate .gate-panel {
+    margin-top: 48px;
+  }
+
+  /* The year remains a clean metadata column. Current employment is a state
+     of the company, so NOW sits after the company name without growing a row. */
+  [data-theme="mist"] .journey-index__year {
+    display: block;
+  }
+
+  [data-theme="mist"] .journey-index__company {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    overflow-wrap: normal;
+    word-break: keep-all;
+  }
+
+  [data-theme="mist"] .journey-index__status {
+    display: inline-flex;
+    flex: 0 0 auto;
+    gap: 4px;
+    align-items: baseline;
+    font-size: 9px;
+    line-height: 18px;
+  }
+
+  /* Every project becomes one self-contained editorial record. The project
+     number, category, title and summary stay together before its outcomes. */
+  [data-theme="mist"] #projects .projects-archive-list {
+    display: block;
+  }
+
+  [data-theme="mist"] #projects .projects-archive-item {
+    padding: 0 0 32px;
+    border-bottom: 1px solid var(--mist-line-strong);
+  }
+
+  [data-theme="mist"] #projects .projects-archive-item + .projects-archive-item {
+    margin-top: 40px;
+    padding-top: 40px;
+    border-top: 0;
+  }
+
+  [data-theme="mist"] #projects .t-card > div:first-child {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    padding-bottom: 24px;
+  }
+
+  [data-theme="mist"] #projects .project-card__sequence {
+    display: block;
+    margin: 0 0 10px;
+    color: var(--mist-meta);
+    font: 400 11px/18px var(--mist-mono);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  [data-theme="mist"] #projects .t-card > div:first-child > span:not(.project-card__sequence) {
+    margin: 0;
+    padding: 0;
+    color: var(--mist-meta);
+    background: transparent;
+  }
+
+  [data-theme="mist"] #projects .t-card > div:first-child h3 {
+    margin: 0;
+    font-size: 21px;
+    line-height: 29px;
+  }
+
+  [data-theme="mist"] #projects .t-card > div:first-child p {
+    margin: 2px 0 0;
+    font-size: 16px;
+    line-height: 26px;
+  }
+
+  [data-theme="mist"] #projects .project-story {
+    margin-top: 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--mist-line);
+  }
+
+  /* Education owns the same number/content columns as its heading. Period is
+     part of the school record and therefore shares the content start line. */
+  [data-theme="mist"] #resume .resume-block__heading {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  [data-theme="mist"] #resume .resume-education__row {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 6px 12px;
+    padding-block: 18px;
+  }
+
+  [data-theme="mist"] #resume .resume-education__copy,
+  [data-theme="mist"] #resume .resume-education__period {
+    grid-column: 2;
+  }
+
+  /* Footer keeps its own Top action. Each information group receives a row,
+     preventing copyright and navigation from competing for one baseline. */
+  [data-theme="mist"] .notebook-footer,
+  [data-theme="mist"] .project-detail-footer .notebook-footer,
+  [data-theme="mist"] .portfolio-subpage + .notebook-footer {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding: 24px var(--mist-gutter) max(28px, env(safe-area-inset-bottom));
+  }
+
+  [data-theme="mist"] .notebook-footer__column--center {
+    grid-column: 1;
+    grid-row: 1;
+    white-space: normal;
+  }
+
+  [data-theme="mist"] .notebook-footer__column--end {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: end;
+    text-align: right;
+  }
+
+  [data-theme="mist"] .notebook-footer__column--start {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  [data-theme="mist"] .notebook-footer__column p {
+    white-space: normal;
+  }
+
+  [data-theme="mist"] .notebook-footer__contacts,
+  [data-theme="mist"] .notebook-footer__strong,
+  [data-theme="mist"] .notebook-footer__link {
+    white-space: nowrap;
+  }
+}
+
+/* Reading floor for expandable experience records and project story tabs.
+   Kept after every responsive rule so utilities cannot demote primary text. */
+[data-theme="mist"] .experience-entry__projects .experience-project__toggle p:first-child {
+  color: var(--mist-ink);
+  font-size: 16px;
+  line-height: 24px;
+}
+[data-theme="mist"] .experience-entry__projects .experience-project__toggle p + p {
+  color: var(--mist-meta);
+  font-size: 14px;
+  line-height: 22px;
+}
+[data-theme="mist"] :where(.experience-project__summary, .experience-project__result) :where(div, p) {
+  color: var(--mist-body);
+  font-size: 15px;
+  line-height: 24px;
+}
+[data-theme="mist"] .experience-project__result > p,
+[data-theme="mist"] .experience-entry__other > p {
+  color: var(--mist-meta);
+  font: 500 13px/20px var(--mist-mono);
+  letter-spacing: .08em;
+}
+[data-theme="mist"] #projects .project-story__nav button {
+  min-height: 44px;
+  padding: 8px 10px 7px;
+  font-size: 15px;
+  line-height: 22px;
+}
+[data-theme="mist"] #projects .project-story__nav span {
+  font-size: 13px;
+  line-height: 22px;
+}
+
+/* Keep the native pointer as the aiming point; Mist marks are supplemental. */
+[data-theme="mist"] [data-note-cursor] { cursor: auto; }
+[data-theme="mist"] [data-note-cursor] :is(a, button, [role="button"]) { cursor: pointer; }

@@ -28,26 +28,23 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+    <div className="admin-shell admin-login-shell" data-admin-theme="light">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-sm"
+        className="admin-login"
       >
-        <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800 shadow-2xl">
-          <div className="text-center mb-8">
-            <div className="w-14 h-14 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-7 h-7 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
-              </svg>
-            </div>
-            <h2 className="text-xl font-bold text-white">Admin 로그인</h2>
-          </div>
+        <section className="admin-login-card">
+          <header>
+            <p><span className="admin-status-dot" />Private Archive</p>
+            <h1>관리자 로그인</h1>
+            <span>포트폴리오 콘텐츠와 방문 권한을 관리합니다.</span>
+          </header>
 
           <button
             onClick={handleGoogle}
             disabled={loading}
-            className="w-full py-3 bg-white hover:bg-gray-100 disabled:opacity-60 text-gray-900 font-medium rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2.5"
+            className="admin-login-button"
           >
             <svg className="w-4.5 h-4.5" width="18" height="18" viewBox="0 0 48 48">
               <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
@@ -62,16 +59,17 @@ export default function AdminLogin() {
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-red-400 text-sm text-center mt-4"
+              className="admin-login-error"
+              role="alert"
             >
               {error}
             </motion.p>
           )}
 
-        </div>
+        </section>
 
-        <div className="text-center mt-4">
-          <a href="#" className="text-gray-400 hover:text-gray-200 text-xs">
+        <div className="admin-login-back">
+          <a href="/">
             ← 포트폴리오로 돌아가기
           </a>
         </div>

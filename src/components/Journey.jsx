@@ -14,12 +14,10 @@ function scrollToCompany(id, org) {
   }
 }
 
-export default function Journey({ themeId = 'default' }) {
+export default function Journey() {
   const [config] = useState(loadJourneyConfig)
   const reduceMotion = useReducedMotion()
   const journey = config.items || []
-  const colorFor = (item) => item.colors?.[themeId] || item.color || 'currentColor'
-
   if (journey.length === 0) return null
 
   return (
@@ -39,13 +37,13 @@ export default function Journey({ themeId = 'default' }) {
             transition={{ duration: 0.38, delay: reduceMotion ? 0 : i * 0.06, ease: [0.16, 1, 0.3, 1] }}
             data-no-global-track
             data-current={item.current ? 'true' : undefined}
-            style={{ '--journey-item-color': colorFor(item) }}
             className="journey-index__row group"
             onClick={() => scrollToCompany(item.companyId, item.org)}
           >
             <span className="journey-index__number">{String(i + 1).padStart(2, '0')}</span>
-            <span className="journey-index__year">
-              <span>{item.year}</span>
+            <span className="journey-index__year">{item.year}</span>
+            <span className="admin-copy journey-index__company">
+              <span>{item.org}</span>
               {item.current && (
                 <span
                   className="journey-index__status"
@@ -57,7 +55,6 @@ export default function Journey({ themeId = 'default' }) {
                 </span>
               )}
             </span>
-            <span className="admin-copy journey-index__company">{item.org}</span>
             <span className="admin-copy journey-index__field">{item.field}</span>
           </motion.button>
         ))}

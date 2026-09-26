@@ -1,10 +1,10 @@
-import { lazy, Suspense, useState, useEffect } from 'react'
+import { lazy, Suspense, useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { recordHeartbeat, trackAction, setActiveSession, loadThemeSettings, loadHeroConfig, ADMIN_PATH } from './utils/crypto'
 import { applyTheme, THEMES } from './themes'
 
 const Admin = lazy(() => import('./components/Admin'))
-const FrontDesignSystem = lazy(() => import('./components/FrontDesignSystem'))
+const AdminDesignSystem = lazy(() => import('./components/AdminDesignSystem'))
 const AuthGate = lazy(() => import('./components/AuthGate'))
 const AdminLogin = lazy(() => import('./components/AdminLogin'))
 const Hero = lazy(() => import('./components/Hero'))
@@ -29,32 +29,45 @@ function ScreenLoader() {
   )
 }
 
-// Fixed-color bar (independent of the active theme) shown while the admin
-// previews a theme on the real visitor screens.
+// Admin chrome shown over the real visitor screen. It follows the saved
+// admin color mode and never inherits the visitor theme being previewed.
 function ThemePreviewBar({ preview, onChange, onClose }) {
+  const width = preview.width || 'desktop'
+  const adminTheme = localStorage.getItem('portfolio_admin_color_mode') || 'light'
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[110] flex flex-wrap items-center justify-center gap-2 px-3 py-2 rounded-2xl sm:rounded-full bg-[#10141b]/95 border border-[#2c3442] shadow-2xl backdrop-blur-md max-w-[calc(100vw-2rem)]">
-      <span className="text-[11px] font-semibold text-[#8b95a5] pl-1 whitespace-nowrap">미리보기</span>
-      <select
-        value={preview.theme}
-        onChange={(e) => onChange({ ...preview, theme: e.target.value })}
-        className="bg-[#1b2230] text-[#e6e9ef] text-xs rounded-full px-2.5 py-1.5 border border-[#2c3442] focus:outline-none cursor-pointer max-w-40"
-      >
-        {THEMES.map((th) => <option key={th.id} value={th.id}>{th.name}</option>)}
-      </select>
-      <div className="flex shrink-0 rounded-full overflow-hidden border border-[#2c3442]">
-        <button
-          onClick={() => onChange({ ...preview, view: 'site' })}
-          className={`px-2.5 py-1.5 text-[11px] whitespace-nowrap cursor-pointer ${preview.view === 'site' ? 'bg-[#0064FF] text-white font-semibold' : 'bg-[#1b2230] text-[#8b95a5]'}`}
-        >포트폴리오</button>
-        <button
-          onClick={() => onChange({ ...preview, view: 'gate' })}
-          className={`px-2.5 py-1.5 text-[11px] whitespace-nowrap cursor-pointer ${preview.view === 'gate' ? 'bg-[#0064FF] text-white font-semibold' : 'bg-[#1b2230] text-[#8b95a5]'}`}
-        >진입 화면</button>
+    <div className="theme-preview-toolbar" data-admin-theme={adminTheme} role="toolbar" aria-label="방문자 테마 미리보기">
+      <strong>테마 미리보기</strong>
+      <label className="theme-preview-toolbar__control">
+        <span>테마</span>
+        <select
+          value={preview.theme}
+          onChange={(e) => onChange({ ...preview, theme: e.target.value })}
+        >
+          {THEMES.map((th) => <option key={th.id} value={th.id}>{th.name}</option>)}
+        </select>
+      </label>
+      <div className="theme-preview-toolbar__control">
+        <span>화면</span>
+        <div className="theme-preview-toolbar__group" aria-label="화면">
+          <button
+            onClick={() => onChange({ ...preview, view: 'site' })}
+            aria-pressed={preview.view === 'site'}
+          >포트폴리오</button>
+          <button
+            onClick={() => onChange({ ...preview, view: 'gate' })}
+            aria-pressed={preview.view === 'gate'}
+          >진입 화면</button>
+        </div>
+      </div>
+      <div className="theme-preview-toolbar__control">
+        <span>폭</span>
+        <div className="theme-preview-toolbar__group theme-preview-toolbar__width" aria-label="미리보기 폭">
+          {[['mobile', 'M'], ['tablet', 'T'], ['desktop', 'D']].map(([key, label]) => <button key={key} type="button" aria-label={`${key} 폭`} aria-pressed={width === key} onClick={() => onChange({ ...preview, width: key })}>{label}</button>)}
+        </div>
       </div>
       <button
         onClick={onClose}
-        className="px-3 py-1.5 text-[11px] font-semibold text-white bg-[#2c3442] hover:bg-[#3a465a] rounded-full cursor-pointer whitespace-nowrap"
+        className="theme-preview-toolbar__close"
       >어드민으로</button>
     </div>
   )
@@ -62,26 +75,57 @@ function ThemePreviewBar({ preview, onChange, onClose }) {
 import { syncFromCloud, isCloudEnabled, cloudGet } from './utils/db'
 import { watchOwnerAuth, signInVisitor, signOutOwner, OWNER_EMAIL } from './utils/firebase'
 
-function TokenExpiryBanner({ expiresAt }) {
+const EXPIRY_WARNING_MS = 10 * 60 * 1000
+
+export function TokenExpiryBanner({ expiresAt, onExpired }) {
   const [visible, setVisible] = useState(true)
-  const [now] = useState(Date.now)
+  const [now, setNow] = useState(Date.now)
 
-  if (!expiresAt || !visible) return null
+  useEffect(() => {
+    if (!Number.isFinite(expiresAt)) return undefined
 
-  const expiryDate = new Date(expiresAt)
+    let timer
+    let interval
+
+    const enforceExpiry = () => {
+      if (Date.now() >= expiresAt) onExpired()
+      else setNow(Date.now())
+    }
+
+    const schedule = () => {
+      const remaining = expiresAt - Date.now()
+      if (remaining <= 0) {
+        onExpired()
+        return
+      }
+      if (remaining <= EXPIRY_WARNING_MS) {
+        setVisible(true)
+        setNow(Date.now())
+        interval = window.setInterval(() => setNow(Date.now()), 1000)
+        timer = window.setTimeout(onExpired, remaining)
+        return
+      }
+      timer = window.setTimeout(schedule, Math.min(remaining - EXPIRY_WARNING_MS, 60 * 60 * 1000))
+    }
+
+    schedule()
+    window.addEventListener('focus', enforceExpiry)
+    window.addEventListener('pageshow', enforceExpiry)
+    document.addEventListener('visibilitychange', enforceExpiry)
+    return () => {
+      window.clearTimeout(timer)
+      window.clearInterval(interval)
+      window.removeEventListener('focus', enforceExpiry)
+      window.removeEventListener('pageshow', enforceExpiry)
+      document.removeEventListener('visibilitychange', enforceExpiry)
+    }
+  }, [expiresAt, onExpired])
+
   const diffMs = expiresAt - now
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-  const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  if (!expiresAt || !visible || diffMs > EXPIRY_WARNING_MS || diffMs <= 0) return null
 
-  let remaining
-  if (diffDays > 0) {
-    remaining = `${diffDays}d ${diffHours}h`
-  } else if (diffHours > 0) {
-    remaining = `${diffHours}h`
-  } else {
-    const diffMin = Math.max(1, Math.floor(diffMs / (1000 * 60)))
-    remaining = `${diffMin}m`
-  }
+  const totalSeconds = Math.max(0, Math.ceil(diffMs / 1000))
+  const remaining = `${String(Math.floor(totalSeconds / 60)).padStart(2, '0')}:${String(totalSeconds % 60).padStart(2, '0')}`
 
   return (
     <AnimatePresence>
@@ -90,18 +134,22 @@ function TokenExpiryBanner({ expiresAt }) {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -40, opacity: 0 }}
         transition={{ duration: 0.4, delay: 0.5 }}
-        className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-center gap-3 px-4 py-2.5 bg-gray-900/90 backdrop-blur-md border-b border-gray-800/60 text-sm"
+        className="visitor-session-banner fixed top-0 left-0 right-0 z-[100] flex items-center justify-center gap-3 px-4 py-2.5 bg-gray-900/90 backdrop-blur-md border-b border-gray-800/60 text-sm"
+        role="status"
+        aria-live="polite"
       >
         <svg className="w-4 h-4 text-accent shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
         </svg>
-        <span className="text-gray-400">
-          Access expires: <span className="text-white font-medium">{expiryDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
-          <span className="text-accent ml-1.5">({remaining} left)</span>
+        <span className="visitor-session-banner__copy text-gray-400">
+          <span className="visitor-session-banner__label">ACCESS EXPIRING</span>
+          <span className="visitor-session-banner__remaining text-accent ml-1.5">{remaining}</span>
+          <span>접속 만료 전 작업을 마치거나 접근 시간을 연장해 주세요.</span>
         </span>
         <button
           onClick={() => setVisible(false)}
-          className="text-gray-600 hover:text-gray-300 ml-1 cursor-pointer"
+          className="visitor-session-banner__close text-gray-600 hover:text-gray-300 ml-1 cursor-pointer"
+          aria-label="만료 임박 안내 닫기"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -115,11 +163,16 @@ function TokenExpiryBanner({ expiresAt }) {
 function App() {
   const adminHash = `#${ADMIN_PATH}`
   const adminSystemHash = `#${ADMIN_PATH}-system`
-  const isLocalPreview = import.meta.env.DEV && new URLSearchParams(window.location.search).has('preview')
+  const query = new URLSearchParams(window.location.search)
+  const isLocalPreview = import.meta.env.DEV && query.has('preview')
+  const isAdminPreviewFrame = query.get('admin-preview') === '1'
+  const adminPreviewTheme = query.get('theme') || 'mist'
+  const adminPreviewView = query.get('view') === 'gate' ? 'gate' : 'site'
   const [adminRoute, setAdminRoute] = useState(window.location.hash)
   const isAdmin = [adminHash, adminSystemHash].includes(adminRoute)
   // Visitor auth is memory-only: refresh = re-auth required
   const [visitorAuth, setVisitorAuth] = useState(false)
+  const [gateReason, setGateReason] = useState('')
   const [tokenExpiresAt, setTokenExpiresAt] = useState(null)
   const [tokenId, setTokenId] = useState(null)
   const [sessionId, setSessionId] = useState(null)
@@ -134,6 +187,17 @@ function App() {
   // visitor screens under the chosen theme without leaving the admin session
   const [themePreview, setThemePreview] = useState(null)
   const [routePath, setRoutePath] = useState(window.location.pathname)
+
+  const expireVisitorSession = useCallback(() => {
+    setVisitorAuth(false)
+    setGateReason('expired')
+    setTokenId(null)
+    setTokenExpiresAt(null)
+    setSessionId(null)
+    setPlainToken(null)
+    setActiveSession(null)
+    signOutOwner()
+  }, [])
 
   useEffect(() => {
     const onRouteChange = () => setRoutePath(window.location.pathname)
@@ -179,11 +243,12 @@ function App() {
   // sees the theme attached to their token.
   useEffect(() => {
     const settings = loadThemeSettings()
-    if (themePreview && adminAuth) applyTheme(themePreview.theme)
+    if (isAdminPreviewFrame && adminAuth) applyTheme(adminPreviewTheme)
+    else if (themePreview && adminAuth) applyTheme(themePreview.theme)
     else if (isAdmin) applyTheme('default')
     else if (visitorAuth) applyTheme(visitorTheme || settings.defaultVisitorTheme)
     else applyTheme(settings.entryTheme)
-  }, [isAdmin, visitorAuth, visitorTheme, cloudReady, themePreview, adminAuth])
+  }, [isAdmin, visitorAuth, visitorTheme, cloudReady, themePreview, adminAuth, isAdminPreviewFrame, adminPreviewTheme])
 
   useEffect(() => watchOwnerAuth((u) => setAdminUser(u ?? null)), [])
 
@@ -193,11 +258,7 @@ function App() {
     if (!visitorAuth || !tokenExpiresAt) return
     let tick = 0
     let currentExpiry = tokenExpiresAt
-    const kick = () => {
-      setVisitorAuth(false); setTokenId(null); setTokenExpiresAt(null); setSessionId(null); setPlainToken(null)
-      setActiveSession(null)
-      signOutOwner() // end the visitor's Firebase session so content reads are locked again
-    }
+    const kick = expireVisitorSession
     const iv = setInterval(async () => {
       if (Date.now() > currentExpiry) { kick(); return }
       tick++
@@ -236,7 +297,7 @@ function App() {
       }
     }, 60 * 1000)
     return () => clearInterval(iv)
-  }, [visitorAuth, tokenExpiresAt, tokenId, sessionId, plainToken])
+  }, [visitorAuth, tokenExpiresAt, tokenId, sessionId, plainToken, expireVisitorSession])
 
   // Detailed action tracking: which sections the visitor actually reached.
   // Flush buffered actions when the tab goes to background (best effort).
@@ -316,6 +377,12 @@ function App() {
     return <ScreenLoader />
   }
 
+  if (isAdminPreviewFrame) {
+    if (adminUser === undefined || !adminAuth) return <ScreenLoader />
+    if (adminPreviewView === 'gate') return <AuthGate onSuccess={() => {}} />
+    return <div className="t-page min-h-screen bg-gray-950 text-gray-100 font-sans">{renderPortfolio()}<NotebookCursor /></div>
+  }
+
   if (isLocalPreview) {
     return (
       <div className="t-page min-h-screen bg-gray-950 text-gray-100 font-sans">
@@ -329,16 +396,12 @@ function App() {
 
   // Admin theme preview: real visitor screens + fixed preview bar
   if (themePreview && adminAuth) {
+    const previewSrc = `${window.location.pathname}?admin-preview=1&theme=${encodeURIComponent(themePreview.theme)}&view=${themePreview.view}`
     return (
       <>
-        {themePreview.view === 'gate' ? (
-          <AuthGate onSuccess={() => {}} />
-        ) : (
-          <div className="t-page min-h-screen bg-gray-950 text-gray-100 font-sans">
-            {renderPortfolio()}
-            <NotebookCursor />
-          </div>
-        )}
+        <div className={`theme-preview-stage theme-preview-stage--${themePreview.width || 'desktop'}`}>
+          <iframe key={previewSrc} title="방문자 테마 실제 화면" src={previewSrc} />
+        </div>
         <ThemePreviewBar preview={themePreview} onChange={setThemePreview} onClose={() => setThemePreview(null)} />
       </>
     )
@@ -353,14 +416,14 @@ function App() {
       return <Suspense fallback={<ScreenLoader />}><AdminLogin /></Suspense>
     }
     if (adminRoute === adminSystemHash) {
-      return <Suspense fallback={<ScreenLoader />}><FrontDesignSystem onBack={() => { window.location.hash = ADMIN_PATH }} /></Suspense>
+      return <Suspense fallback={<ScreenLoader />}><AdminDesignSystem onBack={() => { window.location.hash = ADMIN_PATH }} /></Suspense>
     }
     return (
       <Suspense fallback={<ScreenLoader />}>
         <Admin
           onLogout={() => signOutOwner()}
           onViewPortfolio={() => { setVisitorAuth(true); window.location.hash = '' }}
-          onPreviewTheme={(view, theme) => setThemePreview({ view, theme })}
+          onPreviewTheme={(view, theme, width = 'desktop') => setThemePreview({ view, theme, width })}
           onOpenDesignSystem={() => { window.location.hash = `${ADMIN_PATH}-system` }}
         />
       </Suspense>
@@ -369,7 +432,7 @@ function App() {
 
   if (!visitorAuth) {
     return (
-      <Suspense fallback={<ScreenLoader />}><AuthGate
+      <Suspense fallback={<ScreenLoader />}><AuthGate reason={gateReason}
         onSuccess={(expiresAt, id, sid, plain, theme) => {
           setTokenExpiresAt(expiresAt)
           setTokenId(id || null)
@@ -377,6 +440,7 @@ function App() {
           setActiveSession(sid || null) // enables immediate action flushing
           setPlainToken(plain || null)
           setVisitorTheme(theme || '')
+          setGateReason('')
           setVisitorAuth(true)
         }}
       /></Suspense>
@@ -385,7 +449,9 @@ function App() {
 
   return (
     <div className="t-page min-h-screen bg-gray-950 text-gray-100 font-sans">
-      <TokenExpiryBanner expiresAt={tokenExpiresAt} />
+      {Number.isFinite(tokenExpiresAt) && (
+        <TokenExpiryBanner expiresAt={tokenExpiresAt} onExpired={expireVisitorSession} />
+      )}
       <Suspense fallback={<ScreenLoader />}>
         {renderPortfolio()}
         <NotebookCursor />

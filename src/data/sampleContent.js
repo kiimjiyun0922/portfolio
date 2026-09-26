@@ -66,8 +66,8 @@ export const sampleJourney = {
 
 export const sampleProjects = {
   designArchive: {
-    title: 'Selected Design Work',
-    intro: '브랜드와 제품의 맥락을 이미지와 설계 근거로 기록한 디자인 프로젝트입니다.',
+    title: 'Selected Work',
+    intro: '프로젝트의 맥락과 결과를 이미지와 상세 기록으로 보여주는 아카이브입니다.',
     archiveThreshold: 4,
   },
   designProjects: [
@@ -92,7 +92,13 @@ export const sampleProjects = {
       solution: '청색 제품 블록과 넓은 무채색 여백을 공통 장치로 삼아 매체 크기가 달라도 제품이 먼저 보이게 했습니다.',
       validation: '모바일 피드, 세로형 옥외 광고와 작은 패키지 라벨에서 브랜드명과 제품군이 같은 순서로 읽히는지 점검합니다.',
       designSystem: '캠페인 색상, 로고 여백, 제품 이미지 크롭과 매체별 제목 크기를 토큰과 템플릿으로 정의한 샘플입니다.',
-      gallery: [],
+      gallery: [
+        {
+          url: '/assets/campaign-noma.webp',
+          alt: 'NOMA 캠페인의 패키지, 포스터와 모바일 광고 적용 예시',
+          caption: '패키지와 옥외·디지털 매체에 적용한 통합 캠페인 샘플',
+        },
+      ],
     },
     {
       id: 'sample-pulse-festival',
@@ -115,7 +121,13 @@ export const sampleProjects = {
       solution: '흑백 동작 사진, 버밀리언 원과 고정된 제목 기준선을 모든 매체에 반복 적용했습니다.',
       validation: '원거리 포스터와 작은 모바일 화면에서 축제명, 연도와 공연 이미지가 순서대로 인지되는지 확인합니다.',
       designSystem: '사진 크롭, 원형 그래픽 비율, 프로그램 정보의 타입 스케일과 포스터 변형 규칙을 정의한 샘플입니다.',
-      gallery: [],
+      gallery: [
+        {
+          url: '/assets/campaign-pulse.webp',
+          alt: 'PULSE 축제의 포스터, 티켓과 프로그램 적용 예시',
+          caption: '공연 정보와 움직임의 리듬을 연결한 문화 캠페인 샘플',
+        },
+      ],
     },
     {
       id: 'sample-still-seasonal',
@@ -138,7 +150,13 @@ export const sampleProjects = {
       solution: '딥 그린 면과 산지 사진, 작은 앰버 원을 시즌 전용 시각 신호로 사용했습니다.',
       validation: '컵, 원두 봉투와 모바일 광고처럼 크기가 다른 매체에서 시즌 색과 브랜드명이 유지되는지 확인합니다.',
       designSystem: '시즌 컬러, 산지 이미지 크롭, 가격표와 소셜 광고 템플릿의 적용 규칙을 정의한 샘플입니다.',
-      gallery: [],
+      gallery: [
+        {
+          url: '/assets/campaign-still.webp',
+          alt: 'STILL 시즌 원두의 패키지, 컵과 소셜 광고 적용 예시',
+          caption: '매장과 온라인 접점에 확장한 시즌 출시 캠페인 샘플',
+        },
+      ],
     },
     {
       id: 'sample-north-launch',
@@ -161,7 +179,13 @@ export const sampleProjects = {
       solution: '흑백 환경 이미지와 하나의 녹색 반원으로 데이터의 범위와 집중을 시각화했습니다.',
       validation: '대형 포스터, 보고서 표지와 작은 배지에서 브랜드 인지와 정보 위계가 유지되는지 확인합니다.',
       designSystem: '이미지 톤, 반원 비율, 보고서와 행사 자산의 타입 스케일을 공통 규칙으로 정의한 샘플입니다.',
-      gallery: [],
+      gallery: [
+        {
+          url: '/assets/campaign-north.webp',
+          alt: 'NORTH 기후 데이터 서비스의 보고서, 행사와 디지털 광고 적용 예시',
+          caption: '기술 자료와 마케팅 접점을 연결한 B2B 캠페인 샘플',
+        },
+      ],
     },
   ],
   groups: [

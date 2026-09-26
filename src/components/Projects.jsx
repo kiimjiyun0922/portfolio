@@ -80,7 +80,7 @@ export default function Projects() {
                 const span = project.fullWidth ? 'md:col-span-2' : ''
                 return (
                   <div key={project.id || `${group.title}-${project.title}-${projectIndex}`} id={project.id ? `project-${project.id}` : undefined} className={`projects-archive-item ${span} transition-all duration-500`}>
-                    <ProjectCard project={project} />
+                    <ProjectCard project={project} index={projectIndex + 1} />
                   </div>
                 )
               })}

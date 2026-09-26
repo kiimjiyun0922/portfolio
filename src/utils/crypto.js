@@ -541,11 +541,11 @@ export function resetThemeSettings() {
 
 export const defaultTaxonomyConfig = {
   categories: [
-    { key: 'default', label: '기본', color: '#6b7280' },
-    { key: 'ai', label: 'AI', color: '#34d399' },
-    { key: 'data', label: '데이터', color: '#60a5fa' },
-    { key: 'ux', label: 'UX', color: '#f472b6' },
-    { key: 'ops', label: '운영', color: '#fbbf24' },
+    { key: 'default', label: '기본' },
+    { key: 'ai', label: 'AI' },
+    { key: 'data', label: '데이터' },
+    { key: 'ux', label: 'UX' },
+    { key: 'ops', label: '운영' },
   ],
 }
 
@@ -716,10 +716,10 @@ const CONTACT_KEY = 'portfolio_contact_config'
 const defaultContactConfig = {
   heading: 'Contact',
   message: "Interested in working together? Let's connect.",
-  email: 'hello@example.com',
-  linkedinUrl: 'https://linkedin.com/in/',
+  email: SITE.contactEmail,
+  linkedinUrl: '',
   linkedinLabel: 'LinkedIn',
-  copyright: '© 2026. All rights reserved.',
+  copyright: `© ${new Date().getFullYear()} ${SITE.ownerName}. All rights reserved.`,
 }
 
 export function loadContactConfig() {

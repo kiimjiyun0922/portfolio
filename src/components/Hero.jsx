@@ -8,12 +8,16 @@ export default function Hero() {
   const [resume] = useState(loadResumeConfig)
   const [isMobile, setIsMobile] = useState(false)
   const reduceMotion = useReducedMotion()
-  const focusX = useMotionValue(50)
-  const focusY = useMotionValue(48)
+  const fogAX = useMotionValue(18)
+  const fogAY = useMotionValue(46)
+  const fogBX = useMotionValue(78)
+  const fogBY = useMotionValue(50)
+  const fogCX = useMotionValue(46)
+  const fogCY = useMotionValue(43)
   const fogMask = useMotionTemplate`
-    radial-gradient(ellipse clamp(82px, 12vw, 160px) clamp(66px, 9vw, 120px) at calc(${focusX}% - 7%) calc(${focusY}% + 2%), transparent 0 20%, rgba(0,0,0,.02) 38%, rgba(0,0,0,.1) 58%, rgba(0,0,0,.32) 78%, rgba(0,0,0,.7) 94%, black 100%),
-    radial-gradient(ellipse clamp(94px, 14vw, 184px) clamp(74px, 10vw, 132px) at ${focusX}% calc(${focusY}% - 2%), transparent 0 22%, rgba(0,0,0,.02) 40%, rgba(0,0,0,.1) 60%, rgba(0,0,0,.32) 80%, rgba(0,0,0,.7) 94%, black 100%),
-    radial-gradient(ellipse clamp(78px, 11vw, 150px) clamp(70px, 9vw, 116px) at calc(${focusX}% + 8%) calc(${focusY}% + 3%), transparent 0 18%, rgba(0,0,0,.02) 36%, rgba(0,0,0,.1) 58%, rgba(0,0,0,.32) 78%, rgba(0,0,0,.7) 94%, black 100%)
+    radial-gradient(ellipse clamp(180px, 23vw, 360px) clamp(104px, 13vw, 190px) at ${fogAX}% ${fogAY}%, rgba(0,0,0,.58) 0 10%, rgba(0,0,0,.34) 34%, rgba(0,0,0,.1) 66%, transparent 94%),
+    radial-gradient(ellipse clamp(210px, 27vw, 410px) clamp(112px, 14vw, 210px) at ${fogBX}% ${fogBY}%, rgba(0,0,0,.62) 0 10%, rgba(0,0,0,.36) 36%, rgba(0,0,0,.1) 68%, transparent 95%),
+    radial-gradient(ellipse clamp(165px, 21vw, 330px) clamp(96px, 12vw, 176px) at ${fogCX}% ${fogCY}%, rgba(0,0,0,.52) 0 8%, rgba(0,0,0,.3) 34%, rgba(0,0,0,.08) 68%, transparent 94%)
   `
 
   const workYears = (() => {
@@ -61,25 +65,53 @@ export default function Hero() {
 
   useEffect(() => {
     if (reduceMotion) {
-      focusX.set(50)
-      focusY.set(isMobile ? 43 : 48)
+      fogAX.set(22)
+      fogAY.set(isMobile ? 43 : 46)
+      fogBX.set(76)
+      fogBY.set(isMobile ? 48 : 50)
+      fogCX.set(48)
+      fogCY.set(isMobile ? 46 : 43)
       return undefined
     }
-    const horizontal = animate(focusX, [42, 58, 54, 46, 42], {
-      duration: 9,
+    const horizontalA = animate(fogAX, [18, 42, 76, 34, 18], {
+      duration: 27,
       repeat: Infinity,
       ease: 'easeInOut',
     })
-    const vertical = animate(focusY, isMobile ? [43, 39, 47, 41, 43] : [44, 40, 48, 42, 44], {
-      duration: 11,
+    const verticalA = animate(fogAY, isMobile ? [43, 48, 44, 47, 43] : [46, 51, 45, 49, 46], {
+      duration: 21,
+      repeat: Infinity,
+      ease: 'easeInOut',
+    })
+    const horizontalB = animate(fogBX, [78, 57, 24, 68, 78], {
+      duration: 33,
+      repeat: Infinity,
+      ease: 'easeInOut',
+    })
+    const verticalB = animate(fogBY, isMobile ? [48, 44, 49, 45, 48] : [50, 46, 51, 47, 50], {
+      duration: 25,
+      repeat: Infinity,
+      ease: 'easeInOut',
+    })
+    const horizontalC = animate(fogCX, [46, 72, 38, 16, 46], {
+      duration: 38,
+      repeat: Infinity,
+      ease: 'easeInOut',
+    })
+    const verticalC = animate(fogCY, isMobile ? [46, 42, 47, 44, 46] : [43, 48, 44, 49, 43], {
+      duration: 29,
       repeat: Infinity,
       ease: 'easeInOut',
     })
     return () => {
-      horizontal.stop()
-      vertical.stop()
+      horizontalA.stop()
+      verticalA.stop()
+      horizontalB.stop()
+      verticalB.stop()
+      horizontalC.stop()
+      verticalC.stop()
     }
-  }, [focusX, focusY, isMobile, reduceMotion])
+  }, [fogAX, fogAY, fogBX, fogBY, fogCX, fogCY, isMobile, reduceMotion])
 
   return (
     <section id="home" className="t-hero relative min-h-[100dvh] flex flex-col items-center justify-center px-5 text-center overflow-hidden">
@@ -105,9 +137,7 @@ export default function Hero() {
         className="mist-fog-layer absolute inset-0 pointer-events-none"
         style={{
           maskImage: fogMask,
-          maskComposite: 'intersect',
           WebkitMaskImage: fogMask,
-          WebkitMaskComposite: 'source-in',
         }}
       />
 

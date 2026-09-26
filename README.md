@@ -7,13 +7,14 @@
 - 실제 사이트: [design-jy.vercel.app](https://design-jy.vercel.app)
 - 설정 및 운영: [TEMPLATE.md](TEMPLATE.md)
 - 디자인 규칙: [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)
+- 공개 프론트 공통 계약: [docs/FRONT_THEME_CONTRACT.md](docs/FRONT_THEME_CONTRACT.md)
 - 변경 기록: [docs/CHANGELOG.md](docs/CHANGELOG.md)
 
 ## 주요 기능
 
 - 방문자별 접속 토큰 발급, 만료, 연장, 폐기 및 서버 검증
 - 히어로, 소개, 커리어 저니, 성과, 프로젝트, 경력, 교육·활동 콘텐츠 관리
-- 기존 PM 사례와 별도로 이미지 중심 디자인 프로젝트, 전체 아카이브, 개별 케이스 스터디 관리
+- 구조형과 아카이브형 등 여러 표현 방식으로 프로젝트, 전체 아카이브, 개별 상세 관리
 - 어드민 콘솔의 콘텐츠 편집, 접속 분석, 변경 이력, PDF 출력
 - Firestore 기반 콘텐츠 및 설정 동기화
 - 데스크톱, 태블릿, 모바일 반응형 레이아웃
@@ -39,6 +40,7 @@ Firebase, 어드민 인증, 환경변수, 개인값 교체와 Vercel 배포 절�
 ```bash
 npm run dev       # 로컬 개발 서버
 npm run check     # 린트, 테스트, 프로덕션 빌드
+npm run audit:theme-guides # 7개 테마 가이드의 8개 반응형 폭 자동 검수
 npm run build     # 프로덕션 빌드
 npm run preview   # 빌드 결과 미리보기
 ```
@@ -61,9 +63,9 @@ src/site.config.js      도메인과 소유자 관련 설정
 
 방문자 화면의 주요 섹션은 `Hero`, `About`, `Journey`, `Achievements`, `Projects`, `Experience`, `Resume`, `Contact`입니다. 입력한 줄바꿈은 넓은 화면에서 우선 보존하고, 좁은 화면에서는 콘텐츠가 넘치지 않도록 자연스럽게 재배치합니다.
 
-디자인 프로젝트는 메인의 편집 인덱스, `/projects` 전체 아카이브, `/projects/:slug` 상세 페이지로 구성됩니다. 전체 아카이브 링크는 어드민에서 설정한 공개 프로젝트 개수 기준을 충족할 때만 메인에 나타납니다. 프로젝트별 공개·추천 여부, 대표 이미지, 대체 텍스트, 5단계 케이스 스터디와 갤러리를 어드민에서 관리할 수 있습니다. 갤러리는 여러 이미지를 등록한 뒤 위·아래 이동으로 노출 순서를 바꿀 수 있고, 상세 페이지에서는 이전·다음 버튼과 썸네일로 넘겨 봅니다.
+프로젝트는 그룹·스토리·성과 중심의 구조형과 대표 이미지·상세 페이지·갤러리 중심의 아카이브형으로 관리합니다. 이는 분야 분류가 아니라 표시 방식이며 이후 새 방식도 같은 프로젝트 영역에 확장합니다. `/projects` 전체 아카이브 링크는 어드민에서 설정한 공개 프로젝트 개수 기준을 충족할 때만 메인에 나타납니다. 프로젝트별 공개·추천 여부, 대표 이미지, 대체 텍스트, 5단계 케이스 스터디와 갤러리를 어드민에서 관리할 수 있습니다. 갤러리는 여러 이미지를 등록한 뒤 위·아래 이동으로 노출 순서를 바꿀 수 있고, 상세 페이지에서는 이전·다음 버튼과 썸네일로 넘겨 봅니다.
 
-초기 디자인 프로젝트에는 실제 운영 실적이 아닌 가상의 미니멀 마케팅 캠페인 샘플 4종이 포함됩니다. 제품 출시, 문화 행사, 리테일과 B2B 작업 형태를 확인하기 위한 원본 예시이며, 운영 전 어드민에서 실제 이미지와 내용으로 교체합니다.
+초기 아카이브형 프로젝트에는 실제 운영 실적이 아닌 가상의 미니멀 마케팅 캠페인 샘플 4종이 포함됩니다. 제품 출시, 문화 행사, 리테일과 B2B 작업 형태를 확인하기 위한 원본 예시이며, 운영 전 어드민에서 실제 이미지와 내용으로 교체합니다.
 
 ## 현재 디자인 원칙
 
@@ -77,7 +79,22 @@ src/site.config.js      도메인과 소유자 관련 설정
 - 프로젝트 및 경력 원문 데이터는 디자인 변경 과정에서 삭제하거나 축약하지 않습니다.
 - 샘플 프로젝트의 수치와 설명은 실제 실적으로 간주하지 않으며, 운영 전 어드민에서 실제 자료로 교체합니다.
 
-자세한 수치와 컴포넌트별 규칙은 [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)에 기록합니다.
+공개 프론트에서 공통으로 지켜야 하는 광학 정렬, 대칭 여백, 경계, 가독성, 반응형 기준과 테마 분석 순서는 [docs/FRONT_THEME_CONTRACT.md](docs/FRONT_THEME_CONTRACT.md)에 기록합니다. 어드민 규칙은 [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)에서 별도로 관리합니다.
+
+## 프론트 테마 가이드
+
+테마 가이드는 실제 테마에 적용하기 전 검토하는 독립 페이지입니다. 공통 IA와 품질 기준은 공유하지만, 색·서체·표면·선·모션은 각 테마의 핵심 은유를 먼저 분석한 뒤 개별적으로 정의합니다. Mist의 포그·종이 장식·랜덤 추종 커서는 다른 테마로 복제하지 않습니다.
+
+- 전체 인덱스: `/front-systems.html`
+- Mist: `/front-system.html`
+- Midnight: `/front-system-midnight.html`
+- Signal: `/front-system-signal.html`
+- Bold: `/front-system-bold.html`
+- Blueprint: `/front-system-blueprint.html`
+- Bento: `/front-system-bento.html`
+- Mono: `/front-system-mono.html`
+
+`npm run audit:theme-guides`는 각 가이드를 320·360·390·430·768·1024·1280·1440px에서 검사합니다. 새 표현은 가이드의 `Analysis before expression`에 근거가 먼저 작성되어야 하며, 검토 전에는 실제 방문자 테마에 옮기지 않습니다.
 
 ## 배포
 

@@ -26,7 +26,7 @@ export default function ProjectArchivePage() {
         </nav>
         <header className="portfolio-subpage__header">
           <p>Archive · {String(projects.length).padStart(2, '0')}</p>
-          <h1>{archive.title || 'Design Projects'}</h1>
+          <h1>{archive.title || 'Projects'}</h1>
           {archive.intro && <p>{archive.intro}</p>}
         </header>
 
@@ -45,7 +45,7 @@ export default function ProjectArchivePage() {
             ))}
           </div>
         ) : (
-          <div className="project-archive-empty"><p>Published design projects will appear here.</p></div>
+          <div className="project-archive-empty"><p>Published projects will appear here.</p></div>
         )}
       </main>
       <Contact />

@@ -26,7 +26,7 @@ async function verifyViaServer(token) {
   }
 }
 
-export default function AuthGate({ onSuccess }) {
+export default function AuthGate({ onSuccess, reason = '' }) {
   // Auto-fill token from URL hash (e.g., #token=abc123)
   const hashToken = (() => {
     const h = window.location.hash
@@ -169,9 +169,18 @@ export default function AuthGate({ onSuccess }) {
         transition={{ duration: 0.6, delay: 0.5 }}
         className="gate-panel relative w-full max-w-md mt-12"
       >
+        {reason === 'expired' && (
+          <div className="gate-expired-notice mb-4 border border-current px-5 py-4 text-left" role="alert">
+            <p className="admin-copy text-xs tracking-[0.14em]">ACCESS EXPIRED</p>
+            <strong className="mt-2 block text-base">접속 시간이 만료되었습니다</strong>
+            <p className="admin-copy mt-1 text-sm">포트폴리오는 보호되었습니다. 계속 보려면 다시 인증해 주세요.</p>
+          </div>
+        )}
         <div className="gate-card t-card bg-gray-900/60 backdrop-blur-xl rounded-2xl p-8 border border-gray-800/60 shadow-2xl">
           <form onSubmit={handleSubmit} className="gate-form space-y-4">
+            <label htmlFor="portfolio-access-token" className="sr-only">Access token</label>
             <input
+              id="portfolio-access-token"
               type="text"
               value={token}
               onChange={(e) => { setToken(e.target.value); setError('') }}

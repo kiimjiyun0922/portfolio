@@ -99,7 +99,7 @@ function StoryTabs({ project }) {
   )
 }
 
-export default function ProjectCard({ project }) {
+export default function ProjectCard({ project, index = 1 }) {
   const hasStory = project.problem || project.solution || project.collaboration || project.result
 
   return (
@@ -109,6 +109,9 @@ export default function ProjectCard({ project }) {
     >
       {/* Header */}
       <div>
+        <span className="project-card__sequence" aria-hidden="true">
+          Project {String(index).padStart(2, '0')}
+        </span>
         <span className="inline-block text-[11px] font-mono font-medium tracking-wider uppercase px-2.5 py-1 rounded mb-3 text-accent bg-accent/10">
           {project.badge}
         </span>

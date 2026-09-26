@@ -62,6 +62,7 @@ try {
             titleZ: Number.parseInt(titleStyle.zIndex, 10) || 0,
             fogZ: Number.parseInt(fogStyle.zIndex, 10) || 0,
             maskLayers: (fogStyle.maskImage.match(/radial-gradient/g) || []).length,
+            maskComposite: fogStyle.maskComposite || fogStyle.webkitMaskComposite || '',
             filter: fogStyle.backdropFilter || fogStyle.webkitBackdropFilter || '',
             edgeFilter: fogStyle.filter,
             background: fogStyle.backgroundColor,
@@ -89,10 +90,33 @@ try {
           if (!row || !index) return null
           return index.getBoundingClientRect().left - row.getBoundingClientRect().left
         })(),
+        selectedIndexState: (() => {
+          const rows = [...document.querySelectorAll('.design-projects__index-row')]
+          const selectedRows = rows.filter((row) => row.getAttribute('aria-pressed') === 'true')
+          return {
+            selectedCount: selectedRows.length,
+            selectedBorder: selectedRows[0] ? getComputedStyle(selectedRows[0]).borderLeftWidth : null,
+            selectedShadow: selectedRows[0] ? getComputedStyle(selectedRows[0]).boxShadow : null,
+            unselectedBorders: rows.filter((row) => row.getAttribute('aria-pressed') !== 'true').map((row) => getComputedStyle(row).borderLeftColor),
+          }
+        })(),
+        archiveHeader: (() => {
+          const header = document.querySelector('.design-projects__header')
+          const title = header?.querySelector('h2')
+          const intro = header?.querySelector('p')
+          if (!header || !title || !intro) return null
+          const titleBox = title.getBoundingClientRect()
+          const introBox = intro.getBoundingClientRect()
+          return {
+            display: getComputedStyle(header).display,
+            sameStart: Math.abs(titleBox.left - introBox.left),
+            vertical: introBox.top >= titleBox.bottom,
+          }
+        })(),
         projectColumns: (() => {
           const groupTitle = document.querySelector('#projects .projects-archive-heading h3')?.getBoundingClientRect()
           const groupCopy = document.querySelector('#projects .projects-archive-heading p')?.getBoundingClientRect()
-          const cardMeta = document.querySelector('#projects .t-card > div:first-child > span')?.getBoundingClientRect()
+          const cardMeta = document.querySelector('#projects .t-card > div:first-child > span:not(.project-card__sequence)')?.getBoundingClientRect()
           const cardTitle = document.querySelector('#projects .t-card > div:first-child > h3')?.getBoundingClientRect()
           return groupTitle && groupCopy && cardMeta && cardTitle
             ? { groupTitle: groupTitle.left, groupCopy: groupCopy.left, cardMeta: cardMeta.left, cardTitle: cardTitle.left }
@@ -102,6 +126,29 @@ try {
           const heading = document.querySelector('#projects > h2')?.getBoundingClientRect()
           const firstGroup = document.querySelector('#projects .projects-archive-group')?.getBoundingClientRect()
           return heading && firstGroup ? firstGroup.top - heading.bottom : null
+        })(),
+        mobileProjectStructure: (() => {
+          const item = document.querySelector('#projects .projects-archive-item')
+          const sequence = item?.querySelector('.project-card__sequence')
+          const next = item?.nextElementSibling
+          if (!item || !sequence) return null
+          return {
+            sequenceVisible: getComputedStyle(sequence).display !== 'none',
+            bottomRule: getComputedStyle(item).borderBottomWidth,
+            nextTopRule: next ? getComputedStyle(next).borderTopWidth : null,
+          }
+        })(),
+        journeyCurrentState: (() => {
+          const status = document.querySelector('.journey-index__status')
+          return status ? status.parentElement?.classList.contains('journey-index__company') : null
+        })(),
+        educationAlignment: (() => {
+          const heading = document.querySelector('#resume .resume-block__heading > :last-child')?.getBoundingClientRect()
+          const school = document.querySelector('#resume .resume-education__copy')?.getBoundingClientRect()
+          const period = document.querySelector('#resume .resume-education__period')?.getBoundingClientRect()
+          return heading && school && period
+            ? { school: Math.abs(heading.left - school.left), period: Math.abs(heading.left - period.left) }
+            : null
         })(),
         sampleCoverLoaded: (() => {
           const image = document.querySelector('.design-projects__feature .design-project-visual img')
@@ -114,6 +161,25 @@ try {
           const nextHeading = blocks[1].querySelector('.resume-block__heading')?.getBoundingClientRect()
           return previousRow && nextHeading ? nextHeading.top - previousRow.bottom : null
         })(),
+        resumeLines: (() => {
+          const elements = [
+            ...document.querySelectorAll('#resume .resume-block__heading'),
+            ...document.querySelectorAll('#resume .resume-list > *'),
+          ]
+          const alpha = (color) => {
+            const match = color.match(/rgba?\([^,]+,[^,]+,[^,]+(?:,\s*([\d.]+))?\)/)
+            return match ? Number.parseFloat(match[1] ?? '1') : 1
+          }
+          return elements.map((element) => {
+            const style = getComputedStyle(element)
+            return {
+              topWidth: Number.parseFloat(style.borderTopWidth),
+              bottomWidth: Number.parseFloat(style.borderBottomWidth),
+              topAlpha: alpha(style.borderTopColor),
+              bottomAlpha: alpha(style.borderBottomColor),
+            }
+          })
+        })(),
         mobileStatus: getComputedStyle(document.querySelector('.portfolio-mobile-status')).display,
         footer: (() => {
           const footer = document.querySelector('.notebook-footer')
@@ -121,10 +187,25 @@ try {
           if (!footer || !message) return null
           const style = getComputedStyle(message)
           const lineHeight = Number.parseFloat(style.lineHeight)
+          const columns = [...footer.querySelectorAll('.notebook-footer__column')].map((element) => element.getBoundingClientRect().top)
           return {
             overflow: footer.scrollWidth - footer.clientWidth,
             messageLines: lineHeight ? message.getBoundingClientRect().height / lineHeight : null,
+            columnTopSpread: columns.length ? Math.max(...columns) - Math.min(...columns) : null,
+            overlap: (() => {
+              const boxes = [...footer.querySelectorAll('.notebook-footer__column')].map((element) => element.getBoundingClientRect())
+              return boxes.some((box, index) => boxes.slice(index + 1).some((other) =>
+                box.left < other.right && box.right > other.left && box.top < other.bottom && box.bottom > other.top
+              ))
+            })(),
           }
+        })(),
+        resultLines: (() => {
+          const paragraph = document.querySelector('#projects .project-story__copy p')
+          if (!paragraph) return null
+          const style = getComputedStyle(paragraph)
+          const lineHeight = Number.parseFloat(style.lineHeight)
+          return lineHeight ? paragraph.getBoundingClientRect().height / lineHeight : null
         })(),
         hiddenContent: [...document.querySelectorAll('#about > div > div, .journey-index__row, .experience-entry, .resume-block')]
           .filter((element) => Number.parseFloat(getComputedStyle(element).opacity) < .99).length,
@@ -143,18 +224,32 @@ try {
     check(metrics.fogContract && metrics.fogContract.fogZ > metrics.fogContract.titleZ, `${width}px: Mist fog is not layered above the hero title`)
     check(metrics.fogContract && metrics.fogContract.maskLayers >= 3, `${width}px: Mist fog is missing its cloud mask`)
     check(metrics.fogContract && metrics.fogContract.filter.includes('blur('), `${width}px: Mist fog has no backdrop blur`)
-    check(metrics.fogContract && metrics.fogContract.edgeFilter.includes('blur('), `${width}px: Mist fog edge is not feathered`)
+    check(metrics.fogContract && metrics.fogContract.edgeFilter === 'none', `${width}px: Mist fog has a visible filter boundary`)
+    check(metrics.fogContract && !metrics.fogContract.maskComposite.includes('intersect'), `${width}px: Mist fog still uses an inverse/intersection mask`)
     check(!metrics.heroStatOverlap, `${width}px: hero stat index overlaps its label`)
     check(!metrics.ornamentOverlap, `${width}px: a decorative mark overlaps protected content`)
     check(metrics.selectedIndexInset === null || metrics.selectedIndexInset >= 19, `${width}px: selected design index content is too close to its state marker`)
+    check(metrics.selectedIndexState?.selectedCount === 1, `${width}px: design index has ${metrics.selectedIndexState?.selectedCount} selected rows`)
+    check(metrics.selectedIndexState?.selectedBorder === '3px', `${width}px: selected design index does not own one stable 3px border`)
+    check(metrics.selectedIndexState?.selectedShadow === 'none', `${width}px: selected design index duplicates its marker with a shadow`)
+    check(metrics.archiveHeader === null || (metrics.archiveHeader.display === 'block' && metrics.archiveHeader.sameStart <= 1 && metrics.archiveHeader.vertical), `${width}px: archive title and intro do not form one readable vertical stack`)
     check(metrics.projectColumns === null || Math.abs(metrics.projectColumns.groupTitle - metrics.projectColumns.cardMeta) <= 1, `${width}px: project group and item labels do not share a column`)
     check(metrics.projectColumns === null || Math.abs(metrics.projectColumns.groupCopy - metrics.projectColumns.cardTitle) <= 1, `${width}px: project group copy and item titles do not share a column`)
     check(metrics.projectHeadingGap === null || (metrics.projectHeadingGap >= 16 && metrics.projectHeadingGap <= 36), `${width}px: project title-to-list gap is ${metrics.projectHeadingGap}px`)
+    if (width < 768) check(metrics.mobileProjectStructure?.sequenceVisible, `${width}px: mobile project sequence is missing`)
+    if (width < 768) check(metrics.mobileProjectStructure?.bottomRule === '1px', `${width}px: mobile project boundary is missing`)
+    check(metrics.journeyCurrentState !== false, `${width}px: NOW is not attached to the company state`)
+    if (width < 768) check(metrics.educationAlignment && metrics.educationAlignment.school <= 1 && metrics.educationAlignment.period <= 1, `${width}px: Education content misses its heading start line`)
     check(metrics.sampleCoverLoaded, `${width}px: selected sample cover is missing`)
     check(metrics.resumeBoundary === null || Math.abs(metrics.resumeBoundary) <= 1, `${width}px: resume blocks have an arbitrary ${metrics.resumeBoundary}px gap`)
+    check(metrics.resumeLines.every((line) => line.topWidth <= 1 && line.bottomWidth <= 1), `${width}px: Background contains a divider thicker than 1px`)
+    check(metrics.resumeLines.every((line) => (line.topWidth === 0 || line.topAlpha <= .141) && (line.bottomWidth === 0 || line.bottomAlpha <= .141)), `${width}px: Background contains a divider darker than the 14% ink rule`)
     check(metrics.mobileStatus === 'none', `${width}px: undocumented mobile status control is visible`)
     check(metrics.footer && metrics.footer.overflow <= 1, `${width}px: footer overflows by ${metrics.footer?.overflow}px`)
+    check(metrics.footer && !metrics.footer.overlap, `${width}px: footer information groups overlap`)
     if (width >= 390 && width < 768) check(metrics.footer?.messageLines <= 1.25, `${width}px: footer message wraps to ${metrics.footer?.messageLines} lines`)
+    if (width >= 1180) check(metrics.footer?.columnTopSpread <= 1, `${width}px: footer columns miss the common top line by ${metrics.footer?.columnTopSpread}px`)
+    if (width >= 1280) check(metrics.resultLines === null || metrics.resultLines <= 1.25, `${width}px: the sample Result wraps without an authored line break`)
     check(metrics.hiddenContent === 0, `${width}px: ${metrics.hiddenContent} content blocks remain hidden before scrolling`)
 
     await page.screenshot({ path: `/tmp/mist-hero-${width}.png`, fullPage: false })
@@ -165,6 +260,16 @@ try {
   const interactions = await browser.newPage({ viewport: { width: 1440, height: 900 } })
   await interactions.goto(`${baseUrl}/?preview`, { waitUntil: 'domcontentloaded' })
   await interactions.locator('#projects').waitFor({ state: 'attached' })
+  const rail = interactions.locator('.portfolio-rail')
+  if (await rail.count()) {
+    await rail.hover()
+    await interactions.locator('.portfolio-rail-card').waitFor({ state: 'visible' })
+    const railDetailLines = await interactions.locator('.portfolio-rail-detail').evaluate((element) => {
+      const style = getComputedStyle(element)
+      return element.getBoundingClientRect().height / Number.parseFloat(style.lineHeight)
+    })
+    check(railDetailLines <= 1.25, `desktop rail tooltip wraps to ${railDetailLines.toFixed(2)} lines despite available width`)
+  }
   await interactions.locator('#projects').scrollIntoViewIfNeeded()
   const tab = interactions.locator('#projects .project-story__nav button').first()
   if (await tab.count()) {
@@ -228,6 +333,35 @@ try {
   await detail.screenshot({ path: '/tmp/mist-detail-390.png', fullPage: true })
   await detail.close()
 
+  const archivePage = await browser.newPage({ viewport: { width: 1440, height: 900 } })
+  await archivePage.goto(`${baseUrl}/projects?preview`, { waitUntil: 'domcontentloaded' })
+  await archivePage.locator('.project-archive-grid').waitFor({ state: 'visible' })
+  const archiveLayoutState = await archivePage.evaluate(() => {
+    const cards = [...document.querySelectorAll('.project-archive-card')]
+    return {
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      columns: getComputedStyle(document.querySelector('.project-archive-grid')).gridTemplateColumns.split(' ').length,
+      imagesLoaded: [...document.querySelectorAll('.project-archive-card img')].every((image) => image.complete && image.naturalWidth > 0),
+      cardsInside: cards.every((card) => {
+        const rect = card.getBoundingClientRect()
+        return rect.left >= -1 && rect.right <= window.innerWidth + 1
+      }),
+    }
+  })
+  check(archiveLayoutState.overflow <= 1, `archive desktop: horizontal overflow ${archiveLayoutState.overflow}px`)
+  check(archiveLayoutState.columns === 2, `archive desktop: expected 2 equal columns, got ${archiveLayoutState.columns}`)
+  check(archiveLayoutState.imagesLoaded, 'archive desktop: sample images are not loaded from project data')
+  check(archiveLayoutState.cardsInside, 'archive desktop: a card escapes the viewport')
+  await archivePage.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+  await archivePage.waitForTimeout(350)
+  const archiveFooterState = await archivePage.evaluate(() => ({
+    footerVisible: document.querySelector('#contact')?.getBoundingClientRect().top < window.innerHeight,
+    floatingTopVisible: Boolean(document.querySelector('.notebook-top-button')),
+  }))
+  check(archiveFooterState.footerVisible && !archiveFooterState.floatingTopVisible, 'archive desktop: floating Top remains visible over the common footer')
+  await archivePage.screenshot({ path: '/tmp/mist-archive-1440.png', fullPage: true })
+  await archivePage.close()
+
   const detailDesktop = await browser.newPage({ viewport: { width: 1440, height: 900 } })
   await detailDesktop.goto(`${baseUrl}/projects/sample-noma-launch?preview`, { waitUntil: 'domcontentloaded' })
   await detailDesktop.locator('.project-detail-brief').waitFor({ state: 'visible' })
@@ -261,9 +395,19 @@ try {
   }))
   check(archiveState.closeHeight >= 44, 'archive: close target is missing or below 44px')
   check(archiveState.loadedImages, 'archive: one or more sample covers are missing')
-  await archive.evaluate(() => window.scrollTo(0, 1000))
+  await archive.evaluate(() => {
+    const footer = document.querySelector('#contact')
+    const beforeFooter = footer ? footer.offsetTop - window.innerHeight - 220 : 1000
+    window.scrollTo(0, Math.max(window.innerHeight, beforeFooter))
+  })
   await archive.waitForTimeout(300)
   check(await archive.locator('.notebook-top-button').isVisible(), 'archive: floating Top is missing after scrolling')
+  await archive.evaluate(() => {
+    const footer = document.querySelector('#contact')
+    if (footer) window.scrollTo(0, footer.offsetTop - window.innerHeight + 24)
+  })
+  await archive.waitForTimeout(300)
+  check(!(await archive.locator('.notebook-top-button').isVisible()), 'archive: floating Top remains visible at the footer')
   await archive.screenshot({ path: '/tmp/mist-archive-1440.png', fullPage: true })
   await archive.close()
 
@@ -289,7 +433,8 @@ try {
     check(gateState.titleSize >= (width < 768 ? 36 : 44), `gate ${width}px: title hierarchy is too small`)
     check(gateState.inputHeight >= 44 && gateState.buttonHeight >= 44, `gate ${width}px: a touch target is below 44px`)
     if (width >= 1024) check(Math.abs(gateState.introTop - gateState.panelTop) <= 2, `gate ${width}px: intro and form do not share a top line`)
-    if (width < 1024) check(gateState.panelTop >= gateState.introBottom, `gate ${width}px: stacked form overlaps the intro`)
+    if (width < 768) check(gateState.panelTop - gateState.introBottom >= 47, `gate ${width}px: intro-to-form gap is only ${gateState.panelTop - gateState.introBottom}px`)
+    if (width >= 768 && width < 1024) check(gateState.panelTop >= gateState.introBottom, `gate ${width}px: stacked form overlaps the intro`)
     await gate.screenshot({ path: `/tmp/mist-gate-${width}.png`, fullPage: true })
     await gate.close()
   }

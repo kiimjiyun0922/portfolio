@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { adminConfirm } from './adminDialogService'
 
 export function AutoTextarea({ id, value, onChange, minRows = 2, className = '' }) {
   const ref = useRef(null)
@@ -14,7 +16,7 @@ export function AutoTextarea({ id, value, onChange, minRows = 2, className = '' 
   return <textarea id={id} ref={ref} value={value} onChange={(event) => { onChange(event.target.value); resize() }} rows={minRows} className={className} style={{ overflow: 'hidden' }} />
 }
 
-export function Field({ label, value, onChange, type = 'text', className = '', rows }) {
+export function Field({ label, value, onChange, type = 'text', className = '', rows, hint }) {
   const id = useId()
   const controlClass = 'admin-control w-full bg-gray-800/60 border border-gray-700/70 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 hover:border-gray-600 focus:outline-none focus:border-accent transition-colors'
   return (
@@ -23,16 +25,131 @@ export function Field({ label, value, onChange, type = 'text', className = '', r
       {rows
         ? <AutoTextarea id={id} value={value} onChange={onChange} minRows={rows} className={`${controlClass} resize-y`} />
         : <input id={id} type={type} value={value} onChange={(event) => onChange(event.target.value)} step={type === 'number' ? 'any' : undefined} className={controlClass} />}
+      {hint && <small className="admin-field-hint">{hint}</small>}
     </div>
   )
 }
 
-export function SelectField({ label, value, onChange, options, className = '', placeholder }) {
+export function DurationField({ value, onChange, className = '' }) {
+  const match = String(value || '').trim().match(/^(\d+)\s*(weeks?|months?|years?|주|개월|년)$/i)
+  const amount = match?.[1] || ''
+  const rawUnit = match?.[2]?.toLowerCase() || 'weeks'
+  const unit = rawUnit.startsWith('month') || rawUnit === '개월' ? 'months' : rawUnit.startsWith('year') || rawUnit === '년' ? 'years' : 'weeks'
+  const setPart = (nextAmount, nextUnit) => {
+    if (!nextAmount) return onChange('')
+    onChange(`${nextAmount} ${nextUnit}`)
+  }
+  return (
+    <fieldset className={`admin-duration-field ${className}`}>
+      <legend>기간</legend>
+      <div>
+        <select aria-label="기간 숫자" value={amount} onChange={(event) => setPart(event.target.value, unit)}>
+          <option value="">선택</option>
+          {Array.from({ length: 52 }, (_, index) => String(index + 1)).map((item) => <option key={item} value={item}>{item}</option>)}
+        </select>
+        <select aria-label="기간 단위" value={unit} onChange={(event) => setPart(amount || '1', event.target.value)}>
+          <option value="weeks">주</option>
+          <option value="months">개월</option>
+          <option value="years">년</option>
+        </select>
+      </div>
+      <small>숫자와 단위를 선택합니다.</small>
+    </fieldset>
+  )
+}
+
+export function MonthRangeField({ label = '기간', value, onChange, className = '', allowCurrent = true }) {
+  const parts = String(value || '').split(/\s*[~–—]\s*/)
+  const toMonth = (part = '') => {
+    const match = part.trim().match(/(\d{4})[.\-/](\d{1,2})/)
+    return match ? `${match[1]}-${String(match[2]).padStart(2, '0')}` : ''
+  }
+  const start = toMonth(parts[0])
+  const end = toMonth(parts[1])
+  const current = allowCurrent && !!start && (!parts[1]?.trim() || /현재|now|present/i.test(parts[1]))
+  const format = (nextStart, nextEnd, nextCurrent) => {
+    const human = (month) => month ? month.replace('-', '.') : ''
+    if (!nextStart) return ''
+    return `${human(nextStart)} ~ ${nextCurrent ? '현재' : human(nextEnd)}`.trim()
+  }
+  return (
+    <fieldset className={`admin-month-range ${className}`}>
+      <legend>{label}</legend>
+      <div>
+        <input aria-label={`${label} 시작월`} type="month" value={start} onChange={(event) => onChange(format(event.target.value, end, current))} />
+        <span aria-hidden="true">–</span>
+        <input aria-label={`${label} 종료월`} type="month" value={end} disabled={current} onChange={(event) => onChange(format(start, event.target.value, false))} />
+        {allowCurrent && <label><input type="checkbox" checked={current} onChange={(event) => onChange(format(start, end, event.target.checked))} /> 현재</label>}
+      </div>
+    </fieldset>
+  )
+}
+
+export function YearRangeField({ label = '기간', value, onChange, className = '', start = 1980, end = new Date().getFullYear() + 5 }) {
+  const years = Array.from({ length: end - start + 1 }, (_, index) => String(end - index))
+  const matches = String(value || '').match(/(\d{4}).*?(\d{4})/)
+  const from = matches?.[1] || ''
+  const to = matches?.[2] || ''
+  const values = [...new Set([from, to, ...years].filter(Boolean))]
+  return (
+    <fieldset className={`admin-year-range ${className}`}>
+      <legend>{label}</legend>
+      <div>
+        <select aria-label={`${label} 시작 연도`} value={from} onChange={(event) => onChange(event.target.value && to ? `${event.target.value} - ${to}` : event.target.value)}><option value="">시작</option>{values.map((year) => <option key={year} value={year}>{year}</option>)}</select>
+        <span aria-hidden="true">–</span>
+        <select aria-label={`${label} 종료 연도`} value={to} onChange={(event) => onChange(from && event.target.value ? `${from} - ${event.target.value}` : from)}><option value="">종료</option>{values.map((year) => <option key={year} value={year}>{year}</option>)}</select>
+      </div>
+    </fieldset>
+  )
+}
+
+export function MediaField({ label = '이미지', value, onChange, onUpload, guide, className = '' }) {
+  const id = useId()
+  const inputRef = useRef(null)
+  const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState('')
+  const selectFile = async (event) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    setError('')
+    setUploading(true)
+    try {
+      const url = await onUpload(file)
+      onChange(url)
+    } catch (uploadError) {
+      setError(uploadError?.message || '이미지를 업로드하지 못했습니다.')
+    } finally {
+      setUploading(false)
+    }
+  }
+  return (
+    <div className={`admin-media-field ${className}`}>
+      <div className="admin-media-field__head"><label htmlFor={`${id}-url`}>{label}</label>{guide && <span>{guide}</span>}</div>
+      <div className="admin-media-field__body">
+        <div className="admin-media-field__preview" aria-label={value ? '선택한 이미지 미리보기' : '이미지 없음'}>
+          {value ? <img src={value} alt="" /> : <span>IMAGE</span>}
+        </div>
+        <div className="admin-media-field__controls">
+          <input id={`${id}-url`} value={value || ''} onChange={(event) => onChange(event.target.value)} placeholder="https://… 또는 /assets/…" />
+          <div>
+            <input ref={inputRef} type="file" accept="image/webp,image/jpeg,image/png,image/avif" className="hidden" onChange={selectFile} />
+            <button type="button" className="admin-secondary-button" disabled={uploading} onClick={() => inputRef.current?.click()}>{uploading ? '업로드 중…' : '파일 업로드'}</button>
+            {value && <button type="button" className="admin-toolbar-button" onClick={async () => { if (await adminConfirm('선택한 이미지 연결을 편집 화면에서 제거합니다. 저장 버튼을 눌러야 실제 데이터에 반영됩니다.', { title: `${label} 비우기`, confirmLabel: '비우기' })) onChange('') }}>이미지 비우기</button>}
+          </div>
+          {error && <p role="alert">{error}</p>}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function SelectField({ label, value, onChange, options, className = '', placeholder, ariaLabel }) {
   const id = useId()
   return (
     <div className={className}>
       {label && <label htmlFor={id} className="block text-[11px] font-medium text-gray-400 mb-1.5">{label}</label>}
-      <select id={id} value={value} onChange={(event) => onChange(event.target.value)} className="admin-control w-full bg-gray-800/60 border border-gray-700/70 rounded-lg px-3 py-2 text-sm text-white hover:border-gray-600 focus:outline-none focus:border-accent transition-colors cursor-pointer">
+      <select id={id} aria-label={ariaLabel} value={value} onChange={(event) => onChange(event.target.value)} className="admin-control w-full bg-gray-800/60 border border-gray-700/70 rounded-lg px-3 py-2 text-sm text-white hover:border-gray-600 focus:outline-none focus:border-accent transition-colors cursor-pointer">
         {placeholder !== undefined && <option value="">{placeholder}</option>}
         {options.map((option) => {
           const item = typeof option === 'string' ? { value: option, label: option } : option
@@ -64,12 +181,12 @@ export function ColorField({ label = '색상', value, onChange, className = '' }
   )
 }
 
-export function SectionHeader({ title, description }) {
-  return <div className="mb-6 pb-5 border-b border-gray-800/80"><h2 className="text-xl md:text-2xl font-bold tracking-tight">{title}</h2>{description && <p className="text-sm text-gray-500 mt-1.5">{description}</p>}</div>
+export function SectionHeader({ title, description, status }) {
+  return <header className="admin-page-header"><div><h2>{title}</h2>{description && <p>{description}</p>}</div>{status && <span className="admin-page-header__state">{status}</span>}</header>
 }
 
 export function ActionBar({ children }) {
-  return <div className="sticky top-[60px] md:top-3 z-20 mb-6"><div className="admin-action-bar flex flex-wrap items-center gap-2 bg-gray-900 border border-gray-800 rounded-xl px-3 py-2.5">{children}</div></div>
+  return <div className="admin-action-bar-wrap"><div className="admin-action-bar">{children}</div></div>
 }
 
 export function SaveButton({ onClick, label = '저장' }) {
@@ -89,45 +206,60 @@ export function JsonBulkEditor({ value, onApply, label = 'JSON 편집' }) {
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState('')
   const [error, setError] = useState('')
+  const [preview, setPreview] = useState(null)
 
   const show = () => {
     setDraft(JSON.stringify(value, null, 2))
     setError('')
+    setPreview(null)
     setOpen(true)
   }
-  const apply = () => {
+  const inspect = () => {
     try {
       const parsed = JSON.parse(draft)
       if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('최상위 값은 객체여야 합니다')
-      onApply(parsed)
-      setOpen(false)
+      const beforeKeys = Object.keys(value || {})
+      const afterKeys = Object.keys(parsed)
+      const added = afterKeys.filter((key) => !beforeKeys.includes(key))
+      const removed = beforeKeys.filter((key) => !afterKeys.includes(key))
+      const changed = afterKeys.filter((key) => beforeKeys.includes(key) && JSON.stringify(value[key]) !== JSON.stringify(parsed[key]))
+      setPreview({ parsed, added, removed, changed })
+      setError('')
     } catch (err) {
+      setPreview(null)
       setError(err.message || 'JSON 형식을 확인해 주세요')
     }
+  }
+  const apply = () => {
+    if (!preview) return
+    onApply(preview.parsed)
+    setOpen(false)
   }
 
   return (
     <>
       <button type="button" onClick={show} className="admin-toolbar-button px-3 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700/60 text-gray-300 hover:text-white text-xs rounded-lg transition-colors cursor-pointer">{'{ }'} {label}</button>
-      {open && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/65 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false) }}>
-          <section role="dialog" aria-modal="true" aria-labelledby="bulk-json-title" className="h-full w-full max-w-2xl bg-gray-950 border-l border-gray-800 shadow-2xl flex flex-col">
-            <header className="flex items-start justify-between gap-4 px-5 py-4 border-b border-gray-800">
+      {open && createPortal(
+        <div className="admin-shell admin-json-overlay" data-admin-theme={document.querySelector('.admin-shell')?.dataset.adminTheme || 'light'} onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false) }}>
+          <section role="dialog" aria-modal="true" aria-labelledby="bulk-json-title" className="admin-json-dialog">
+            <header>
               <div><h2 id="bulk-json-title" className="text-base font-semibold text-white">JSON 벌크 편집</h2><p className="text-xs text-gray-500 mt-1">전체 내용을 붙여넣어 교체합니다. 적용 후 저장 버튼을 눌러야 확정됩니다.</p></div>
               <button type="button" onClick={() => setOpen(false)} aria-label="JSON 벌크 편집 닫기" className="admin-dialog-close">
                 <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" /></svg>
               </button>
             </header>
-            <div className="flex-1 min-h-0 p-5 flex flex-col">
-              <textarea value={draft} onChange={(event) => { setDraft(event.target.value); setError('') }} spellCheck="false" className="flex-1 min-h-[320px] w-full resize-none rounded-xl border border-gray-800 bg-gray-900 p-4 font-mono text-xs leading-5 text-gray-200 focus:border-accent focus:outline-none" />
+            <div className="admin-json-dialog__body">
+              <textarea value={draft} onChange={(event) => { setDraft(event.target.value); setError(''); setPreview(null) }} spellCheck="false" />
               {error && <p role="alert" className="mt-3 text-xs text-red-400">{error}</p>}
+              {preview && <div className="admin-json-diff" role="status"><b>적용 전 차이</b><span>추가 {preview.added.length}</span><span>수정 {preview.changed.length}</span><span>삭제 {preview.removed.length}</span>{preview.removed.length > 0 && <p>삭제 예정: {preview.removed.join(', ')}</p>}</div>}
             </div>
-            <footer className="flex justify-between items-center gap-3 px-5 py-4 border-t border-gray-800">
+            <footer>
               <span className="text-[10px] text-gray-600">현재 데이터는 적용 전까지 변경되지 않습니다.</span>
-              <div className="flex gap-2"><button type="button" onClick={() => setOpen(false)} className="admin-secondary-button">취소</button><button type="button" onClick={apply} className="admin-primary-button">편집 상태에 적용</button></div>
+              <div className="flex gap-2"><button type="button" onClick={() => setOpen(false)} className="admin-secondary-button">취소</button>{preview ? <button type="button" onClick={apply} className="admin-primary-button">편집 상태에 적용</button> : <button type="button" onClick={inspect} className="admin-primary-button">차이 확인</button>}</div>
             </footer>
           </section>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   )
@@ -143,11 +275,11 @@ export function FloatingJumpNav({ items = [] }) {
   }, [])
   if (!visible) return null
   return (
-    <nav aria-label="페이지 바로가기" className="fixed bottom-6 right-5 md:right-8 z-40 flex flex-col items-end gap-2">
-      {open && items.length > 0 && <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-2xl shadow-black/50 py-1.5 max-h-72 overflow-y-auto min-w-44">{items.map((item, index) => <button key={index} onClick={() => { item.onClick(); setOpen(false) }} className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-gray-800 hover:text-white cursor-pointer truncate">{item.label}</button>)}</div>}
-      <div className="flex gap-2">
-        {items.length > 0 && <button aria-expanded={open} aria-label="페이지 바로가기 열기" onClick={() => setOpen(!open)} className={`w-10 h-10 rounded-full border shadow-lg shadow-black/40 flex items-center justify-center cursor-pointer transition-colors ${open ? 'bg-accent border-accent text-white' : 'bg-gray-900 border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}><svg aria-hidden="true" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" /></svg></button>}
-        <button aria-label="맨 위로 이동" onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setOpen(false) }} className="w-10 h-10 rounded-full bg-accent text-white shadow-lg shadow-accent/30 flex items-center justify-center cursor-pointer hover:bg-accent-light transition-colors"><svg aria-hidden="true" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" /></svg></button>
+    <nav aria-label="페이지 바로가기" className="admin-floating-nav">
+      {open && items.length > 0 && <div className="admin-floating-nav__menu">{items.map((item, index) => <button key={index} onClick={() => { item.onClick(); setOpen(false) }}>{item.label}</button>)}</div>}
+      <div className="admin-floating-nav__actions">
+        {items.length > 0 && <button aria-expanded={open} aria-label={`페이지 바로가기 ${open ? '닫기' : '열기'}`} onClick={() => setOpen(!open)} className="admin-floating-nav__button admin-floating-nav__button--menu"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" /></svg></button>}
+        <button aria-label="맨 위로 이동" onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setOpen(false) }} className="admin-floating-nav__button admin-floating-nav__button--top"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" /></svg></button>
       </div>
     </nav>
   )

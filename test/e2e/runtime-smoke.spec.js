@@ -21,7 +21,7 @@ test('admin login route loads without a runtime error', async ({ page }) => {
 
   await page.goto('/#admin')
 
-  await expect(page.getByRole('heading', { name: 'Admin 로그인' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '관리자 로그인' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Google로 로그인' })).toBeVisible()
   await expect(page.getByText('화면을 불러오지 못했습니다')).toHaveCount(0)
   expect(errors).toEqual([])

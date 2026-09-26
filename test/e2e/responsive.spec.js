@@ -116,7 +116,9 @@ for (const width of [390, 1024, 1280]) {
     else expect(positions.briefBody).toBeGreaterThan(positions.briefTitle + 80)
     if (width < 1180) expect(positions.storyBody).toBeCloseTo(positions.storyTitle, 1)
     else expect(positions.storyBody).toBeGreaterThan(positions.storyTitle)
-    expect(positions.briefBackground).not.toBe('rgba(0, 0, 0, 0)')
+    // The reviewed Mist contract uses a transparent paper surface and a
+    // single 14% rule instead of a separate filled quote card.
+    expect(positions.briefBackground).toBe('rgba(0, 0, 0, 0)')
     expect(positions.scrollWidth).toBeLessThanOrEqual(positions.clientWidth)
   })
 }
@@ -230,8 +232,15 @@ for (const viewport of viewports) {
     })
 
     const isMobile = viewport.width < 768
-    expect(metrics.sectionPadding).toBeGreaterThanOrEqual(isMobile ? 40 : 56)
-    expect(metrics.sectionPadding).toBeLessThanOrEqual(isMobile ? 40 : 68)
+    if (isMobile) {
+      expect(metrics.sectionPadding).toBeCloseTo(48, 1)
+    } else if (viewport.width < 1024) {
+      expect(metrics.sectionPadding).toBeGreaterThanOrEqual(56)
+      expect(metrics.sectionPadding).toBeLessThanOrEqual(68)
+    } else {
+      expect(metrics.sectionPadding).toBeGreaterThanOrEqual(72)
+      expect(metrics.sectionPadding).toBeLessThanOrEqual(112)
+    }
     expect(metrics.titleSize).toBeGreaterThanOrEqual(isMobile ? 36 : 40)
     expect(Math.min(...metrics.statButtonWidths)).toBeGreaterThanOrEqual(metrics.statsWidth - 1)
     expect(Math.max(...metrics.valueRights) - Math.min(...metrics.valueRights)).toBeLessThanOrEqual(1)
