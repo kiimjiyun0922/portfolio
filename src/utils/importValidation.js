@@ -1,3 +1,5 @@
+import { validateCaseBlocks } from './caseBlocks.js'
+
 function object(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
@@ -29,6 +31,7 @@ export function validateProjectsImport(value) {
     if (project.gallery !== undefined && !Array.isArray(project.gallery)) {
       throw new Error(`${projectIndex + 1}번째 아카이브형 프로젝트의 gallery는 배열이어야 합니다`)
     }
+    validateCaseBlocks(project.blocks, `${projectIndex + 1}번째 아카이브형 프로젝트`)
   })
   return value
 }

@@ -151,6 +151,9 @@ Mist 테마의 상세 규칙은 [MIST_FRONT_SYSTEM.md](./MIST_FRONT_SYSTEM.md)�
 - 선택적 이미지가 로드되지 않으면 이미지 열 자체를 제거한다. 빈 고정 열이나 대체 여백을 남기지 않는다.
 - 기본 샘플 프로젝트의 커버 경로·대체 문구·위치는 `sampleContent`의 실제 프로젝트 데이터로 보유하고, 기존 저장본의 같은 샘플 ID·slug·제목에 이미지 필드가 비면 데이터 마이그레이션 단계에서 복원한다. 컴포넌트나 테마 CSS에 샘플별 경로·이름을 하드코딩하는 것을 금지한다.
 - 모든 테마는 동일한 `coverImage`, `coverAlt`, `coverPosition`, `coverMode`, `gallery` 데이터 계약만 읽는다. 이미지 로딩 실패는 실제 `<img>` 오류 상태로 감지하고 빈 배경으로 위장하지 않는다.
+- 선택형 케이스 블록은 `blocks` 배열 하나로 저장한다. 각 블록은 `type`(`media`·`compare`·`stats`·`tiles`·`annotated`)과 `placement`(`brief`·`problem`·`userFlow`·`solution`·`validation`·`designSystem`)를 가지며, 계약은 `src/utils/caseBlocks.js`가 단일 원본이다. 모든 테마는 같은 계약을 읽고 공통 구조는 `src/index.css`, 테마별 표현은 각 테마 파일이 소유한다.
+- 케이스 블록은 필수 미디어나 항목이 없으면 감싸는 영역까지 렌더링하지 않는다. 블록 묶음은 자신의 하단선 하나만 소유해 앞뒤 단계의 선과 겹치지 않는다.
+- 블록 안의 영상은 음소거·반복·인라인 재생과 `Play`/`Pause` 버튼을 함께 제공하고, `prefers-reduced-motion`에서는 자동 재생하지 않는다. 전후 비교는 range 입력 하나로 조작하며 포커스 표시는 한 겹만 사용한다.
 - 아카이브와 상세 페이지는 모두 우측 상단에 44px 이상의 `Close` 이탈 경로를 제공하며 메인 포트폴리오로 복귀한다.
 - 메인에 `#home`이 없는 아카이브·상세 페이지도 60vh 이상 스크롤하면 플로팅 Top을 제공하고, 공통 푸터가 보일 때는 숨긴다.
 - 플로팅 Top은 의미 없는 순번이나 장식 값을 넣지 않고 `Top ↑`만 광학 중앙 정렬한다. hover·pressed에서도 위치와 크기를 바꾸지 않는다.

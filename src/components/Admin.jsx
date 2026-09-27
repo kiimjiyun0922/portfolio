@@ -60,6 +60,7 @@ import { ACTION_LABELS, LOG_FILTERS, SECTION_LABELS, buildLogRows, countLogRows 
 import { filterTokens, getTokenStatus, isActiveToken } from './admin/tokenModel'
 import { ActionBar, AutoTextarea, DurationField, Field, FloatingJumpNav, JsonBulkEditor, MediaField, MonthRangeField, ResetButton, SaveButton, SectionHeader, SelectField, Toast, YearField, YearRangeField } from './admin/AdminUI'
 import { AdminDialogHost } from './admin/AdminDialogs'
+import CaseBlocksEditor from './admin/CaseBlocksEditor'
 import { adminAlert, adminConfirm, adminPrompt } from './admin/adminDialogService'
 
 /* ─── Navigation ─── */
@@ -1322,6 +1323,7 @@ function ProjectsSection({ initialMode = 'standard' }) {
         solution: '',
         validation: '',
         designSystem: '',
+        blocks: [],
         gallery: [],
       }],
     })
@@ -1474,6 +1476,7 @@ function ProjectsSection({ initialMode = 'standard' }) {
               { id: 'overview', label: '기본 정보' },
               { id: 'media', label: '대표 이미지' },
               { id: 'case', label: '케이스 스터디' },
+              { id: 'blocks', label: `케이스 블록 ${(project.blocks || []).length}` },
               { id: 'gallery', label: `갤러리 ${(project.gallery || []).length}` },
             ]
             return (
@@ -1541,6 +1544,15 @@ function ProjectsSection({ initialMode = 'standard' }) {
                         <Field label="05 Design System" value={project.designSystem || ''} onChange={(v) => updateDesignProject(index, { ...project, designSystem: v })} rows={3} />
                       </div>
                     </div>}
+
+                    {activeTab === 'blocks' && (
+                      <CaseBlocksEditor
+                        blocks={project.blocks || []}
+                        onChange={(blocks) => updateDesignProject(index, { ...project, blocks })}
+                        upload={(file, folder) => uploadPortfolioImage(file, `design-projects/${project.id || project.slug || index}/${folder}`)}
+                        confirmDelete={confirmDraftDelete}
+                      />
+                    )}
 
                     {activeTab === 'gallery' && <div>
                       <div className="flex items-center justify-between gap-3 mb-3"><p className="text-xs font-medium text-gray-400">갤러리</p><button type="button" onClick={() => updateDesignProject(index, { ...project, gallery: [...(project.gallery || []), { url: '', alt: '', caption: '' }] })} className="min-h-11 px-3 text-xs text-accent">+ 이미지 추가</button></div>

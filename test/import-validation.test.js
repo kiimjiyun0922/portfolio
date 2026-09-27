@@ -17,3 +17,13 @@ test('project import requires nested project titles', () => {
   assert.throws(() => validateProjectsImport({ groups: [], designProjects: [{ title: 'Missing slug' }] }), /slug/)
   assert.throws(() => validateProjectsImport({ groups: [], designProjects: [{ title: 'Project', slug: 'project', gallery: {} }] }), /gallery/)
 })
+
+test('archive case blocks are validated on import', () => {
+  const project = (blocks) => ({ groups: [], designProjects: [{ title: 'Case', slug: 'case', blocks }] })
+  const valid = project([{ type: 'media', placement: 'solution', url: '/clip.mp4' }, { type: 'stats', items: [] }])
+  assert.equal(validateProjectsImport(valid), valid)
+  assert.throws(() => validateProjectsImport(project({})), /blocks/)
+  assert.throws(() => validateProjectsImport(project([{ type: 'iframe' }])), /type/)
+  assert.throws(() => validateProjectsImport(project([{ type: 'media', placement: 'footer' }])), /placement/)
+  assert.throws(() => validateProjectsImport(project([{ type: 'tiles', items: {} }])), /items/)
+})

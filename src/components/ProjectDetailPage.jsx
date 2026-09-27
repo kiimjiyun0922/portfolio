@@ -1,9 +1,10 @@
-import { useRef, useState } from 'react'
+import { Fragment, useRef, useState } from 'react'
 import MarkdownRenderer from './ui/MarkdownRenderer'
 import Contact from './Contact'
 import { loadProjects } from '../data/projects'
 import { handleInternalNavigation } from '../utils/navigation'
 import { ProjectVisual } from './DesignProjects'
+import CaseBlockList from './CaseBlocks'
 
 const CASE_SECTIONS = [
   ['01', 'Problem', 'problem'],
@@ -87,14 +88,21 @@ export default function ProjectDetailPage({ slug }) {
         </section>
       )}
 
+      <CaseBlockList blocks={project.blocks} placement="brief" />
+
       <div className="project-detail-story">
-        {CASE_SECTIONS.map(([number, label, key]) => project[key] ? (
-          <section key={key}>
-            <span>{number}</span>
-            <h2>{label}</h2>
-            <MarkdownRenderer content={project[key]} />
-          </section>
-        ) : null)}
+        {CASE_SECTIONS.map(([number, label, key]) => (
+          <Fragment key={key}>
+            {project[key] && (
+              <section>
+                <span>{number}</span>
+                <h2>{label}</h2>
+                <MarkdownRenderer content={project[key]} />
+              </section>
+            )}
+            <CaseBlockList blocks={project.blocks} placement={key} />
+          </Fragment>
+        ))}
       </div>
 
       {gallery.length > 0 && (
