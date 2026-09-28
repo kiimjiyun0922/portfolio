@@ -49,12 +49,16 @@ export async function cloudGet(docId) {
   }
 }
 
+// Resolves true when the cloud copy was written (or no cloud is configured),
+// false when Firestore rejected the write so callers can tell the owner.
 export async function cloudSet(docId, data) {
-  if (!db) return
+  if (!db) return true
   try {
     await setDoc(doc(db, COLLECTION, docId), data)
+    return true
   } catch (e) {
     console.warn('[Firestore] write failed:', docId, e)
+    return false
   }
 }
 

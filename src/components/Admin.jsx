@@ -1330,7 +1330,7 @@ function ProjectsSection({ initialMode = 'standard' }) {
     })
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const publishedDesign = (data.designProjects || []).filter((project) => project.published)
     const slugs = publishedDesign.map((project) => project.slug?.trim()).filter(Boolean)
     if (publishedDesign.some((project) => !project.title?.trim() || !project.slug?.trim())) {
@@ -1345,8 +1345,10 @@ function ProjectsSection({ initialMode = 'standard' }) {
       flash('대표 이미지가 있는 공개 프로젝트에는 대체 텍스트가 필요합니다')
       return
     }
-    saveProjects(data)
-    flash('프로젝트 저장 완료')
+    const saved = await saveProjects(data)
+    flash(saved
+      ? '프로젝트 저장 완료'
+      : '클라우드 저장 실패 — 이 브라우저에만 임시 저장됐습니다. 관리자 Google 로그인을 확인한 뒤 다시 저장하세요')
   }
   const handleReset = async () => { if (await adminConfirm('프로젝트 편집 내용을 기본값으로 되돌립니다.', { title: '프로젝트 초기화', confirmLabel: '초기화' })) { resetProjects(); setData(loadProjects()); flash('초기화 완료') } }
 

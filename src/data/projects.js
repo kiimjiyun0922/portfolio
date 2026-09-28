@@ -87,10 +87,11 @@ export function loadProjects() {
   return defaultProjects
 }
 
-export function saveProjects(data) {
+export async function saveProjects(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-  cloudSet('projects', data)
-  cloudSaveSnapshot('projects', data)
+  const saved = await cloudSet('projects', data)
+  if (saved) cloudSaveSnapshot('projects', data)
+  return saved
 }
 
 export function resetProjects() {
