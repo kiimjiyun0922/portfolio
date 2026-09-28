@@ -5,6 +5,8 @@ import { loadProjects } from '../data/projects'
 import { handleInternalNavigation } from '../utils/navigation'
 import { ProjectVisual } from './DesignProjects'
 import CaseBlockList from './CaseBlocks'
+import CaseStudyEmbed from './CaseStudyEmbed'
+import { hasCaseStudyHtml } from '../utils/caseStudyEmbed'
 
 const CASE_SECTIONS = [
   ['01', 'Problem', 'problem'],
@@ -48,6 +50,49 @@ export default function ProjectDetailPage({ slug }) {
     if (distance < 0) showNextImage()
     else showPreviousImage()
   }
+  const closeLink = (
+    <a
+      className="project-detail-close"
+      href="/"
+      aria-label="Close project and return to portfolio"
+      onClick={(event) => handleInternalNavigation(event, '/')}
+    >
+      <span>Close</span>
+      <i aria-hidden="true" />
+    </a>
+  )
+  const subpageNav = (
+    <nav className="portfolio-subpage__nav" aria-label="Page navigation">
+      <a href="/" onClick={(event) => handleInternalNavigation(event, '/')}>Portfolio</a>
+      <a href="/projects" onClick={(event) => handleInternalNavigation(event, '/projects')}>Design archive</a>
+      <span>{project.title}</span>
+    </nav>
+  )
+  const projectNav = (
+    <nav className="project-detail-next" aria-label="Project navigation">
+      {projects.length > 1 && <a href={`/projects/${previous.slug}`} onClick={(event) => handleInternalNavigation(event, `/projects/${previous.slug}`)}><span>Previous</span><strong>{previous.title}</strong></a>}
+      <a href="/projects" onClick={(event) => handleInternalNavigation(event, '/projects')}><span>All projects</span></a>
+      {projects.length > 1 && <a href={`/projects/${next.slug}`} onClick={(event) => handleInternalNavigation(event, `/projects/${next.slug}`)}><span>Next</span><strong>{next.title}</strong></a>}
+    </nav>
+  )
+
+  // An authored case-study page replaces the generated story with its own design.
+  if (hasCaseStudyHtml(project)) {
+    return (
+      <>
+        <main className="portfolio-subpage project-detail-page project-detail-page--embed">
+          {closeLink}
+          {subpageNav}
+        </main>
+        <CaseStudyEmbed key={project.slug} project={project} />
+        <main className="portfolio-subpage project-detail-page project-detail-page--embed-end">
+          {projectNav}
+        </main>
+        <Contact />
+      </>
+    )
+  }
+
   return (
     <>
       <main className="portfolio-subpage project-detail-page">

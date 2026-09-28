@@ -27,3 +27,15 @@ test('archive case blocks are validated on import', () => {
   assert.throws(() => validateProjectsImport(project([{ type: 'media', placement: 'footer' }])), /placement/)
   assert.throws(() => validateProjectsImport(project([{ type: 'tiles', items: {} }])), /items/)
 })
+
+test('authored case-study pages list their relative assets and are validated on import', async () => {
+  const { extractCaseStudyAssetPaths, syncCaseStudyAssets } = await import('../src/utils/caseStudyEmbed.js')
+  const html = '<img src="img/hero.jpg"><video src="./img/clip.mp4" poster="img/poster.jpg"></video><img src="https://cdn.example/x.png"><img src="/assets/y.png">'
+  assert.deepEqual(extractCaseStudyAssetPaths(html), ['img/hero.jpg', 'img/clip.mp4', 'img/poster.jpg'])
+  assert.deepEqual(syncCaseStudyAssets(html, [{ path: 'img/hero.jpg', url: 'https://storage/hero' }])[0], { path: 'img/hero.jpg', url: 'https://storage/hero' })
+  const project = (extra) => ({ groups: [], designProjects: [{ title: 'Case', slug: 'case', ...extra }] })
+  assert.ok(validateProjectsImport(project({ caseStudyHtml: html, caseStudyAssets: [{ path: 'img/hero.jpg', url: '' }] })))
+  assert.throws(() => validateProjectsImport(project({ caseStudyHtml: 42 })), /caseStudyHtml/)
+  assert.throws(() => validateProjectsImport(project({ caseStudyAssets: {} })), /caseStudyAssets/)
+  assert.throws(() => validateProjectsImport(project({ caseStudyHtml: 'x'.repeat(400 * 1024 + 1) })), /400KB/)
+})

@@ -1,4 +1,5 @@
 import { validateCaseBlocks } from './caseBlocks.js'
+import { validateCaseStudyEmbed } from './caseStudyEmbed.js'
 
 function object(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -32,6 +33,7 @@ export function validateProjectsImport(value) {
       throw new Error(`${projectIndex + 1}번째 아카이브형 프로젝트의 gallery는 배열이어야 합니다`)
     }
     validateCaseBlocks(project.blocks, `${projectIndex + 1}번째 아카이브형 프로젝트`)
+    validateCaseStudyEmbed(project, `${projectIndex + 1}번째 아카이브형 프로젝트`)
   })
   return value
 }

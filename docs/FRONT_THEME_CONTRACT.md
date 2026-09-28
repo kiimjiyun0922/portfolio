@@ -154,6 +154,7 @@ Mist 테마의 상세 규칙은 [MIST_FRONT_SYSTEM.md](./MIST_FRONT_SYSTEM.md)�
 - 선택형 케이스 블록은 `blocks` 배열 하나로 저장한다. 각 블록은 `type`(`media`·`compare`·`stats`·`tiles`·`annotated`)과 `placement`(`brief`·`problem`·`userFlow`·`solution`·`validation`·`designSystem`)를 가지며, 계약은 `src/utils/caseBlocks.js`가 단일 원본이다. 모든 테마는 같은 계약을 읽고 공통 구조는 `src/index.css`, 테마별 표현은 각 테마 파일이 소유한다.
 - 케이스 블록은 필수 미디어나 항목이 없으면 감싸는 영역까지 렌더링하지 않는다. 블록 묶음은 자신의 하단선 하나만 소유해 앞뒤 단계의 선과 겹치지 않는다.
 - 블록 안의 영상은 음소거·반복·인라인 재생과 `Play`/`Pause` 버튼을 함께 제공하고, `prefers-reduced-motion`에서는 자동 재생하지 않는다. 전후 비교는 range 입력 하나로 조작하며 포커스 표시는 한 겹만 사용한다.
+- `caseStudyHtml`이 있는 프로젝트는 생성형 케이스 스터디 대신 같은 출처 뷰어 `/case-embed.html`에서 저장된 HTML을 렌더링한다. 뷰어는 스크립트·이벤트 속성·`javascript:` 주소를 제거하고, 상대 경로 이미지·영상을 `caseStudyAssets`의 URL로 바꾸며, 높이를 부모에 알려 이중 스크롤을 만들지 않는다. 테마는 이 영역의 표현을 바꾸지 않는다.
 - 아카이브와 상세 페이지는 모두 우측 상단에 44px 이상의 `Close` 이탈 경로를 제공하며 메인 포트폴리오로 복귀한다.
 - 메인에 `#home`이 없는 아카이브·상세 페이지도 60vh 이상 스크롤하면 플로팅 Top을 제공하고, 공통 푸터가 보일 때는 숨긴다.
 - 플로팅 Top은 의미 없는 순번이나 장식 값을 넣지 않고 `Top ↑`만 광학 중앙 정렬한다. hover·pressed에서도 위치와 크기를 바꾸지 않는다.

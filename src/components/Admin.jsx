@@ -61,6 +61,7 @@ import { filterTokens, getTokenStatus, isActiveToken } from './admin/tokenModel'
 import { ActionBar, AutoTextarea, DurationField, Field, FloatingJumpNav, JsonBulkEditor, MediaField, MonthRangeField, ResetButton, SaveButton, SectionHeader, SelectField, Toast, YearField, YearRangeField } from './admin/AdminUI'
 import { AdminDialogHost } from './admin/AdminDialogs'
 import CaseBlocksEditor from './admin/CaseBlocksEditor'
+import CaseStudyHtmlEditor from './admin/CaseStudyHtmlEditor'
 import { adminAlert, adminConfirm, adminPrompt } from './admin/adminDialogService'
 
 /* ─── Navigation ─── */
@@ -1477,6 +1478,7 @@ function ProjectsSection({ initialMode = 'standard' }) {
               { id: 'media', label: '대표 이미지' },
               { id: 'case', label: '케이스 스터디' },
               { id: 'blocks', label: `케이스 블록 ${(project.blocks || []).length}` },
+              { id: 'page', label: project.caseStudyHtml ? '전용 페이지 연결됨' : '전용 페이지' },
               { id: 'gallery', label: `갤러리 ${(project.gallery || []).length}` },
             ]
             return (
@@ -1549,6 +1551,15 @@ function ProjectsSection({ initialMode = 'standard' }) {
                       <CaseBlocksEditor
                         blocks={project.blocks || []}
                         onChange={(blocks) => updateDesignProject(index, { ...project, blocks })}
+                        upload={(file, folder) => uploadPortfolioImage(file, `design-projects/${project.id || project.slug || index}/${folder}`)}
+                        confirmDelete={confirmDraftDelete}
+                      />
+                    )}
+
+                    {activeTab === 'page' && (
+                      <CaseStudyHtmlEditor
+                        project={project}
+                        onChange={(patch) => updateDesignProject(index, { ...project, ...patch })}
                         upload={(file, folder) => uploadPortfolioImage(file, `design-projects/${project.id || project.slug || index}/${folder}`)}
                         confirmDelete={confirmDraftDelete}
                       />
