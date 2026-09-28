@@ -2565,3 +2565,15 @@
   }
   [data-theme="mist"] .case-block__tile-copy { padding: 20px; }
 }
+
+/* Authored case-study page: the subpage shells above and below the viewer
+   only hold navigation, so they must not reserve a full screen height. */
+[data-theme="mist"] .portfolio-subpage.project-detail-page--embed,
+[data-theme="mist"] .portfolio-subpage.project-detail-page--embed-end {
+  min-height: 0;
+  padding-bottom: 0;
+}
+[data-theme="mist"] .portfolio-subpage.project-detail-page--embed-end {
+  padding-top: 40px;
+  padding-bottom: 64px;
+}

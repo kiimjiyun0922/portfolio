@@ -4683,6 +4683,8 @@ body {
   border: 0;
   background: transparent;
 }
+.project-detail-page--embed,
+.project-detail-page--embed-end { min-height: 0; }
 .project-detail-page--embed-end { padding-top: 40px; }
 .admin-case-page__error { margin: 0 0 12px; color: var(--admin-danger, #e16b6b); font-size: var(--admin-type-support); line-height: var(--admin-leading-support); }
 .admin-case-block__fields > .admin-empty-row.is-wide { margin: 0; }
